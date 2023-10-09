@@ -1,0 +1,31 @@
+{if $Template->getAttribute('content-header')}
+<section class="content-header">
+    <header>
+        <h1>{$Site->getAttribute('title')}</h1>
+    </header>
+
+    {if $Site->getAttribute('short')}
+    <div class="content-short">
+        {$Site->getAttribute('short')}
+    </div>
+    {/if}
+</section>
+{/if}
+
+{if $Template->getAttribute('content-body') && $Site->getAttribute('content')}
+<section class="content-body">
+    {$Site->getAttribute('content')}
+</section>
+{/if}
+
+{if isset($Exception)}
+<div class="message-error">
+    {$Exception->getMessage()}
+</div>
+{/if}
+
+{if isset($OrderProcess)}
+<section class="content-template">
+    {$OrderProcess->create()}
+</section>
+{/if}

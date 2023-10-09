@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+
+    <types>
+        <type type="types/simpleCheckout" icon="fa fa-shopping-cart ">
+            <locale group="quiqqer/order-simple-checkout" var="admin.types.simpleCheckout"/>
+            <desc>
+                <locale group="quiqqer/order-simple-checkout" var="admin.types.simpleCheckout.desc"/>
+            </desc>
+        </type>
+    </types>
+
+</site>
