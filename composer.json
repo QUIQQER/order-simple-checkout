@@ -1,0 +1,30 @@
+{
+  "name": "quiqqer\/order-simple-checkout",
+  "type": "quiqqer-module",
+  "description": "A simple checkout",
+  "license": [
+    "GPL-3.0+",
+    "PCSG QEL-1.0"
+  ],
+  "authors": [
+    {
+      "name": "Henning Leutz",
+      "email": "support@pcsg.de",
+      "homepage": "http:\/\/www.pcsg.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "support@pcsg.de",
+    "url": "http:\/\/www.pcsg.de"
+  },
+  "require": {
+    "php": ">=7.4",
+    "quiqqer\/order": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "QUI\\ERP\\Order\\SimpleCheckout\\": "src\/QUI\/ERP\/Order\/SimpleCheckout"
+    }
+  }
+}
