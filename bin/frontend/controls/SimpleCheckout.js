@@ -1,10 +1,15 @@
-define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout', [], function() {
+define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout', [
+
+    'qui/QUI',
+    'qui/controls/Control'
+
+], function(QUI, QUIControl) {
     'use strict';
 
     return new Class({
 
         Extends: QUIControl,
-        Type: '',
+        Type: 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
 
         initialize: function(options) {
             this.parent(options);
@@ -15,7 +20,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onImport: function() {
-
+            
         }
     });
 });

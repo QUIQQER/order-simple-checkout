@@ -1,0 +1,49 @@
+<div class="quiqqer-simple-checkout-container">
+    <form class="quiqqer-simple-checkout-data" method="post" action="">
+        <div class="quiqqer-simple-checkout-data-express">
+            <p>Express checkout</p>
+            <div></div>
+        </div>
+
+        <div class="quiqqer-simple-checkout-data-or" role="separator">
+            <div>OR</div>
+        </div>
+
+        <div class="quiqqer-simple-checkout-data-contact">
+            <h1>Contact</h1>
+
+            {if $User}
+            <div>Eingeloggt als: {$User->getName()}</div>
+            {else}
+            <div>
+                <span>Have an account? Log in</span>
+            </div>
+            {/if}
+        </div>
+
+        <div class="quiqqer-simple-checkout-data-delivery">
+            <h1>Delivery</h1>
+            {$Delivery->create()}
+        </div>
+
+        <div class="quiqqer-simple-checkout-data-shipping">
+            <h1>Shipping</h1>
+            {$Shipping->create()}
+        </div>
+
+        <div class="quiqqer-simple-checkout-data-payment">
+            <h1>Payment</h1>
+            {$Payment->create()}
+        </div>
+
+        <div class="quiqqer-simple-checkout-data-pay">
+            <button name="pay" disabled>Pay now</button>
+        </div>
+    </form>
+
+    <section class="quiqqer-simple-checkout-basket">
+        <div class="quiqqer-simple-checkout-basket--sticky">
+            {$Basket->create()}
+        </div>
+    </section>
+</div>
