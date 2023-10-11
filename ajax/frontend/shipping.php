@@ -14,7 +14,7 @@ QUI::$Ajax->registerFunction(
         $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout([
             'orderHash' => $orderHash
         ]);
-        
+
         return $Checkout->getShipping();
     },
     ['orderHash']
