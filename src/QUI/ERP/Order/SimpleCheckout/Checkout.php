@@ -4,16 +4,25 @@ namespace QUI\ERP\Order\SimpleCheckout;
 
 use QUI;
 use QUI\ERP\Order\OrderInProcess;
+use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
+use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
+use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
 use QUI\Exception;
 
 use function dirname;
 use function file_exists;
 
+/**
+ * Class Checkout
+ *
+ * Represents the simple checkout control
+ */
 class Checkout extends QUI\Control
 {
     public function __construct($attributes = [])
     {
         $this->setAttributes([
+            'orderHash' => false,
             'template' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout'
         ]);
@@ -41,9 +50,9 @@ class Checkout extends QUI\Control
         $Engine->assign([
             'Basket' => $Control,
             'User' => $this->getUser(),
-            'Delivery' => new CheckoutDelivery(),
-            'Shipping' => new CheckoutShipping(),
-            'Payment' => new CheckoutPayment()
+            'Delivery' => new CheckoutDelivery($this),
+            'Shipping' => new CheckoutShipping($this),
+            'Payment' => new CheckoutPayment($this)
         ]);
 
         return $Engine->fetch($template);
@@ -67,6 +76,8 @@ class Checkout extends QUI\Control
         }
     }
 
+    // region getter
+
     /**
      * @throws Exception
      * @throws QUI\ERP\Order\Exception
@@ -75,6 +86,13 @@ class Checkout extends QUI\Control
     {
         $Order = null;
         $Orders = QUI\ERP\Order\Handler::getInstance();
+
+        if ($this->getAttribute('orderHash')) {
+            try {
+                return $Orders->getOrderInProcessByHash($this->getAttribute('orderHash'));
+            } catch (QUI\Exception $exception) {
+            }
+        }
 
         try {
             // select the last order in processing
@@ -94,8 +112,30 @@ class Checkout extends QUI\Control
         return $Order;
     }
 
+    /**
+     * Returns the user associated with the current session.
+     *
+     * @return QUI\Interfaces\Users\User The user object.
+     */
     public function getUser(): QUI\Interfaces\Users\User
     {
         return QUI::getUserBySession();
     }
+
+    /**
+     * Get the shipping html for the current order.
+     *
+     * @return string The shipping information
+     */
+    public function getShipping(): string
+    {
+        $Shipping = new CheckoutShipping($this);
+        $Output = new QUI\Output();
+        $result = $Shipping->create();
+        $css = QUI\Control\Manager::getCSS();
+
+        return $Output->parse($css . $result);
+    }
+
+    //endregion
 }

@@ -59,6 +59,10 @@
     width: 100%;
 }
 
+.quiqqer-order-step-shipping header {
+    display: none;
+}
+
 /** right side
  ============================================= */
 

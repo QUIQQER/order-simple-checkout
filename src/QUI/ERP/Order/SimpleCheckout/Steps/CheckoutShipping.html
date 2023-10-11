@@ -1,3 +1,7 @@
+{if !isset($Shipping)}
 <div class="order-simple-checkout-shipping--info">
     Enter your delivery address to view available shipping methods.
 </div>
+{else}
+{$Shipping->create()}
+{/if}

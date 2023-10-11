@@ -1,8 +1,10 @@
 <?php
 
-namespace QUI\ERP\Order\SimpleCheckout;
+namespace QUI\ERP\Order\SimpleCheckout\Steps;
 
 use QUI;
+use QUI\ERP\Order\SimpleCheckout\Checkout;
+use QUI\ERP\Order\SimpleCheckout\CheckoutStepInterface;
 use QUI\Exception;
 use QUI\Users\User;
 
@@ -15,20 +17,25 @@ use function json_decode;
  *
  * @package Your\Package\Namespace
  */
-class CheckoutDelivery extends QUI\Control
+class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
 {
+    protected Checkout $Checkout;
+
     /**
      * Constructor method for the SimpleCheckoutDelivery class.
      *
-     * @param array $attributes Optional attributes to be passed to the parent constructor.
+     * @param Checkout $Checkout
+     * @param array $attributes
      * @return void
      */
-    public function __construct($attributes = [])
+    public function __construct(Checkout $Checkout, $attributes = [])
     {
+        $this->Checkout = $Checkout;
+
         parent::__construct($attributes);
 
         $this->addCSSFile(dirname(__FILE__) . '/CheckoutDelivery.css');
-        $this->addCSSClass('quiqqer-simple-checkout-delivery');
+        $this->addCSSClass('quiqqer-simple-checkout-delivery quiqqer-simple-checkout-step');
         $this->setJavaScriptControl(
             'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutDelivery'
         );
@@ -123,6 +130,15 @@ class CheckoutDelivery extends QUI\Control
     protected function getInvoiceAddress()
     {
         $User = QUI::getUserBySession();
+        $Order = $this->Checkout->getOrder();
+
+        $Address = $Order->getInvoiceAddress();
+        $attributes = $Address->getAttributes();
+
+        // is not empty
+        if (count($attributes) > 3) {
+            return $Address;
+        }
 
         if ($User->getAttribute('quiqqer.erp.address')) {
             try {
@@ -140,5 +156,17 @@ class CheckoutDelivery extends QUI\Control
         }
 
         return null;
+    }
+
+    /**
+     * Validates the invoice address of the current order.
+     *
+     * @throws QUI\ERP\Order\Exception|Exception
+     */
+    public function validate()
+    {
+        QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
+            $this->Checkout->getOrder()->getInvoiceAddress()
+        );
     }
 }
