@@ -50,5 +50,4 @@ class Basket extends QUI\Control
 
         return $Engine->fetch(dirname(__FILE__) . '/Basket.html');
     }
-
 }
