@@ -29,7 +29,15 @@ QUI::$Ajax->registerFunction(
             $Order->removeShipping();
         }
 
+        if (!empty($orderData['payment'])) {
+            $Order->setPayment($orderData['payment']);
+        } else {
+            $Order->clearPayment();
+        }
+
         $Order->save();
+
+        return $Checkout->isValid();
     },
     ['orderHash', 'orderData']
 );

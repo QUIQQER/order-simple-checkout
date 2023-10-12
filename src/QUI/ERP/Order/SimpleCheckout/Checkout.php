@@ -42,13 +42,14 @@ class Checkout extends QUI\Control
             $template = $this->getAttribute('template');
         }
 
-        $Control = new QUI\ERP\Order\Controls\Basket\Small();
-        $Control->setBasket(
-            QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser())
-        );
+        // put the basket articles to the order in process
+        $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+        $Basket->toOrder($this->getOrder());
 
         $Engine->assign([
-            'Basket' => $Control,
+            'Order' => $this->getOrder(),
+            'Basket' => $Basket,
+            'BasketDisplay' => new Basket($this),
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
             'Shipping' => new CheckoutShipping($this),
@@ -58,22 +59,41 @@ class Checkout extends QUI\Control
         return $Engine->fetch($template);
     }
 
+    /**
+     * Check if the order is valid and the order can be executed
+     *
+     * @return bool Returns true if the order is valid, false otherwise.
+     */
+    public function isValid(): bool
+    {
+        // check address
+        try {
+            $Order = $this->getOrder();
+
+            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
+                $Order->getInvoiceAddress()
+            );
+        } catch (QUI\Exception $exception) {
+            return false;
+        }
+
+        // check payment
+        $Payment = $Order->getPayment();
+
+        if (!$Payment) {
+            return false;
+        }
+
+        // check shipping
+        if (QUI::getPackageManager()->isInstalled('quiqqer/shipping') && !$Order->getShipping()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function send()
     {
-        $Order = $this->getOrder();
-
-        // set all stuff to the order
-        $Order->setInvoiceAddress();
-        $Order->setShipping();
-        $Order->setPayment();
-
-
-        // all runs fine
-        if ($Order instanceof OrderInProcess) {
-            $OrderInProcess = $Order;
-            $Order = $Order->createOrder();
-            $OrderInProcess->delete();
-        }
     }
 
     // region getter
@@ -134,7 +154,47 @@ class Checkout extends QUI\Control
         $result = $Shipping->create();
         $css = QUI\Control\Manager::getCSS();
 
-        return $Output->parse($css . $result);
+        try {
+            return $Output->parse($css . $result);
+        } catch (QUI\Exception $exception) {
+            QUI\System\Log::writeException($exception);
+            return '';
+        }
+    }
+
+    /**
+     * Get the payment html for the current order.
+     *
+     * @return string The shipping information
+     */
+    public function getPayments(): string
+    {
+        $Payments = new CheckoutPayment($this);
+        $Output = new QUI\Output();
+        $result = $Payments->create();
+        $css = QUI\Control\Manager::getCSS();
+
+        try {
+            return $Output->parse($css . $result);
+        } catch (QUI\Exception $exception) {
+            QUI\System\Log::writeException($exception);
+            return '';
+        }
+    }
+
+    public function getBasket(): string
+    {
+        $Basket = new Basket($this);
+        $Output = new QUI\Output();
+        $result = $Basket->create();
+        $css = QUI\Control\Manager::getCSS();
+
+        try {
+            return $Output->parse($css . $result);
+        } catch (QUI\Exception $exception) {
+            QUI\System\Log::writeException($exception);
+            return '';
+        }
     }
 
     //endregion

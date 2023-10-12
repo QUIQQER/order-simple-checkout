@@ -1,16 +1,25 @@
 <div class="quiqqer-simple-checkout-container">
     <form class="quiqqer-simple-checkout-data" method="post" action="">
+
+
+        {template_event name="quiqqer::order::orderProcessBasketEnd" Basket=$Basket Order=$Order assign=expressButtons}
+        {if !empty($expressButtons)}
         <div class="quiqqer-simple-checkout-data-express">
             <p>Express checkout</p>
-            <div></div>
+            <div>
+                {$expressButtons}
+            </div>
         </div>
 
         <div class="quiqqer-simple-checkout-data-or" role="separator">
             <div>OR</div>
         </div>
+        {/if}
 
         <div class="quiqqer-simple-checkout-data-contact">
-            <h1>Contact</h1>
+            <h1>
+                {locale group="quiqqer/order-simple-checkout" var="title.contact"}
+            </h1>
 
             {if $User}
             <div>Eingeloggt als: {$User->getName()}</div>
@@ -22,28 +31,30 @@
         </div>
 
         <div class="quiqqer-simple-checkout-data-delivery">
-            <h1>Delivery</h1>
+            <h1>{locale group="quiqqer/order" var="ordering.step.title.CustomerData"}</h1>
             {$Delivery->create()}
         </div>
 
         <div class="quiqqer-simple-checkout-data-shipping">
-            <h1>Shipping</h1>
+            <h1>{locale group="quiqqer/shipping" var="ordering.step.title.Shipping"}</h1>
             {$Shipping->create()}
         </div>
 
         <div class="quiqqer-simple-checkout-data-payment">
-            <h1>Payment</h1>
+            <h1>{locale group="quiqqer/order" var="ordering.step.title.Payment"}</h1>
             {$Payment->create()}
         </div>
 
         <div class="quiqqer-simple-checkout-data-pay">
-            <button name="pay" disabled>Pay now</button>
+            <button name="pay" disabled>
+                {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
+            </button>
         </div>
     </form>
 
     <section class="quiqqer-simple-checkout-basket">
         <div class="quiqqer-simple-checkout-basket--sticky">
-            {$Basket->create()}
+            {$BasketDisplay->create()}
         </div>
     </section>
 </div>

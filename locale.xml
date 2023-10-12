@@ -10,6 +10,10 @@
             <de><![CDATA[ ]]></de>
             <en><![CDATA[ ]]></en>
         </locale>
+        <locale name="title.contact">
+            <de><![CDATA[Konto / Kontakt]]></de>
+            <en><![CDATA[Account / Contact]]></en>
+        </locale>
     </groups>
 
 </locales>
