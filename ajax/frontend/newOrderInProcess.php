@@ -44,7 +44,7 @@ QUI::$Ajax->registerFunction(
                 if (empty($product['fields'])) {
                     $product['fields'] = [];
                 }
-                
+
                 $BasketProduct = new QUI\ERP\Order\Basket\Product($productId, [
                     'fields' => $product['fields']
                 ]);
