@@ -34,6 +34,7 @@ class Basket extends QUI\Control
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $Order = $this->Checkout->getOrder();
+        $Order->recalculate(); // because of price factors
         $Articles = $Order->getArticles();
 
         if (!$Articles->count()) {

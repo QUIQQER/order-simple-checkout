@@ -46,6 +46,23 @@ class Checkout extends QUI\Control
         $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
         $Basket->toOrder($this->getOrder());
 
+        $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
+
+        // terms and conditions
+        $termsAndConditions = QUI::getLocale()->get(
+            'quiqqer/order',
+            'ordering.step.checkout.checkoutAcceptText',
+            [
+                'terms_and_conditions' => $Checkout->getLinkOf('terms_and_conditions')
+            ]
+        );
+
+        QUI::getEvents()->fireEvent(
+            'quiqqerOrderSimpleCheckoutOutput',
+            [$this, &$termsAndConditions]
+        );
+
+
         $Engine->assign([
             'Order' => $this->getOrder(),
             'Basket' => $Basket,
@@ -53,7 +70,8 @@ class Checkout extends QUI\Control
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
             'Shipping' => new CheckoutShipping($this),
-            'Payment' => new CheckoutPayment($this)
+            'Payment' => new CheckoutPayment($this),
+            'termsAndConditions' => $termsAndConditions
         ]);
 
         return $Engine->fetch($template);
@@ -92,8 +110,32 @@ class Checkout extends QUI\Control
         return true;
     }
 
-    public function send()
+    public function orderWithCosts(): array
     {
+        $OrderProcess = $this->getOrder();
+        $Order = $OrderProcess->createOrder(QUI::getUsers()->getSystemUser());
+        $Order->setData('orderedWithCosts', true);
+        $Order->save(QUI::getUsers()->getSystemUser());
+
+        // init order process
+        $OrderProcess = new QUI\ERP\Order\OrderProcess([
+            'orderHash' => $Order->getHash(),
+            'step' => 'Processing'
+        ]);
+
+        $result = $OrderProcess->create();
+        $current = false;
+
+        if ($OrderProcess->getCurrentStep()) {
+            $current = $OrderProcess->getCurrentStep()->getName();
+        }
+
+        return [
+            'html' => $result,
+            'step' => $current,
+            'url' => $OrderProcess->getStepUrl($current),
+            'hash' => $OrderProcess->getStepHash()
+        ];
     }
 
     // region getter

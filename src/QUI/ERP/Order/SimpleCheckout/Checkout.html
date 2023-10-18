@@ -1,8 +1,8 @@
 <div class="quiqqer-simple-checkout-container">
     <form class="quiqqer-simple-checkout-data" method="post" action="">
 
+        {template_event name="quiqqer::order::simple::expressButtons" Order=$Order assign=expressButtons}
 
-        {template_event name="quiqqer::order::orderProcessBasketEnd" Basket=$Basket Order=$Order assign=expressButtons}
         {if !empty($expressButtons)}
         <div class="quiqqer-simple-checkout-data-express">
             <p>Express checkout</p>
@@ -12,7 +12,9 @@
         </div>
 
         <div class="quiqqer-simple-checkout-data-or" role="separator">
-            <div>OR</div>
+            <div>
+                {locale group="quiqqer/order-simple-checkout" var="or"}
+            </div>
         </div>
         {/if}
 
@@ -46,6 +48,13 @@
         </div>
 
         <div class="quiqqer-simple-checkout-data-pay">
+            <div class="quiqqer-order-step-checkout-notice">
+                <label>
+                    <input type="checkbox" name="termsAndConditions" required/>
+                    {$termsAndConditions}
+                </label>
+            </div>
+
             <button name="pay" disabled>
                 {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
             </button>

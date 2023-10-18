@@ -18,7 +18,9 @@
 }
 
 .quiqqer-simple-checkout-data-express {
+    display: inline-block;
     text-align: center;
+    width: 100%;
 }
 
 .quiqqer-simple-checkout-data-or {
@@ -59,7 +61,15 @@
     width: 100%;
 }
 
+.quiqqer-simple-checkout-data-pay .quiqqer-order-step-checkout-notice {
+    margin-bottom: 1rem;
+}
+
 .quiqqer-order-step-shipping header {
+    display: none;
+}
+
+.quiqqer-order-ordering-timeline {
     display: none;
 }
 
