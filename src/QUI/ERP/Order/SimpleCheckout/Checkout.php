@@ -42,9 +42,11 @@ class Checkout extends QUI\Control
             $template = $this->getAttribute('template');
         }
 
-        // put the basket articles to the order in process
-        $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
-        $Basket->toOrder($this->getOrder());
+        // put the basket articles to the order in process, if the current order has no articles
+        if (!$this->getOrder()->getArticles()->count()) {
+            $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+            $Basket->toOrder($this->getOrder());
+        }
 
         $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
 
@@ -65,8 +67,7 @@ class Checkout extends QUI\Control
 
         $Engine->assign([
             'Order' => $this->getOrder(),
-            'Basket' => $Basket,
-            'BasketDisplay' => new Basket($this),
+            'Basket' => new Basket($this),
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
             'Shipping' => new CheckoutShipping($this),

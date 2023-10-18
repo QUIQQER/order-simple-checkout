@@ -14,7 +14,7 @@ QUI::$Ajax->registerFunction(
         $orderData = json_decode($orderData, true);
 
         if (!is_array($orderData)) {
-            return;
+            return false;
         }
 
         $Checkout = new Checkout(['orderHash' => $orderHash]);

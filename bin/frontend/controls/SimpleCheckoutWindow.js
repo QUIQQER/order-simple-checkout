@@ -1,9 +1,10 @@
 define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow', [
 
     'qui/QUI',
-    'qui/controls/windows/Popup'
+    'qui/controls/windows/Popup',
+    'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout'
 
-], function(QUI, QUIWindow) {
+], function(QUI, QUIWindow, SimpleCheckout) {
     'use strict';
 
     return new Class({
@@ -24,28 +25,30 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 maxWidth: 1200
             });
 
+            this.$Checkout = null;
+
             this.addEvents({
                 onOpen: this.$onOpen
             });
         },
 
         $onOpen: function() {
+            if (this.$Checkout) {
+                return;
+            }
+
             this.Loader.show();
             this.getContent().set('html', '');
             this.getContent().setStyle('padding', 0);
 
-            require([
-                'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout'
-            ], (SimpleCheckout) => {
-
-                const Checkout = new SimpleCheckout({
-                    events: {
-                        onLoaded: () => {
-                            this.Loader.hide();
-                        }
+            this.$Checkout = new SimpleCheckout({
+                products: this.getAttribute('products'),
+                events: {
+                    onLoaded: () => {
+                        this.Loader.hide();
                     }
-                }).inject(this.getContent());
-            });
+                }
+            }).inject(this.getContent());
         }
     });
 });

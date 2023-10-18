@@ -1,11 +1,9 @@
 define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutDelivery', [
 
     'qui/QUI',
-    'qui/controls/Control',
-    'qui/utils/Form',
-    'Ajax'
+    'qui/controls/Control'
 
-], function(QUI, QUIControl, QUIFormUtils, QUIAjax) {
+], function(QUI, QUIControl) {
     'use strict';
 
     return new Class({

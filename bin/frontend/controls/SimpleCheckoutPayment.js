@@ -53,7 +53,15 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         refresh: function() {
-            return new Promise(() => {
+            return new Promise((resolve) => {
+                if (!this.getAttribute('Checkout')) {
+                    return new Promise((r) => {
+                        (() => {
+                            return this.refresh().then(r);
+                        }).delay(200);
+                    });
+                }
+
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_payments', (html) => {
                     const Ghost = new Element('div', {
                         html: html
@@ -63,8 +71,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     Ghost.getElements('style').inject(this.getElm());
 
                     this.$registerEvents();
+                    resolve();
                 }, {
-                    'package': 'quiqqer/order-simple-checkout'
+                    'package': 'quiqqer/order-simple-checkout',
+                    orderHash: this.getAttribute('Checkout').getAttribute('orderHash')
                 });
             });
         }

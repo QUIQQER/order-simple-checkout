@@ -20,6 +20,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             '$onImport'
         ],
 
+        options: {
+            orderHash: false
+        },
+
         initialize: function(options) {
             this.parent(options);
 
@@ -55,7 +59,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 this.$Delivery.addEvent('change', () => {
                     this.Loader.show();
-                    console.log('change');
+
                     this.update().then(() => {
                         if (this.$Shipping) {
                             return this.$Shipping.refresh().then(() => {
@@ -96,20 +100,55 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onInject: function() {
-            QUIAjax.get(
-                'package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl',
-                (html) => {
-                    this.getElm().set('html', html);
-                    
+            this.$loadProducts().then(() => {
+                return this.$loadCheckout();
+            });
+        },
+
+        $loadProducts: function() {
+            if (this.getAttribute('products') && !this.getAttribute('orderHash')) {
+                return new Promise((resolve) => {
+                    QUIAjax.post(
+                        'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
+                        (orderHash) => {
+                            this.setAttribute('orderHash', orderHash);
+                            resolve();
+                        },
+                        {
+                            'package': 'quiqqer/order-simple-checkout',
+                            products: JSON.encode(this.getAttribute('products'))
+                        }
+                    );
+                });
+            }
+
+            return Promise.resolve();
+        },
+
+        $loadCheckout: function() {
+            return new Promise((resolve) => {
+                QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl', (html) => {
+                    const Ghost = new Element('div', {
+                        html: html
+                    });
+
+                    const Checkout = Ghost.getElement('.quiqqer-simple-checkout');
+
+                    this.getElm().addClass(Checkout.className);
+                    this.getElm().set('data-qui', Checkout.get('data-qui'));
+                    this.getElm().set('html', Checkout.get('html'));
+                    Ghost.getElements('style').inject(this.getElm());
+
                     QUI.parse(this.getElm()).then(() => {
                         this.fireEvent('loaded', [this]);
                         this.$onImport();
+                        resolve();
                     });
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('orderHash')
-                }
-            );
+                });
+            });
         },
 
         orderWithCosts: function() {
@@ -143,8 +182,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         opacity: 0
                     }, {
                         callback: () => {
-                            console.log(result);
-
                             Container.set('html', result.html);
 
                             QUI.parse(Container).then(() => {
@@ -178,6 +215,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 Node.addEvent('load', () => {
                     resolve(QUI.Controls.getById(Node.get('data-quiid')));
                 });
+            }).then((Instance) => {
+                if (!Instance) {
+                    return null;
+                }
+
+                Instance.setAttribute('Checkout', this);
+
+                return Instance;
             });
         },
 
@@ -190,7 +235,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.Loader.hide();
                     resolve();
                 }, {
-                    'package': 'quiqqer/order-simple-checkout'
+                    'package': 'quiqqer/order-simple-checkout',
+                    orderHash: this.getAttribute('orderHash')
                 });
             });
         },
@@ -206,7 +252,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.$refreshBasket().then(resolve);
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
-                    orderData: JSON.encode(orderData)
+                    orderData: JSON.encode(orderData),
+                    orderHash: this.getAttribute('orderHash')
                 });
             });
         }
