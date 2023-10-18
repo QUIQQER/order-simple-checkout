@@ -18,6 +18,10 @@
             <de><![CDATA[ODER]]></de>
             <en><![CDATA[OR]]></en>
         </locale>
+        <locale name="basket.empty">
+            <de><![CDATA[Dein Warenkorb enthält leider keine Artikel]]></de>
+            <en><![CDATA[Your shopping cart does not contain any items]]></en>
+        </locale>
     </groups>
 
 </locales>

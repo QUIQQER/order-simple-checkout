@@ -38,7 +38,7 @@ class Basket extends QUI\Control
         $Articles = $Order->getArticles();
 
         if (!$Articles->count()) {
-            return '';
+            return QUI::getLocale()->get('quiqqer/order-simple-checkout', 'basket.empty');
         }
 
         $Articles->setCurrency($Order->getCurrency());

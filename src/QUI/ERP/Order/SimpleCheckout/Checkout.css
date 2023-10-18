@@ -69,8 +69,8 @@
     display: none;
 }
 
-.quiqqer-order-ordering-timeline {
-    display: none;
+.quiqqer-simple-checkout .quiqqer-order-ordering-timeline {
+    display: none !important;
 }
 
 /** right side
