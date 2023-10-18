@@ -15,7 +15,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         Type: 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
 
         Binds: [
-            'update'
+            'update',
+            '$onInject',
+            '$onImport'
         ],
 
         initialize: function(options) {
@@ -27,7 +29,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.Loader = null;
 
             this.addEvents({
-                onImport: this.$onImport
+                onImport: this.$onImport,
+                onInject: this.$onInject
             });
         },
 
@@ -52,7 +55,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 this.$Delivery.addEvent('change', () => {
                     this.Loader.show();
-
+                    console.log('change');
                     this.update().then(() => {
                         if (this.$Shipping) {
                             return this.$Shipping.refresh().then(() => {
@@ -86,7 +89,27 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 // load
                 this.$Delivery.fireEvent('change');
+            }).catch((err) => {
+                console.error(err);
+                this.Loader.hide();
             });
+        },
+
+        $onInject: function() {
+            QUIAjax.get(
+                'package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl',
+                (html) => {
+                    this.getElm().set('html', html);
+                    
+                    QUI.parse(this.getElm()).then(() => {
+                        this.fireEvent('loaded', [this]);
+                        this.$onImport();
+                    });
+                }, {
+                    'package': 'quiqqer/order-simple-checkout',
+                    orderHash: this.getAttribute('orderHash')
+                }
+            );
         },
 
         orderWithCosts: function() {
