@@ -102,12 +102,16 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         $onInject: function() {
             this.$loadProducts().then(() => {
                 return this.$loadCheckout();
+            }).catch((err) => {
+                console.error(err);
+                this.getElm().set('html', '');
+                this.fireEvent('loadedError', [this]);
             });
         },
 
         $loadProducts: function() {
             if (this.getAttribute('products') && !this.getAttribute('orderHash')) {
-                return new Promise((resolve) => {
+                return new Promise((resolve, reject) => {
                     QUIAjax.post(
                         'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
                         (orderHash) => {
@@ -116,7 +120,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         },
                         {
                             'package': 'quiqqer/order-simple-checkout',
-                            products: JSON.encode(this.getAttribute('products'))
+                            products: JSON.encode(this.getAttribute('products')),
+                            onError: reject
                         }
                     );
                 });

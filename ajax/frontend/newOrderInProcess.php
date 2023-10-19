@@ -4,6 +4,7 @@
  * This file contains package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess
  */
 
+use QUI\ERP\Order\Guest\GuestOrder;
 use QUI\ERP\Products\Handler\Products;
 
 QUI::$Ajax->registerFunction(
@@ -11,6 +12,7 @@ QUI::$Ajax->registerFunction(
     function ($products) {
         $products = json_decode($products, true);
         $Orders = QUI\ERP\Order\Handler::getInstance();
+        $UserSession = QUI::getUserBySession();
 
         if (!count($products)) {
             // select the last order in processing
@@ -21,7 +23,22 @@ QUI::$Ajax->registerFunction(
             }
         }
 
-        $OrderInProcess = QUI\ERP\Order\Factory::getInstance()->createOrderInProcess();
+        if (
+            QUI::getUsers()->isNobodyUser($UserSession)
+            && QUI::getPackageManager()->isInstalled('quiqqer/order-guestorder')
+            && !GuestOrder::isActive()
+        ) {
+            throw new QUI\Exception('Please log in');
+        }
+
+        try {
+            $OrderInProcess = QUI\ERP\Order\Factory::getInstance()->createOrderInProcess();
+        } catch (\Exception $exception) {
+        }
+
+        if (!isset($OrderInProcess)) {
+            throw new QUI\Exception('Not allowed');
+        }
 
         foreach ($products as $product) {
             try {

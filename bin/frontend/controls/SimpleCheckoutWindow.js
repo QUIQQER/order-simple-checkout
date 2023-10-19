@@ -46,6 +46,24 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 events: {
                     onLoaded: () => {
                         this.Loader.hide();
+                    },
+                    onLoadedError: () => {
+                        require([
+                            'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                        ], (LoginWindow) => {
+                            this.close();
+
+                            new LoginWindow({
+                                events: {
+                                    onSuccess: () => {
+                                        this.$Checkout.destroy();
+                                        this.$Checkout = null;
+                                        this.open();
+                                    }
+                                }
+                            }).open();
+                        });
+
                     }
                 }
             }).inject(this.getContent());
