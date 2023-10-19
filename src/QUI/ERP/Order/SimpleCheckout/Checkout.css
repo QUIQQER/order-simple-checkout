@@ -7,9 +7,16 @@
     width: 100%;
 }
 
-.quiqqer-simple-checkout-data {
-    padding: 2rem;
+.quiqqer-simple-checkout-container > section {
+    display: flex;
     width: 50%;
+}
+
+.quiqqer-simple-checkout-data {
+    margin-left: auto;
+    max-width: 600px;
+    padding: 2rem;
+    width: 100%;
 }
 
 .quiqqer-simple-checkout-data > div {
@@ -80,10 +87,12 @@
     background: #f5f5f5;
     border-left: 1px solid #d6d6d6;
     padding: 2rem;
-    width: 50%;
+    width: 100%;
 }
 
 .quiqqer-simple-checkout-basket--sticky {
+    max-width: 600px;
+
     position: sticky;
     top: 80px;
 }
