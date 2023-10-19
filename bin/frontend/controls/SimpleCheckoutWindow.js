@@ -17,14 +17,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         ],
 
         initialize: function(options) {
-            this.parent(options);
-
             this.setAttributes({
-                buttons: false,
                 maxHeight: 800,
                 maxWidth: 1200
             });
 
+            this.parent(options);
             this.$Checkout = null;
 
             this.addEvents({

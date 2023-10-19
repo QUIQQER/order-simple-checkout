@@ -35,3 +35,25 @@ License
 
 - GPL-3.0+
 - PCSG QEL-1.0
+
+```javascript
+require([
+    'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow'
+], function(w) {
+    const Checkout = new w({
+        products: [
+            {
+                id: 1,
+                quantity: 2,
+                fields: {}
+            }, {
+                id: 9,
+                quantity: 1,
+                fields: {}
+            }
+        ]
+    });
+
+    Checkout.open();
+});
+```
