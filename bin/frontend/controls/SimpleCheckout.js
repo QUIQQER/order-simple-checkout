@@ -46,6 +46,25 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             };
 
 
+            const LoginNode = this.getElm().getElement('.quiqqer-order-simple-login');
+
+            if (LoginNode) {
+                require(['package/quiqqer/frontend-users/bin/frontend/controls/login/Login'], (Login) => {
+                    new Login({
+                        redirect: false,
+                        reload: false,
+                        onSuccess: () => {
+                            this.getElm().setStyle('minHeight', this.getElm().getSize().y);
+                            this.Loader.show();
+                            LoginNode.destroy();
+                            this.$onInject();
+                        }
+                    }).inject(LoginNode);
+                });
+
+                return;
+            }
+
             this.Loader.show();
 
             Promise.all([
@@ -105,7 +124,25 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }).catch((err) => {
                 console.error(err);
                 this.getElm().set('html', '');
-                this.fireEvent('loadedError', [this]);
+
+                if (this.getElm().getParent('.qui-window-popup')) {
+                    this.fireEvent('loadedError', [this]);
+                    return;
+                }
+
+                require([
+                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Login'
+                ], (Login) => {
+                    console.log(Login);
+                    new Login({
+                        events: {
+                            onSuccess: () => {
+
+                            }
+                        }
+                    }).open();
+                });
+
             });
         },
 
@@ -208,7 +245,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $getControl: function(Node) {
             return new Promise((resolve) => {
-                if (!Node.get('data-qui')) {
+                if (!Node || !Node.get('data-qui')) {
                     return resolve(null);
                 }
 

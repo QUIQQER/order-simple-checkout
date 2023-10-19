@@ -37,9 +37,21 @@ class Checkout extends QUI\Control
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $template = dirname(__FILE__) . '/Checkout.html';
+        $templateLogin = dirname(__FILE__) . '/Checkout.Login.html';
 
         if ($this->getAttribute('template') && file_exists($this->getAttribute('template'))) {
             $template = $this->getAttribute('template');
+        }
+
+        // gast bestellung prüfen
+        if (QUI::getUsers()->isNobodyUser($this->getUser())) {
+            if (!QUI::getPackageManager()->isInstalled('quiqqer/order-simple-checkout')) {
+                return $Engine->fetch($templateLogin);
+            }
+
+            if (!QUI\ERP\Order\Guest\GuestOrder::isActive()) {
+                return $Engine->fetch($templateLogin);
+            }
         }
 
         // put the basket articles to the order in process, if the current order has no articles
