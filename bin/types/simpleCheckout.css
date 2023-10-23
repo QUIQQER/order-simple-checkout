@@ -23,6 +23,22 @@
     margin: 0 !important;
 }
 
-.quiqqer-simple-checkout-data {
+.cologne-header-control {
+    display: none !important;
+}
 
+.quiqqer-order-step-payments-list-entry-text-supportedPayments-payment {
+    background: #ebebeb;
+    border: none;
+    border-radius: 2rem;
+    color: #386180;
+    cursor: pointer;
+    display: inline-block;
+    float: none;
+    margin-right: 0.25em;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0.125em 0.75em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

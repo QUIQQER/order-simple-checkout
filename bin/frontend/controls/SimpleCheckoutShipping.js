@@ -53,6 +53,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         refresh: function() {
+            this.fireEvent('refreshBegin', [this]);
+
             // @todo loader
             if (!this.getAttribute('Checkout')) {
                 return new Promise((r) => {
@@ -62,7 +64,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 });
             }
 
-            return new Promise(() => {
+            return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_shipping', (html) => {
                     const Ghost = new Element('div', {
                         html: html
@@ -72,6 +74,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     Ghost.getElements('style').inject(this.getElm());
 
                     this.$registerEvents();
+                    this.fireEvent('refreshEnd', [this]);
+                    resolve();
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('Checkout').getAttribute('orderHash')

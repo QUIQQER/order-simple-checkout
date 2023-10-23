@@ -44,6 +44,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             const hideLoader = () => {
                 this.Loader.hide();
             };
+            const showLoader = () => {
+                this.Loader.show();
+            };
 
 
             const LoginNode = this.getElm().getElement('.quiqqer-order-simple-login');
@@ -75,6 +78,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 this.$Delivery = instances[0];
                 this.$Shipping = instances[1];
                 this.$Payment = instances[2];
+
+                this.$Delivery.setAttribute('Checkout', this);
+                this.$Shipping.setAttribute('Checkout', this);
+                this.$Payment.setAttribute('Checkout', this);
+
+                this.$Payment.addEvent('refreshBegin', showLoader);
+                this.$Payment.addEvent('refreshEnd', hideLoader);
 
                 this.$Delivery.addEvent('change', () => {
                     this.Loader.show();
@@ -193,6 +203,31 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
+        setCurrency: function(currency) {
+            this.Loader.show();
+
+            return new Promise((resolve, reject) => {
+                QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_setCurrency', resolve, {
+                    'package': 'quiqqer/order-simple-checkout',
+                    currency: currency,
+                    orderHash: this.getAttribute('orderHash'),
+                    onError: reject
+                });
+            }).then(() => {
+                return this.$refreshBasket();
+            }).then(() => {
+                if (this.$Shipping) {
+                    return this.$Shipping.refresh();
+                }
+            }).then(() => {
+                return this.$Payment.refresh();
+            }).then(() => {
+                return this.Loader.hide();
+            }).catch(() => {
+                return this.Loader.hide();
+            });
+        },
+
         orderWithCosts: function() {
             this.Loader.show();
 
@@ -238,7 +273,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         }
                     });
                 }, {
-                    'package': 'quiqqer/order-simple-checkout'
+                    'package': 'quiqqer/order-simple-checkout',
+                    orderHash: this.getAttribute('orderHash')
                 });
             });
         },
