@@ -1,0 +1,8 @@
+.order-simple-checkout-shipping--info {
+    background: #f5f5f5;
+    padding: 1.7rem;
+}
+
+.quiqqer-simple-checkout-payment .quiqqer-order-step-payments header {
+    display: none;
+}

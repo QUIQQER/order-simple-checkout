@@ -20,7 +20,8 @@
   },
   "require": {
     "php": ">=7.4",
-    "quiqqer\/order": "*"
+    "quiqqer\/order": "^1.10|@dev",
+    "quiqqer\/frontend-users": "^1.10.3|@dev"
   },
   "autoload": {
     "psr-4": {

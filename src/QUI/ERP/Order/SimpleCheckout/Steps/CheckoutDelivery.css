@@ -1,0 +1,39 @@
+.quiqqer-simple-checkout-delivery label {
+    clear: both;
+    display: block;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-delivery label select,
+.quiqqer-simple-checkout-delivery label input[type="text"],
+.quiqqer-simple-checkout-delivery label input[type="tel"],
+.quiqqer-simple-checkout-delivery label input[type="fax"] {
+    width: 100%;
+}
+
+
+.quiqqer-simple-checkout-delivery label .qui-select {
+    float: initial;
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-delivery label > span {
+    display: block;
+    width: 100%;
+}
+
+.quiqqer-order-customerData-edit-firstname,
+.quiqqer-order-customerData-edit-lastname,
+.quiqqer-order-customerData-edit-zip,
+.quiqqer-order-customerData-edit-city {
+    float: left;
+    width: calc(50% - 10px) !important;
+}
+
+.quiqqer-order-customerData-edit-lastname,
+.quiqqer-order-customerData-edit-city {
+    clear: initial !important;
+    margin-left: 20px;
+}
+
