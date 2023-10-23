@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<locales>
+
+    <groups name="quiqqer/order-simple-checkout" datatype="php,js">
+        <locale name="package.title">
+            <de><![CDATA[QUIQQER - Einfacher Bestellcheckout]]></de>
+            <en><![CDATA[QUIQQER - Simple order checkout]]></en>
+        </locale>
+        <locale name="package.description">
+            <de><![CDATA[ ]]></de>
+            <en><![CDATA[ ]]></en>
+        </locale>
+        <locale name="title.contact">
+            <de><![CDATA[Konto / Kontakt]]></de>
+            <en><![CDATA[Account / Contact]]></en>
+        </locale>
+        <locale name="or">
+            <de><![CDATA[ODER]]></de>
+            <en><![CDATA[OR]]></en>
+        </locale>
+        <locale name="basket.empty">
+            <de><![CDATA[Dein Warenkorb enthält leider keine Artikel]]></de>
+            <en><![CDATA[Your shopping cart does not contain any items]]></en>
+        </locale>
+    </groups>
+
+</locales>

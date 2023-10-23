@@ -1,0 +1,14 @@
+<quiqqer>
+    <package>
+        <title>
+            <locale group="quiqqer/order-simple-checkout" var="package.title"/>
+        </title>
+
+        <description>
+            <locale group="quiqqer/order-simple-checkout" var="package.title"/>
+        </description>
+
+        <provider>
+        </provider>
+    </package>
+</quiqqer>
