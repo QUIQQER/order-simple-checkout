@@ -48,6 +48,24 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 this.Loader.show();
             };
 
+            this.getElm().getElements('a.log-in').addEvent('click', (e) => {
+                e.stop();
+
+                require([
+                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                ], (LoginWindow) => {
+                    new LoginWindow({
+                        redirect: false,
+                        reload: false,
+                        events: {
+                            onSuccess: () => {
+                                window.location.reload();
+                            }
+                        }
+                    }).open();
+                });
+            });
+
 
             const LoginNode = this.getElm().getElement('.quiqqer-order-simple-login');
 
@@ -78,6 +96,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 this.$Delivery = instances[0];
                 this.$Shipping = instances[1];
                 this.$Payment = instances[2];
+
+                if (!this.$Delivery && !this.$Shipping && !this.$Payment) {
+                    this.Loader.hide();
+                    return;
+                }
 
                 this.$Delivery.setAttribute('Checkout', this);
                 this.$Shipping.setAttribute('Checkout', this);
@@ -143,7 +166,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 require([
                     'package/quiqqer/frontend-users/bin/frontend/controls/login/Login'
                 ], (Login) => {
-                    console.log(Login);
                     new Login({
                         events: {
                             onSuccess: () => {
