@@ -23,11 +23,19 @@
                     {locale group="quiqqer/order-simple-checkout" var="title.contact"}
                 </h1>
 
-                {if $User}
-                <div>Eingeloggt als: {$User->getName()}</div>
+                {if $User && $User->getId() === 6}
+                <div>
+                    <span>{locale group="quiqqer/order-simple-checkout" var="logged.in.guest"}</span>
+                    <br/>
+                    <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
+                    <a href="" class="log-in">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
+                </div>
+                {elseif $User}
+                <div>{locale group="quiqqer/order-simple-checkout" var="logged.in.user" user=$User->getName()}</div>
                 {else}
                 <div>
-                    <span>Have an account? Log in</span>
+                    <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
+                    <a href="">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
                 </div>
                 {/if}
             </div>
