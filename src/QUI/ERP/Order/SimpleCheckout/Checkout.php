@@ -3,6 +3,8 @@
 namespace QUI\ERP\Order\SimpleCheckout;
 
 use QUI;
+use QUI\ERP\Order\Controls\Checkout\Login;
+use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
@@ -43,7 +45,7 @@ class Checkout extends QUI\Control
             $template = $this->getAttribute('template');
         }
 
-        // gast bestellung prüfen
+        // guest order
         if (QUI::getUsers()->isNobodyUser($this->getUser())) {
             if (!QUI::getPackageManager()->isInstalled('quiqqer/order-simple-checkout')) {
                 return $Engine->fetch($templateLogin);
@@ -52,6 +54,20 @@ class Checkout extends QUI\Control
             if (!QUI\ERP\Order\Guest\GuestOrder::isActive()) {
                 return $Engine->fetch($templateLogin);
             }
+
+            // guest log in
+            $Engine->assign([
+                'Registration' => new Registration([
+                    'autofill' => false
+                ]),
+                'Login' => new Login()
+            ]);
+
+            $this->setAttribute('data-nobody-log-in', 1);
+
+            return $Engine->fetch(
+                OPT_DIR . 'quiqqer/order/src/QUI/ERP/Order/Controls/OrderProcess.Nobody.html'
+            );
         }
 
         // put the basket articles to the order in process, if the current order has no articles

@@ -17,6 +17,10 @@ QUI::$Ajax->registerFunction(
             return false;
         }
 
+        if (isset($orderData['street']) && isset($orderData['street_number'])) {
+            $orderData['street_no'] = $orderData['street'] . ' ' . $orderData['street_number'];
+        }
+
         $Checkout = new Checkout(['orderHash' => $orderHash]);
         $Order = $Checkout->getOrder();
         $Order->setInvoiceAddress(new Address($orderData));

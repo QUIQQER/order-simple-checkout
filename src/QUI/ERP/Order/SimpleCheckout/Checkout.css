@@ -97,3 +97,22 @@
     top: 80px;
 }
 
+
+/** log in for nobody
+ ============================================= */
+
+[data-nobody-log-in="1"] [name="order"] .quiqqer-order-ordering-nobody {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+[data-nobody-log-in="1"] [name="order"] .quiqqer-order-ordering-nobody > div {
+    text-align: center;
+    width: 100%;
+}
+
+[data-nobody-log-in="1"] .quiqqer-order-ordering-timeline {
+    display: none;
+}

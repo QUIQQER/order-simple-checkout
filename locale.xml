@@ -22,6 +22,22 @@
             <de><![CDATA[Dein Warenkorb enthält leider keine Artikel]]></de>
             <en><![CDATA[Your shopping cart does not contain any items]]></en>
         </locale>
+        <locale name="logged.in.guest">
+            <de><![CDATA[Eingeloggt als: Gast]]></de>
+            <en><![CDATA[Logged in as: Guest]]></en>
+        </locale>
+        <locale name="logged.in.user">
+            <de><![CDATA[Eingeloggt als: [user]]]]></de>
+            <en><![CDATA[Logged in as: [user]]]></en>
+        </locale>
+        <locale name="log.in">
+            <de><![CDATA[Du hast einen Account?]]></de>
+            <en><![CDATA[You have an account?]]></en>
+        </locale>
+        <locale name="log.in.link">
+            <de><![CDATA[Jetzt einloggen]]></de>
+            <en><![CDATA[Log in]]></en>
+        </locale>
     </groups>
 
 </locales>

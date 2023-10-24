@@ -37,3 +37,12 @@
     margin-left: 20px;
 }
 
+.quiqqer-order-customerData-edit-street_no [name="street"] {
+    float: left;
+    margin-right: 10px;
+    width: calc(100% - 130px) !important;
+}
+
+.quiqqer-order-customerData-edit-street_no [name="street_number"] {
+    width: 120px !important;
+}
