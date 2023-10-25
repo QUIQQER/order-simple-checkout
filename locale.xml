@@ -27,7 +27,7 @@
             <en><![CDATA[Logged in as: Guest]]></en>
         </locale>
         <locale name="logged.in.user">
-            <de><![CDATA[Eingeloggt als: [user]]]]></de>
+            <de><![CDATA[Eingeloggt als: [user]]]></de>
             <en><![CDATA[Logged in as: [user]]]></en>
         </locale>
         <locale name="log.in">
