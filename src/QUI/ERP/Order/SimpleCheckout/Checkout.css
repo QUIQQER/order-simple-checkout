@@ -8,8 +8,7 @@
 }
 
 .quiqqer-simple-checkout-container > section {
-    display: flex;
-    width: 50%;
+    width: 55%;
 }
 
 .quiqqer-simple-checkout-data {
@@ -84,10 +83,12 @@
  ============================================= */
 
 .quiqqer-simple-checkout-basket {
-    background: #f5f5f5;
-    border-left: 1px solid #d6d6d6;
-    padding: 2rem;
-    width: 100%;
+    width: 45% !important;
+    background: var(--_bg, #f8f8f8);
+    padding: 1rem;
+    align-self: start;
+    position: sticky;
+    top: 1rem;
 }
 
 .quiqqer-simple-checkout-basket--sticky {
@@ -115,4 +116,11 @@
 
 [data-nobody-log-in="1"] .quiqqer-order-ordering-timeline {
     display: none;
+}
+
+/**/
+.articles-sum-container .articles-sum {
+    background: var(--_bg, #f8f8f8);
+    border-radius: 0.5rem;
+    border: none;
 }

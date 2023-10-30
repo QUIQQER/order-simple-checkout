@@ -1,32 +1,3 @@
-.cologne-main {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.topbar {
-    display: none !important;
-}
-
-.cologne-header-nav {
-    display: none !important;
-}
-
-.cologne-main .cologne-grid-container,
-.cologne-main .main-start-page {
-    display: inline-block;
-    max-width: 100% !important;
-    padding: 0 !important;
-    width: 100% !important;
-}
-
-.cologne-main .main-start-page .content-template {
-    margin: 0 !important;
-}
-
-.cologne-header-control {
-    display: none !important;
-}
-
 .quiqqer-order-step-payments-list-entry-text-supportedPayments-payment {
     background: #ebebeb;
     border: none;

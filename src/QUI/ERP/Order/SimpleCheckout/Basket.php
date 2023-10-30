@@ -38,7 +38,10 @@ class Basket extends QUI\Control
         $Articles = $Order->getArticles();
 
         if (!$Articles->count()) {
-            return QUI::getLocale()->get('quiqqer/order-simple-checkout', 'basket.empty');
+            return QUI::getLocale()->get(
+                'quiqqer/order-simple-checkout',
+                'basket.empty'
+            );
         }
 
         $Articles->setCurrency($Order->getCurrency());
@@ -46,7 +49,8 @@ class Basket extends QUI\Control
         $UniqueArticles->hideHeader();
 
         $Engine->assign([
-            'UniqueArticles' => $UniqueArticles
+            'UniqueArticles' => $UniqueArticles,
+            'basketHtml'     => $UniqueArticles->toHTML(dirname(__FILE__) . '/Basket.ArticleList.html')
         ]);
 
         return $Engine->fetch(dirname(__FILE__) . '/Basket.html');
