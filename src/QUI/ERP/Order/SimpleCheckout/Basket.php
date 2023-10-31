@@ -49,10 +49,16 @@ class Basket extends QUI\Control
         $UniqueArticles = $Articles->toUniqueList();
         $UniqueArticles->hideHeader();
 
+        $basketHtml = $UniqueArticles->toHTML(dirname(__FILE__) . '/Basket.ArticleList.html');
+
+        if ($this->getAttribute('basketForHeader')) {
+            $basketHtml = $UniqueArticles->toHTML(dirname(__FILE__) . '/Basket.ForHeader.html');
+        }
+
         $Engine->assign([
             'basketEmpty' => false,
             'UniqueArticles' => $UniqueArticles,
-            'basketHtml'     => $UniqueArticles->toHTML(dirname(__FILE__) . '/Basket.ArticleList.html')
+            'basketHtml'     => $basketHtml
         ]);
 
         return $Engine->fetch(dirname(__FILE__) . '/Basket.html');

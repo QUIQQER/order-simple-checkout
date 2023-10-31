@@ -124,15 +124,66 @@ ul.articleData__fields {
 /*******/
 /* sum */
 /*******/
+.quiqqer-simple-checkout-orderDetails .articles-sum,
 .quiqqer-simple-checkout-basket .articles-sum {
+    background: var(--_bg, #f8f8f8);
+    border-radius: 0.5rem;
+    border: none;
     float: none;
 }
 
+.quiqqer-simple-checkout-orderDetails .articles-sum td,
 .quiqqer-simple-checkout-basket .articles-sum td {
     padding-bottom: 0;
 }
 
+.quiqqer-simple-checkout-orderDetails .articles-sum-row-sum,
 .quiqqer-simple-checkout-basket .articles-sum-row-sum {
     font-weight: bold;
     font-size: 1.25rem;
+}
+
+/****************************/
+/* Simple basket for header */
+/****************************/
+.quiqqer-simple-checkout-basket__toggleBasketBtn {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-basket__toggleBasketBtn > .btn-label {
+    padding-left: 0;
+}
+
+.quiqqer-simple-checkout-basket__toggleBasketBtn > .btn-label > .fa {
+    transition: transform 0.3s ease;
+    margin-right: 0;
+}
+
+/* toggle button: open status */
+.quiqqer-simple-checkout-basket__toggleBasketBtn.state-open > .btn-label > .fa{
+    transform: rotate(180deg);
+}
+
+.quiqqer-simple-checkout-basket-header__sum {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+/* hidden content */
+.quiqqer-simple-checkout-basket-articles {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+    height: auto;
+}
+
+.quiqqer-simple-checkout-basket-articles > .articleList {
+    overflow: hidden;
+}
+
+/*  hidden content: open status */
+.state-open + .quiqqer-simple-checkout-basket-articles {
+    grid-template-rows: 1fr;
 }

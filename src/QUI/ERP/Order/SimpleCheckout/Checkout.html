@@ -1,92 +1,99 @@
-<div class="quiqqer-simple-checkout-container">
-    <section class="quiqqer-simple-checkout-details">
-        <form class="quiqqer-simple-checkout-data" method="post" action="">
-            {template_event name="quiqqer::order::simple::expressButtons" Order=$Order assign=expressButtons}
+<div class="quiqqer-simple-checkout-orderDetails">
+    {$BasketForHeader->create()}
+</div>
+<form method="post" action="">
 
+    <div class="quiqqer-simple-checkout-container">
+        <section class="quiqqer-simple-checkout-details">
+            <div class="quiqqer-simple-checkout-data">
+                {template_event name="quiqqer::order::simple::expressButtons" Order=$Order assign=expressButtons}
 
-            {if !empty($expressButtons)}
-                <div class="quiqqer-simple-checkout-data-express simpleCheckout-detail-section">
+                {if !empty($expressButtons)}
+                    <div class="quiqqer-simple-checkout-data-express simpleCheckout-detail-section">
+                        <h2 class="simpleCheckoutCard-subheader">
+                            {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.subheader.expressCheckout"}
+                        </h2>
+
+                        {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.expressCheckout.text"}
+
+                        <div class="quiqqer-simple-checkout-data-express__buttons">
+                            {$expressButtons}
+                        </div>
+                    </div>
+                    <div class="quiqqer-simple-checkout-data-or" role="separator">
+                        {locale group="quiqqer/order-simple-checkout" var="or"}
+                    </div>
+                {/if}
+
+                <div class="quiqqer-simple-checkout-data-contact simpleCheckout-detail-section">
                     <h2 class="simpleCheckoutCard-subheader">
-                        {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.subheader.expressCheckout"}
+                        {locale group="quiqqer/order-simple-checkout" var="title.contact"}
                     </h2>
 
-                    {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.expressCheckout.text"}
-
-                    <div class="quiqqer-simple-checkout-data-express__buttons">
-                        {$expressButtons}
-                    </div>
-                </div>
-
-                <div class="quiqqer-simple-checkout-data-or" role="separator">
-                        {locale group="quiqqer/order-simple-checkout" var="or"}
-                </div>
-            {/if}
-
-            <div class="quiqqer-simple-checkout-data-contact simpleCheckout-detail-section">
-                <h2 class="simpleCheckoutCard-subheader">
-                    {locale group="quiqqer/order-simple-checkout" var="title.contact"}
-                </h2>
-
-                {if $User && $User->getId() === 6}
-                <div class="text-muted">
-                    <span>{locale group="quiqqer/order-simple-checkout" var="logged.in.guest"}</span>
-                    <br/>
-                    <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
-                    <a href="" class="log-in">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
-                </div>
-                {elseif $User}
-                    <div>
+                    {if $User && $User->getId() === 6}
+                        <div class="text-muted">
+                            <span>{locale group="quiqqer/order-simple-checkout" var="logged.in.guest"}</span>
+                            <br/>
+                            <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
+                            <a href=""
+                               class="log-in">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
+                        </div>
+                    {elseif $User}
+                        <div>
                         <span class="text-muted">
                             {locale group="quiqqer/order-simple-checkout" var="logged.in.user"}
                         </span>
 
-                        <span class="">{$User->getName()}</span>
-                    </div>
-                {else}
-                    <div>
-                        <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
-                        <a href="">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
-                    </div>
-                {/if}
-            </div>
-
-            <div class="quiqqer-simple-checkout-data-delivery simpleCheckout-detail-section">
-                <h2 class="simpleCheckoutCard-subheader">
-                    {locale group="quiqqer/order" var="ordering.step.title.CustomerData"}
-                </h2>
-                {$Delivery->create()}
-            </div>
-
-            <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-detail-section">
-                <h2 class="simpleCheckoutCard-subheader">
-                    {locale group="quiqqer/shipping" var="ordering.step.title.Shipping"}
-                </h2>
-                {$Shipping->create()}
-            </div>
-
-            <div class="quiqqer-simple-checkout-data-payment simpleCheckout-detail-section">
-                <h2 class="simpleCheckoutCard-subheader">
-                    {locale group="quiqqer/order" var="ordering.step.title.Payment"}
-                </h2>
-                {$Payment->create()}
-            </div>
-
-            <div class="quiqqer-simple-checkout-data-pay">
-                <div class="quiqqer-order-step-checkout-notice">
-                    <label>
-                        <input type="checkbox" name="termsAndConditions" required/>
-                        {$termsAndConditions}
-                    </label>
+                            <span class="">{$User->getName()}</span>
+                        </div>
+                    {else}
+                        <div>
+                            <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
+                            <a href="">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
+                        </div>
+                    {/if}
                 </div>
 
-                <button name="pay" disabled class="btn btn-primary btn-lg btn-large">
-                    {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
-                </button>
-            </div>
-        </form>
-    </section>
+                <div class="quiqqer-simple-checkout-data-delivery simpleCheckout-detail-section">
+                    <h2 class="simpleCheckoutCard-subheader">
+                        {locale group="quiqqer/order" var="ordering.step.title.CustomerData"}
+                    </h2>
+                    {$Delivery->create()}
+                </div>
 
-    <section class="quiqqer-simple-checkout-basket">
-        {$Basket->create()}
-    </section>
-</div>
+                <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-detail-section">
+                    <h2 class="simpleCheckoutCard-subheader">
+                        {locale group="quiqqer/shipping" var="ordering.step.title.Shipping"}
+                    </h2>
+                    {$Shipping->create()}
+                </div>
+
+                <div class="quiqqer-simple-checkout-data-payment simpleCheckout-detail-section">
+                    <h2 class="simpleCheckoutCard-subheader">
+                        {locale group="quiqqer/order" var="ordering.step.title.Payment"}
+                    </h2>
+                    {$Payment->create()}
+                </div>
+
+                <div class="quiqqer-simple-checkout-data-pay">
+                    <div class="quiqqer-order-step-checkout-notice">
+                        <label>
+                            <input type="checkbox" name="termsAndConditions" required/>
+                            {$termsAndConditions}
+                        </label>
+                    </div>
+
+                    <button name="pay" disabled class="btn btn-primary btn-lg btn-large">
+                        {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="quiqqer-simple-checkout-basket">
+            <div class="quiqqer-simple-checkout-basket__inner">
+                {$Basket->create()}
+            </div>
+        </section>
+    </div>
+</form>

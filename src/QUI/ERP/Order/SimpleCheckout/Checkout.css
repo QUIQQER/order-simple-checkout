@@ -1,21 +1,41 @@
-.quiqqer-simple-checkout-container {
+.quiqqer-simple-checkout {
     --_gap: var(--gap, 3rem);
     --_detailEntryBorder: var(--detailEntryBorder, 0.5rem);
     --_detailEntryBg: var(--detailEntryBg, #fff);
     --_detailEntrySpacing: var(--detailEntrySpacing, 0.5rem);
     --_sectionSpacing: var(--sectionSpacing, 3rem);
     --_sectionPadding: var(--sectionPadding, 2rem);
-
-    gap: var(--_gap);
-    display: flex;
-    flex-wrap: wrap;
 }
 
 @media screen and (max-width: 767px) {
-    .quiqqer-simple-checkout-container {
+    /**
+    1. Because of position fixed of .quiqqer-simple-checkout-data-pay on mobile.
+       This value is override by JavaScript
+     */
+    .quiqqer-simple-checkout {
+        --_gap: var(--gap, 1.5rem);
         --_sectionSpacing: var(--sectionSpacing, 1.5rem);
         --_sectionPadding: var(--sectionPadding, 1rem);
+        margin-bottom: 5rem; /* 1 */
     }
+}
+
+/*******************************/
+/* order details (only mobile) */
+/*******************************/
+@media screen and (min-width: 768px) {
+    .quiqqer-simple-checkout-orderDetails {
+        display: none;
+    }
+}
+
+/**********************/
+/* checkout container */
+/**********************/
+.quiqqer-simple-checkout-container {
+    gap: var(--_gap);
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .quiqqer-simple-checkout-details,
@@ -90,6 +110,19 @@
     background-color: currentColor;
 }
 
+@media screen and (max-width: 767px) {
+    .quiqqer-simple-checkout-data-pay {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        z-index: 1;
+        background: #fff;
+        width: 100%;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        padding: 1rem;
+    }
+}
+
 .quiqqer-simple-checkout-data-pay > .btn {
     width: 100%;
 }
@@ -119,27 +152,15 @@
     top: 1.5rem;
 }
 
-/* basket decoration */
-.quiqqer-simple-checkout-basket:before,
-.quiqqer-simple-checkout-basket:after {
-    content: "";
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 10px;
-    background-color: transparent;
-    background-image: radial-gradient(farthest-side, transparent 6px, var(--_bg) 0);
-    background-size: 15px 15px;
-}
-
-.quiqqer-simple-checkout-basket:before {
-    top: -10px;
-    background-position: -3px -5px, 0 0;
-}
-
-.quiqqer-simple-checkout-basket:after {
-    bottom: -10px;
-    background-position: -3px 2px, 0 0;
+/******************************************/
+/* Order details for header (only mobile) */
+/******************************************/
+.quiqqer-simple-checkout-orderDetails {
+    background-color: #f8f8f8;
+    top: 0;
+    padding: var(--_sectionPadding);
+    margin-bottom: var(--_sectionSpacing);
+    z-index: 1;
 }
 
 /****************/
@@ -174,11 +195,4 @@
 
 [data-nobody-log-in="1"] .quiqqer-order-ordering-timeline {
     display: none;
-}
-
-/**/
-.articles-sum-container .articles-sum {
-    background: var(--_bg, #f8f8f8);
-    border-radius: 0.5rem;
-    border: none;
 }

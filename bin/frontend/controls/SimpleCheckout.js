@@ -12,7 +12,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     return new Class({
 
         Extends: QUIControl,
-        Type: 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
+        Type   : 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
 
         Binds: [
             'update',
@@ -29,8 +29,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.$Delivery = null;
             this.$Shipping = null;
-            this.$Payment = null;
-            this.Loader = null;
+            this.$Payment  = null;
+            this.Loader    = null;
 
             this.addEvents({
                 onImport: this.$onImport,
@@ -56,8 +56,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 ], (LoginWindow) => {
                     new LoginWindow({
                         redirect: false,
-                        reload: false,
-                        events: {
+                        reload  : false,
+                        events  : {
                             onSuccess: () => {
                                 window.location.reload();
                             }
@@ -66,14 +66,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 });
             });
 
-
             const LoginNode = this.getElm().getElement('.quiqqer-order-simple-login');
 
             if (LoginNode) {
                 require(['package/quiqqer/frontend-users/bin/frontend/controls/login/Login'], (Login) => {
                     new Login({
-                        redirect: false,
-                        reload: false,
+                        redirect : false,
+                        reload   : false,
                         onSuccess: () => {
                             this.getElm().setStyle('minHeight', this.getElm().getSize().y);
                             this.Loader.show();
@@ -95,7 +94,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             ]).then((instances) => {
                 this.$Delivery = instances[0];
                 this.$Shipping = instances[1];
-                this.$Payment = instances[2];
+                this.$Payment  = instances[2];
 
                 if (!this.$Delivery && !this.$Shipping && !this.$Payment) {
                     this.Loader.hide();
@@ -143,6 +142,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.orderWithCosts();
                 });
 
+                this.$setSpacingOnMobile();
+
                 // load
                 this.$Delivery.fireEvent('change');
             }).catch((err) => {
@@ -189,8 +190,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         },
                         {
                             'package': 'quiqqer/order-simple-checkout',
-                            products: JSON.encode(this.getAttribute('products')),
-                            onError: reject
+                            products : JSON.encode(this.getAttribute('products')),
+                            onError  : reject
                         }
                     );
                 });
@@ -216,6 +217,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     QUI.parse(this.getElm()).then(() => {
                         this.fireEvent('loaded', [this]);
                         this.$onImport();
+                        this.$setSpacingOnMobile();
+
                         resolve();
                     });
                 }, {
@@ -231,9 +234,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             return new Promise((resolve, reject) => {
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_setCurrency', resolve, {
                     'package': 'quiqqer/order-simple-checkout',
-                    currency: currency,
+                    currency : currency,
                     orderHash: this.getAttribute('orderHash'),
-                    onError: reject
+                    onError  : reject
                 });
             }).then(() => {
                 return this.$refreshBasket();
@@ -331,7 +334,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
-                    this.getElm().getElement('.quiqqer-simple-checkout-basket').set('html', basket);
+                    this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
                     this.Loader.hide();
                     resolve();
                 }, {
@@ -349,6 +352,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_update', (isValid) => {
                     PayButton.disabled = !isValid;
+
                     this.$refreshBasket().then(resolve);
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
@@ -356,6 +360,24 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     orderHash: this.getAttribute('orderHash')
                 });
             });
+        },
+
+        /**
+         * Calculate needed margin on mobile.
+         * Not pretty solution, needs to be reworked.
+         */
+        $setSpacingOnMobile: function() {
+            if (QUI.getBodySize().x >= 768) {
+                return;
+            }
+
+            const PayContainer = this.getElm().querySelector('.quiqqer-simple-checkout-data-pay');
+
+            if (!PayContainer) {
+                return;
+            }
+
+            this.getElm().setStyle('margin-bottom', PayContainer.offsetHeight + 'px');
         }
     });
 });
