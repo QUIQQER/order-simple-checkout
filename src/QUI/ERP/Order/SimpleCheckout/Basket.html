@@ -1,3 +1,14 @@
 {template_event name="quiqqer::order::simple::basket::begin"}
-{$basketHtml}
+{if $basketEmpty}
+    <div class="quiqqer-simple-checkout-basket__empty">
+        <h2 class="simpleCheckoutCard-subheader simpleCheckoutCard-subheader--orderCard">
+            {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.subheader.basket"}
+        </h2>
+        <div class="text-muted quiqqer-simple-checkout-basket__emptyMessage">
+            {locale group="quiqqer/order-simple-checkout" var="basket.empty"}
+        </div>
+    </div>
+{else}
+    {$basketHtml}
+{/if}
 {template_event name="quiqqer::order::simple::basket::beforeCheckoutButton"}

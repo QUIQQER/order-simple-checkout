@@ -26,13 +26,25 @@
             <de><![CDATA[Produktdetails]]></de>
             <en><![CDATA[Product details]]></en>
         </locale>
+        <locale name="simpleCheckout.subheader.expressCheckout">
+            <de><![CDATA[Express checkout]]></de>
+            <en><![CDATA[Express checkout]]></en>
+        </locale>
+        <locale name="simpleCheckout.expressCheckout.text" html="true">
+            <de><![CDATA[<p>Mit "Express Checkout" schneller und bequemer bezahlen.</p>]]></de>
+            <en><![CDATA[<p>Pay faster and more conveniently with "Express Checkout".</p>]]></en>
+        </locale>
+        <locale name="simpleCheckout.subheader.basket">
+            <de><![CDATA[Warenkorn]]></de>
+            <en><![CDATA[Your order]]></en>
+        </locale>
         <locale name="logged.in.guest">
             <de><![CDATA[Eingeloggt als: Gast]]></de>
             <en><![CDATA[Logged in as: Guest]]></en>
         </locale>
         <locale name="logged.in.user">
-            <de><![CDATA[Eingeloggt als: [user]]]></de>
-            <en><![CDATA[Logged in as: [user]]]></en>
+            <de><![CDATA[Eingeloggt als:]]></de>
+            <en><![CDATA[Logged in as:]]></en>
         </locale>
         <locale name="log.in">
             <de><![CDATA[Du hast einen Account?]]></de>

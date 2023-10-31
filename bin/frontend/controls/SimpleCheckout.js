@@ -331,7 +331,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
-                    this.getElm().getElement('.quiqqer-simple-checkout-basket--sticky').set('html', basket);
+                    this.getElm().getElement('.quiqqer-simple-checkout-basket').set('html', basket);
                     this.Loader.hide();
                     resolve();
                 }, {
