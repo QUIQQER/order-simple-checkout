@@ -22,6 +22,10 @@
             <de><![CDATA[Dein Warenkorb enthält leider keine Artikel]]></de>
             <en><![CDATA[Your shopping cart does not contain any items]]></en>
         </locale>
+        <locale name="simpleCheckout.basket.btn.moreDetails">
+            <de><![CDATA[Produktdetails]]></de>
+            <en><![CDATA[Product details]]></en>
+        </locale>
         <locale name="logged.in.guest">
             <de><![CDATA[Eingeloggt als: Gast]]></de>
             <en><![CDATA[Logged in as: Guest]]></en>

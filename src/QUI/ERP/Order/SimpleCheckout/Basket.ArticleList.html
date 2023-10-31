@@ -12,7 +12,9 @@
             </a>
         </div>
         <div class="articleList-entry__data">
-            <div class="articleData__title">{$Article->getAttribute('title')|escape:'html'}</div>
+            <div class="articleData__title">
+                <a href="{$Product->getUrl()}">{$Article->getAttribute('title')|escape:'html'}</a>
+            </div>
 
             <div class="articleData__artNo text-muted">
                 <span>
@@ -26,10 +28,11 @@
                     {$Article->getAttribute('quantity')} {$Article->getQuantityUnit()} x
                     {$Currency->format($calc.basisPrice)}
                 </div>
-                <div class="sum fw-bolder">
-                    {$Currency->format($calc.sum)}
+                <div class="articleData__sum">
+                    <span class="articleData__sumValue fw-bolder">{$Currency->format($calc.sum)}</span>
+
                     {if !empty($vatArray)}
-                        <div class="articleData__price-vat text-muted">
+                        <div class="articleData__vat text-muted">
                             {locale group="quiqqer/erp" var="article.list.articles.header.vat" Locale=$Locale}
                             {$Article->getAttribute('vat')}%
                         </div>
@@ -37,9 +40,11 @@
                 </div>
             </div>
 
+            {if $Article->getAttribute('description') || $Article->getCustomFields()}
             <button class="articleData__btnToggleDetails btn btn-link-dark btn-sm btn-small"
                     {literal}onClick="(() => {this.classList.toggle('open')})();return false;"{/literal}>
-                Produktdetails <span class="fa fa-angle-down"></span>
+                {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.basket.btn.moreDetails" Locale=$Locale}
+                <span class="fa fa-angle-down"></span>
             </button>
 
             <div class="articleData__more">
@@ -54,7 +59,7 @@
                     <ul class="articleData__fields">
                         {foreach $Article->getCustomFields() as $field}
                             <li>
-                                <span>{$field.title}:</span>
+                                <span class="text-muted">{$field.title}:</span>
                                 {if isset($field.custom_calc) && isset($field.custom_calc.valueText)}
                                     <span>{$field.custom_calc.valueText}</span>
                                 {elseif isset($field['valueText'])}
@@ -67,9 +72,7 @@
                     </ul>
                 </div>
             </div>
-
-
-
+            {/if}
         </div>
 
     </section>

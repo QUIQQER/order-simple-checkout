@@ -1,27 +1,41 @@
-
+/***********/
+/* article */
+/***********/
 .articleList-entry {
+    --_gap: var(--gap, 0.5rem);
+
     display: grid;
-    gap: var(--_gap, 0.5rem);
+    gap: var(--_gap);
     grid-template-areas: "image data";
-    margin-bottom: var(--_gap, 0.5rem);
+    margin-bottom: var(--_gap);
     grid-template-columns: auto 1fr;
 }
 
 .articleList-entry__image,
 .articleList-entry__data {
+    --_bg: var(--bg, #fff);
+
     padding: 1rem;
     border-radius: 0.5rem;
-    background-color: var(--_bg, #fff);
+    background-color: var(--_bg);
 }
 
+/*********/
 /* image */
+/*********/
 .articleList-entry__image {
     display: grid;
 }
 
-/* data */
+/****************/
+/* product data */
+/****************/
 .articleData__title {
     font-size: var(--qui-fs-md, 1.125rem);
+}
+
+.articleData__title > a:not(:hover, :focus) {
+    color: inherit;
 }
 
 .articleData__price {
@@ -35,24 +49,32 @@
     flex-grow: 1;
 }
 
-.articleData__price > .sum {
+.articleData__sumValue {
     font-weight: bolder;
 }
 
-.articleData__price-vat {
+.articleData__vat {
     font-size: 0.75rem;
     text-align: right;
     line-height: 1;
-    font-weight: normal;
 }
 
-.articleList-entry__data {
+.articleData__desc {
+    margin-block: 0.5rem;
 }
 
-.articleData__action {
-    text-align: right;
+.articleData__desc > .label {
+    font-size: var(--qui-fs-sm, 0.875rem);
 }
 
+ul.articleData__fields {
+    list-style: none;
+    padding-left: 0;
+    margin-block: 0;
+    line-height: 1.5;
+}
+
+/* toggle button */
 .articleData__btnToggleDetails.btn {
     padding-inline: 0;
     display: block;
@@ -64,11 +86,14 @@
     margin-right: 0;
 }
 
+/* toggle button: open status */
 .articleData__btnToggleDetails.open > .fa {
     transform: rotate(180deg);
 }
 
+/******************/
 /* hidden content */
+/******************/
 .articleData__more {
     overflow: hidden;
     display: grid;
@@ -77,19 +102,11 @@
     height: auto;
 }
 
-.open + .articleData__more  {
-    grid-template-rows: 1fr;
-}
-
 .articleData__more > .inner {
     overflow: hidden;
 }
 
-.articleData__desc {
-    margin-block: 0.5rem;
+/*  hidden content: open status */
+.open + .articleData__more  {
+    grid-template-rows: 1fr;
 }
-
-.articleData__desc > .label {
-    font-size: var(--qui-fs-sm, 0.875rem);
-}
-
