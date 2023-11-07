@@ -35,7 +35,7 @@
             <en><![CDATA[<p>Pay faster and more conveniently with "Express Checkout".</p>]]></en>
         </locale>
         <locale name="simpleCheckout.subheader.basket">
-            <de><![CDATA[Warenkorn]]></de>
+            <de><![CDATA[Warenkorb]]></de>
             <en><![CDATA[Your order]]></en>
         </locale>
         <locale name="logged.in.guest">
