@@ -91,11 +91,20 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.Loader.show();
 
-            Promise.all([
-                this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-delivery')),
-                this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-shipping')),
-                this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-payment'))
-            ]).then((instances) => {
+            let SetCurrency = Promise.resolve();
+
+            if (typeof window.DEFAULT_USER_CURRENCY !== 'undefined' &&
+                typeof window.DEFAULT_USER_CURRENCY.code !== 'undefined') {
+                SetCurrency = this.setCurrency(window.DEFAULT_USER_CURRENCY.code);
+            }
+
+            SetCurrency.then(() => {
+                return Promise.all([
+                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-delivery')),
+                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-shipping')),
+                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-payment'))
+                ]);
+            }).then((instances) => {
                 this.$Delivery = instances[0];
                 this.$Shipping = instances[1];
                 this.$Payment = instances[2];
@@ -233,8 +242,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         setCurrency: function(currency) {
-            this.Loader.show();
-
             return new Promise((resolve, reject) => {
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_setCurrency', resolve, {
                     'package': 'quiqqer/order-simple-checkout',
@@ -250,10 +257,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }
             }).then(() => {
                 return this.$Payment.refresh();
-            }).then(() => {
-                return this.Loader.hide();
             }).catch(() => {
-                return this.Loader.hide();
             });
         },
 
