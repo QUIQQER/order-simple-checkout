@@ -1,8 +1,16 @@
-.order-simple-checkout-shipping--info {
-    background: #f5f5f5;
-    padding: 1.7rem;
+.quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping header {
+    display: none;
 }
 
-.quiqqer-simple-checkout-payment .quiqqer-order-step-payments header {
-    display: none;
+.quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry {
+    background-color: var(--_detailEntryBg);
+    margin-bottom: var(--_detailEntrySpacing);
+    border-radius: var(--_detailEntryBorder);
+    border-bottom: none;
+}
+
+.quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry:hover,
+.quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry.selected {
+    background-color: var(--_detailEntryBg) !important;
+    outline: 1px solid currentColor;
 }

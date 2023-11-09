@@ -1,0 +1,93 @@
+<button class="btn btn-link-dark quiqqer-simple-checkout-basket__toggleBasketBtn"
+        {literal}onClick="(() => {this.classList.toggle('state-open')})();return false;"{/literal}>
+    <span class="btn-label">
+        Bestelldetails <span class="fa fa-angle-down"></span>
+    </span>
+
+    <div class="quiqqer-simple-checkout-basket-header__sum">
+        {$calculations.sum}
+    </div>
+</button>
+
+<div class="quiqqer-simple-checkout-basket-articles">
+    <div class="articleList">
+        <br>
+        {foreach $articles as $Article}
+            {assign var=Product value=\QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
+            {assign var=calc value=$Article->getAttribute('calculated')}
+            <section class="articleList-entry">
+                <div class="articleList-entry__image">
+                    <a href="{$Product->getUrl()}">
+                        <img src="{$Product->getImage()->getSizeCacheUrl(160, 160)}" width="60" height="160"
+                             alt="{$Article->getAttribute('title')|escape:'html'}"
+                        />
+                    </a>
+                </div>
+                <div class="articleList-entry__data">
+                    <div class="articleData__title">
+                        <a href="{$Product->getUrl()}">{$Article->getAttribute('title')|escape:'html'}</a>
+                    </div>
+
+                    <div class="articleData__artNo text-muted">
+                <span>
+                    {locale group="quiqqer/erp" var="article.list.articles.header.articleNo" Locale=$Locale}
+                </span>
+                        <span>{$Article->getAttribute('articleNo')}</span>
+                    </div>
+
+                    <div class="articleData__price">
+                        <div class="quantity">
+                            {$Article->getAttribute('quantity')} {$Article->getQuantityUnit()} x
+                            {$Currency->format($calc.basisPrice)}
+                        </div>
+                        <div class="articleData__sum">
+                            <span class="articleData__sumValue fw-bolder">{$Currency->format($calc.sum)}</span>
+
+                            {if !empty($vatArray)}
+                                <div class="articleData__vat text-muted">
+                                    {locale group="quiqqer/erp" var="article.list.articles.header.vat" Locale=$Locale}
+                                    {$Article->getAttribute('vat')}%
+                                </div>
+                            {/if}
+                        </div>
+                    </div>
+
+                    {if $Article->getAttribute('description') || $Article->getCustomFields()}
+                        <button class="articleData__btnToggleDetails btn btn-link-dark btn-sm btn-small"
+                                {literal}onClick="(() => {this.classList.toggle('open')})();return false;"{/literal}>
+                            {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.basket.btn.moreDetails" Locale=$Locale}
+                            <span class="fa fa-angle-down"></span>
+                        </button>
+                        <div class="articleData__more">
+                            <div class="inner">
+                                <div class="articleData__desc">
+                                    <div class="text-muted label">
+                                        {locale group="quiqqer/erp" var="article.list.articles.header.description" Locale=$Locale}
+                                        :
+                                    </div>
+                                    {$Article->getAttribute('description')}
+                                </div>
+
+                                <ul class="articleData__fields">
+                                    {foreach $Article->getCustomFields() as $field}
+                                        <li>
+                                            <span class="text-muted">{$field.title}:</span>
+                                            {if isset($field.custom_calc) && isset($field.custom_calc.valueText)}
+                                                <span>{$field.custom_calc.valueText}</span>
+                                            {elseif isset($field['valueText'])}
+                                                <span>{$field['valueText']}</span>
+                                            {elseif isset($field['userInput'])}
+                                                <span>{$field['userInput']}</span>
+                                            {/if}
+                                        </li>
+                                    {/foreach}
+                                </ul>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+
+            </section>
+        {/foreach}
+    </div>
+</div>

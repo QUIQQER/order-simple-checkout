@@ -92,10 +92,13 @@ class Checkout extends QUI\Control
             [$this, &$termsAndConditions]
         );
 
+        $BasketForHeader = new Basket($this);
+        $BasketForHeader->setAttribute('basketForHeader', true);
 
         $Engine->assign([
             'Order' => $this->getOrder(),
             'Basket' => new Basket($this),
+            'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
             'Shipping' => new CheckoutShipping($this),

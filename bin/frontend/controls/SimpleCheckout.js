@@ -36,6 +36,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 onImport: this.$onImport,
                 onInject: this.$onInject
             });
+
+            QUI.addEvent('onQuiqqerCurrencyChange', (Instance, curr) => {
+                this.setCurrency(curr.code);
+            });
         },
 
         $onImport: function() {
@@ -65,7 +69,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }).open();
                 });
             });
-
 
             const LoginNode = this.getElm().getElement('.quiqqer-order-simple-login');
 
@@ -143,6 +146,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.orderWithCosts();
                 });
 
+                this.$setSpacingOnMobile();
+
                 // load
                 this.$Delivery.fireEvent('change');
             }).catch((err) => {
@@ -216,6 +221,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     QUI.parse(this.getElm()).then(() => {
                         this.fireEvent('loaded', [this]);
                         this.$onImport();
+                        this.$setSpacingOnMobile();
+
                         resolve();
                     });
                 }, {
@@ -331,7 +338,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
-                    this.getElm().getElement('.quiqqer-simple-checkout-basket--sticky').set('html', basket);
+                    this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
                     this.Loader.hide();
                     resolve();
                 }, {
@@ -349,6 +356,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_update', (isValid) => {
                     PayButton.disabled = !isValid;
+
                     this.$refreshBasket().then(resolve);
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
@@ -356,6 +364,24 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     orderHash: this.getAttribute('orderHash')
                 });
             });
+        },
+
+        /**
+         * Calculate needed margin on mobile.
+         * Not pretty solution, needs to be reworked.
+         */
+        $setSpacingOnMobile: function() {
+            if (QUI.getBodySize().x >= 768) {
+                return;
+            }
+
+            const PayContainer = this.getElm().querySelector('.quiqqer-simple-checkout-data-pay');
+
+            if (!PayContainer) {
+                return;
+            }
+
+            this.getElm().setStyle('margin-bottom', PayContainer.offsetHeight + 'px');
         }
     });
 });
