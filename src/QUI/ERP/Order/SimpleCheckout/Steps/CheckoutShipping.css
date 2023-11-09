@@ -6,6 +6,7 @@
     background-color: var(--_detailEntryBg);
     margin-bottom: var(--_detailEntrySpacing);
     border-radius: var(--_detailEntryBorder);
+    border-bottom: none;
 }
 
 .quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry:hover,

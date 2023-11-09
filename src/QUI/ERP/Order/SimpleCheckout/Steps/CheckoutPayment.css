@@ -6,6 +6,7 @@
     background-color: var(--_detailEntryBg);
     margin-bottom: var(--_detailEntrySpacing);
     border-radius: var(--_detailEntryBorder);
+    border-bottom: none;
 }
 
 .quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry:hover,
