@@ -287,12 +287,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 // execute order
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts', (result) => {
                     const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
+                    this.setAttribute('orderHash', result.orderHash);
+
+                    // for the OrderProcess.js
+                    if (this.getElm().getElement('form')) {
+                        this.getElm().getElement('form').set('data-order-hash', result.orderHash);
+                    }
 
                     moofx(Container).animate({
                         opacity: 0
                     }, {
                         callback: () => {
                             Container.set('html', result.html);
+                            Container.getElement('[]');
 
                             QUI.parse(Container).then(() => {
                                 moofx(Container).animate({

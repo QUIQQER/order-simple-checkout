@@ -166,7 +166,8 @@ class Checkout extends QUI\Control
             'html' => $result,
             'step' => $current,
             'url' => $OrderProcess->getStepUrl($current),
-            'hash' => $OrderProcess->getStepHash()
+            'hash' => $OrderProcess->getStepHash(),
+            'orderHash' => $Order->getHash()
         ];
     }
 
