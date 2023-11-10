@@ -38,15 +38,27 @@ class Basket extends QUI\Control
         $Articles = $Order->getArticles();
 
         if (!$Articles->count()) {
-            return QUI::getLocale()->get('quiqqer/order-simple-checkout', 'basket.empty');
+            $Engine->assign([
+                'basketEmpty' => true
+            ]);
+
+            return $Engine->fetch(dirname(__FILE__) . '/Basket.html');
         }
 
         $Articles->setCurrency($Order->getCurrency());
         $UniqueArticles = $Articles->toUniqueList();
         $UniqueArticles->hideHeader();
 
+        $basketHtml = $UniqueArticles->toHTML(dirname(__FILE__) . '/Basket.ArticleList.html');
+
+        if ($this->getAttribute('basketForHeader')) {
+            $basketHtml = $UniqueArticles->toHTML(dirname(__FILE__) . '/Basket.ForHeader.html');
+        }
+
         $Engine->assign([
-            'UniqueArticles' => $UniqueArticles
+            'basketEmpty' => false,
+            'UniqueArticles' => $UniqueArticles,
+            'basketHtml'     => $basketHtml
         ]);
 
         return $Engine->fetch(dirname(__FILE__) . '/Basket.html');

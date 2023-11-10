@@ -92,10 +92,13 @@ class Checkout extends QUI\Control
             [$this, &$termsAndConditions]
         );
 
+        $BasketForHeader = new Basket($this);
+        $BasketForHeader->setAttribute('basketForHeader', true);
 
         $Engine->assign([
             'Order' => $this->getOrder(),
             'Basket' => new Basket($this),
+            'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
             'Shipping' => new CheckoutShipping($this),
@@ -163,7 +166,8 @@ class Checkout extends QUI\Control
             'html' => $result,
             'step' => $current,
             'url' => $OrderProcess->getStepUrl($current),
-            'hash' => $OrderProcess->getStepHash()
+            'hash' => $OrderProcess->getStepHash(),
+            'orderHash' => $Order->getHash()
         ];
     }
 
