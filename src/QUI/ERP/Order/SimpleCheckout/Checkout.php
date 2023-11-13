@@ -144,8 +144,8 @@ class Checkout extends QUI\Control
 
     public function orderWithCosts(): array
     {
-        $OrderProcess = $this->getOrder();
-        $Order = $OrderProcess->createOrder(QUI::getUsers()->getSystemUser());
+        $OrderInProcess = $this->getOrder();
+        $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
         $Order->setData('orderedWithCosts', true);
         $Order->save(QUI::getUsers()->getSystemUser());
 
