@@ -325,7 +325,17 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    onError: (err) => {
+                        if (typeof err.getMessage === 'function') {
+                            this.$showError(err.getMessage());
+                            this.Loader.hide();
+                            return;
+                        }
+
+                        console.error(err);
+                        this.Loader.hide();
+                    }
                 });
             });
         },
@@ -370,6 +380,15 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
+        $showError: function(message) {
+            // @todo michael -> schönere error message
+            QUI.getMessageHandler().then((MH) => {
+                MH.addError(message);
+            });
+
+            console.error(message);
+        },
+
         update: function() {
             const PayButton = this.getElm().getElement('[name="pay"]');
 
@@ -383,7 +402,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderData: JSON.encode(orderData),
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    onError: (err) => {
+                        if (typeof err.getMessage === 'function') {
+                            this.$showError(err.getMessage());
+                            this.Loader.hide();
+                            resolve();
+                            return;
+                        }
+
+                        console.error(err);
+                        this.Loader.hide();
+                        resolve();
+                    }
                 });
             });
         },
