@@ -23,7 +23,29 @@ QUI::$Ajax->registerFunction(
 
         $Checkout = new Checkout(['orderHash' => $orderHash]);
         $Order = $Checkout->getOrder();
-        $Order->setInvoiceAddress(new Address($orderData));
+
+        if (isset($orderData['billing_address']) && $orderData['billing_address'] === 'different') {
+            $Order->setDeliveryAddress(new Address($orderData));
+
+            // invoice address / billing address
+            if (isset($orderData['billing_street']) && isset($orderData['billing_street_number'])) {
+                $orderData['billing_street_no'] = $orderData['billing_street'] . ' ' . $orderData['billing_street_number'];
+            }
+
+            $Order->setInvoiceAddress(
+                new Address([
+                    'firstname' => $orderData['billing_firstname'],
+                    'lastname' => $orderData['billing_lastname'],
+                    'street_no' => $orderData['billing_street_no'],
+                    'zip' => $orderData['billing_zip'],
+                    'city' => $orderData['billing_city'],
+                    'country' => $orderData['billing_country']
+                ])
+            );
+        } else {
+            $Order->setInvoiceAddress(new Address($orderData));
+            $Order->removeDeliveryAddress();
+        }
 
         if (!empty($orderData['shipping']) && QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
             $Order->setShipping(

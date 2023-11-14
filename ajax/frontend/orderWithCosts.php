@@ -16,6 +16,7 @@ QUI::$Ajax->registerFunction(
         $Order = $Checkout->getOrder();
         $InvoiceAddress = $Order->getInvoiceAddress();
         $DefaultAddress = $SessionUser->getStandardAddress();
+        $hasDeliveryAddress = $Order->hasDeliveryAddress();
 
         $isSameAddress = function (QUI\Users\Address $a, QUI\Users\Address $b) {
             if (
@@ -45,6 +46,7 @@ QUI::$Ajax->registerFunction(
             }
         }
 
+        // if default address is empty, we set it
         if (
             $DefaultAddress->getAttribute('firstname') === ''
             && $DefaultAddress->getAttribute('lastname') === ''
@@ -52,8 +54,9 @@ QUI::$Ajax->registerFunction(
             && $DefaultAddress->getAttribute('zip') === ''
             && $DefaultAddress->getAttribute('city') === ''
             && method_exists($DefaultAddress, 'save')
+            && $hasDeliveryAddress === false
         ) {
-            // set invoice address to default
+            // set invoice address to default, if only invoice exist and no delivery
             $DefaultAddress->setAttribute('firstname', $InvoiceAddress->getAttribute('firstname'));
             $DefaultAddress->setAttribute('lastname', $InvoiceAddress->getAttribute('lastname'));
             $DefaultAddress->setAttribute('street_no', $InvoiceAddress->getAttribute('street_no'));
@@ -63,6 +66,25 @@ QUI::$Ajax->registerFunction(
             $DefaultAddress->save(QUI::getUsers()->getSystemUser());
             $Order->setInvoiceAddress($DefaultAddress);
             $Order->save(QUI::getUsers()->getSystemUser());
+        } elseif (
+            $DefaultAddress->getAttribute('firstname') === ''
+            && $DefaultAddress->getAttribute('lastname') === ''
+            && $DefaultAddress->getAttribute('street_no') === ''
+            && $DefaultAddress->getAttribute('zip') === ''
+            && $DefaultAddress->getAttribute('city') === ''
+            && method_exists($DefaultAddress, 'save')
+            && $hasDeliveryAddress
+        ) {
+            // set delivery address to default
+            $DeliveryAddress = $Order->getInvoiceAddress();
+
+            // set invoice address to default
+            $DefaultAddress->setAttribute('firstname', $DeliveryAddress->getAttribute('firstname'));
+            $DefaultAddress->setAttribute('lastname', $DeliveryAddress->getAttribute('lastname'));
+            $DefaultAddress->setAttribute('street_no', $DeliveryAddress->getAttribute('street_no'));
+            $DefaultAddress->setAttribute('zip', $DeliveryAddress->getAttribute('zip'));
+            $DefaultAddress->setAttribute('city', $DeliveryAddress->getAttribute('city'));
+            $DefaultAddress->save(QUI::getUsers()->getSystemUser());
         } elseif (method_exists($SessionUser, 'addAddress')) {
             // add new address
             $NewAddress = $SessionUser->addAddress($InvoiceAddress->getAttributes());

@@ -6,6 +6,7 @@ use QUI;
 use QUI\ERP\Order\Controls\Checkout\Login;
 use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
+use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
@@ -101,6 +102,7 @@ class Checkout extends QUI\Control
             'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
+            'BillingAddress' => new CheckoutBillingAddress($this),
             'Shipping' => new CheckoutShipping($this),
             'Payment' => new CheckoutPayment($this),
             'termsAndConditions' => $termsAndConditions

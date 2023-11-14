@@ -23,26 +23,26 @@
     width: 100%;
 }
 
-.quiqqer-order-customerData-edit-firstname,
-.quiqqer-order-customerData-edit-lastname,
-.quiqqer-order-customerData-edit-zip,
-.quiqqer-order-customerData-edit-city {
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-firstname,
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-lastname,
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-zip,
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-city {
     float: left;
     width: calc(50% - 10px) !important;
 }
 
-.quiqqer-order-customerData-edit-lastname,
-.quiqqer-order-customerData-edit-city {
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-lastname,
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-city {
     clear: initial !important;
     margin-left: 20px;
 }
 
-.quiqqer-order-customerData-edit-street_no [name="street"] {
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-street_no [name="street"] {
     float: left;
     margin-right: 10px;
     width: calc(100% - 130px) !important;
 }
 
-.quiqqer-order-customerData-edit-street_no [name="street_number"] {
+.quiqqer-simple-checkout-delivery .quiqqer-order-customerData-edit-street_no [name="street_number"] {
     width: 120px !important;
 }

@@ -28,6 +28,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.parent(options);
 
             this.$Delivery = null;
+            this.$Billing = null;
             this.$Shipping = null;
             this.$Payment = null;
             this.Loader = null;
@@ -102,14 +103,16 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return Promise.all([
                     this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-delivery')),
                     this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-shipping')),
-                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-payment'))
+                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-payment')),
+                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-billing'))
                 ]);
             }).then((instances) => {
                 this.$Delivery = instances[0];
                 this.$Shipping = instances[1];
                 this.$Payment = instances[2];
+                this.$Billing = instances[3];
 
-                if (!this.$Delivery && !this.$Shipping && !this.$Payment) {
+                if (!this.$Delivery && !this.$Shipping && !this.$Payment && !this.$Billing) {
                     this.Loader.hide();
                     return;
                 }
@@ -117,6 +120,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 this.$Delivery.setAttribute('Checkout', this);
                 this.$Shipping.setAttribute('Checkout', this);
                 this.$Payment.setAttribute('Checkout', this);
+                this.$Billing.setAttribute('Checkout', this);
 
                 this.$Payment.addEvent('refreshBegin', showLoader);
                 this.$Payment.addEvent('refreshEnd', hideLoader);
@@ -146,6 +150,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }
 
                 this.$Payment.addEvent('change', () => {
+                    this.Loader.show();
+                    this.update().then(hideLoader);
+                });
+
+                this.$Billing.addEvent('change', () => {
+                    console.log('billing changed');
+
                     this.Loader.show();
                     this.update().then(hideLoader);
                 });
