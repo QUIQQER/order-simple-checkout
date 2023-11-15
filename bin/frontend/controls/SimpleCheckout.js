@@ -155,8 +155,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 });
 
                 this.$Billing.addEvent('change', () => {
-                    console.log('billing changed');
-
                     this.Loader.show();
                     this.update().then(hideLoader);
                 });
