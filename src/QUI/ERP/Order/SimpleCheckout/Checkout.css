@@ -71,28 +71,11 @@
 }
 
 /* section */
-.simpleCheckout-detail-section {
+.simpleCheckout-details-section {
     margin-bottom: var(--_sectionSpacing);
     padding: var(--_sectionPadding);
 
     background-color: #f8f8f8;
-}
-
-.simpleCheckout-detail-sectionn .simpleCheckoutCard-subheader {
-    text-align: center;
-    position: relative;
-    background: #fff;
-    display: inline-block;
-    top: -2rem;
-    padding-inline: 1em;
-    margin-bottom: 0;
-}
-
-@media screen and (max-width: 767px) {
-    .simpleCheckout-detail-sectionn .simpleCheckoutCard-subheader {
-        transform: translateX(-50%);
-        left: 50%;
-    }
 }
 
 .quiqqer-simple-checkout-data-or {

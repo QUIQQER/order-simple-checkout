@@ -40,8 +40,10 @@
                 {locale group="quiqqer/frontend-users" var="street_no"}
             </span>
             {if empty($Address->getAttribute('street_no'))}
-                <input type="text" name="billing_street" value="" autocomplete="shipping street-address">
-                <input type="text" name="billing_street_number" value="">
+                <div class="quiqqer-order-customerData-edit-street_no__container">
+                    <input type="text" name="billing_street" value="" autocomplete="shipping street-address">
+                    <input type="text" name="billing_street_number" value="">
+                </div>
             {else}
                 <input type="text"
                        name="billing_street_no"
