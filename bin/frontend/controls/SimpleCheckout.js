@@ -320,7 +320,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                         if (typeof Container.scrollIntoView === 'function') {
                                             Container.scrollIntoView({
                                                 behavior: 'smooth',
-                                                block: 'start',
+                                                block: 'center',
                                                 inline: 'start'
                                             });
                                         }
