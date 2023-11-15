@@ -318,6 +318,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                 }, {
                                     callback: () => {
                                         this.Loader.hide();
+
+                                        if (typeof Container.scrollIntoView === 'function') {
+                                            Container.scrollIntoView({
+                                                behavior: 'smooth',
+                                                block: 'start',
+                                                inline: 'start'
+                                            });
+                                        }
                                     }
                                 });
                             });
