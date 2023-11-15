@@ -1,12 +1,29 @@
-.quiqqer-simple-checkout-billing-diffContainer {
-    width: 100%;
+.quiqqer-simple-checkout-billing label {
+    display: block;
+    cursor: pointer;
 }
 
-.quiqqer-simple-checkout-billing label {
-    clear: both;
-    display: block;
+.quiqqer-simple-checkout-billing__entry {
+    padding: var(--_detailsEntryInnerPadding);
+    background-color: var(--_detailsEntryBg);
+    margin-bottom: var(--_detailsEntrySpacing);
+    border-radius: var(--_detailsEntryBorder);
+}
+
+.quiqqer-simple-checkout-billing__entry input {
+    vertical-align: middle;
+}
+
+.quiqqer-simple-checkout-billing-diffContainer {
+    overflow: hidden;
+}
+
+.quiqqer-simple-checkout-billing-diffContainer > .inner {
+    margin-top: 1rem;
+}
+
+.quiqqer-simple-checkout-billing-diffContainer label {
     margin-bottom: 1rem;
-    width: 100%;
 }
 
 .quiqqer-simple-checkout-billing label select,
@@ -22,15 +39,10 @@
     width: 100%;
 }
 
-.quiqqer-simple-checkout-billing label > span {
-    display: block;
-    width: 100%;
-}
-
-.quiqqer-simple-checkout-billing .quiqqer-order-customerData-edit-firstname,
-.quiqqer-simple-checkout-billing .quiqqer-order-customerData-edit-lastname,
-.quiqqer-simple-checkout-billing .quiqqer-order-customerData-edit-zip,
-.quiqqer-simple-checkout-billing .quiqqer-order-customerData-edit-city {
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-firstname,
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-lastname,
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-zip,
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-city {
     float: left;
     width: calc(50% - 10px) !important;
 }
@@ -49,4 +61,10 @@
 
 .quiqqer-simple-checkout-billing .quiqqer-order-customerData-edit-street_no [name="billing_street_number"] {
     width: 120px !important;
+}
+
+.quiqqer-simple-checkout-billing__entry:hover,
+.quiqqer-simple-checkout-billing__entry.selected {
+    background-color: var(--_detailsEntryBg);
+    outline: 1px solid currentColor;
 }

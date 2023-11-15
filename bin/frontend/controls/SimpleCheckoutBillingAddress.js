@@ -9,12 +9,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     return new Class({
 
         Extends: QUIControl,
-        Type: 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutBillingAddress',
+        Type   : 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutBillingAddress',
 
         Binds: [
             '$onChange',
             '$onImport',
-            '$toggle'
+            '$toggle',
+            '$showAddressContainer',
+            '$hideAddressContainer'
         ],
 
         initialize: function(options) {
@@ -33,6 +35,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$Container = this.getElm().getElement('.quiqqer-simple-checkout-billing-diffContainer');
             this.$InputSame = this.getElm().getElement('[value="same_as_shipping"]');
             this.$InputDiff = this.getElm().getElement('[value="different"]');
+            this.$labels = this.getElm().getElements('.quiqqer-simple-checkout-billing__entry');
 
             this.$InputSame.addEvent('click', this.$toggle);
             this.$InputDiff.addEvent('click', this.$toggle);
@@ -40,11 +43,20 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.getElm().getElements('input').addEvent('change', this.$onChange);
         },
 
-        $toggle: function() {
+        $toggle: function(event) {
+            this.$labels.removeClass('selected');
+
+            const Input = event.target,
+                Label = event.target.getParent('label');
+
+            if (Input.checked) {
+                Label.classList.add('selected');
+            }
+
             if (this.$InputSame.checked) {
-                this.$Container.setStyle('display', 'none');
+                this.$hideAddressContainer();
             } else {
-                this.$Container.setStyle('display', 'inline-block');
+                this.$showAddressContainer();
             }
 
             this.$onChange();
@@ -52,6 +64,35 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $onChange: function() {
             this.fireEvent('change');
+        },
+
+        $showAddressContainer: function() {
+            this.$Container.setStyle('height', 0);
+            this.$Container.setStyle('display', null);
+            const Inner = this.$Container.getElement('.inner');
+
+            return new Promise(() => {
+                moofx(this.$Container).animate({
+                    height: Inner.offsetHeight
+                }, {
+                    callback: () => {
+                        this.$Container.setStyle('height', null);
+                    }
+                });
+            });
+        },
+
+        $hideAddressContainer: function() {
+            return new Promise(() => {
+                moofx(this.$Container).animate({
+                    height: 0
+                }, {
+                    callback: () => {
+                        this.$Container.setStyle('height', 0);
+                        this.$Container.setStyle('display', null);
+                    }
+                });
+            });
         }
     });
 });

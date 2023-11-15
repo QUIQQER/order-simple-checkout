@@ -1,21 +1,18 @@
-<section>
-    <label>
-        <input type="radio" name="billing_address" value="same_as_shipping" checked/>
-        <span>
+<label class="quiqqer-simple-checkout-billing__entry selected">
+    <input type="radio" name="billing_address" value="same_as_shipping" checked/>
+    <span>
             {locale group="quiqqer/order-simple-checkout" var="ordering.step.title.Billing.same"}
         </span>
-    </label>
-</section>
-
-<section>
-    <label>
-        <input type="radio" name="billing_address" value="different"/>
-        <span>
+</label>
+<label class="quiqqer-simple-checkout-billing__entry">
+    <input type="radio" name="billing_address" value="different"/>
+    <span>
             {locale group="quiqqer/order-simple-checkout" var="ordering.step.title.Billing.different"}
         </span>
-    </label>
+</label>
 
-    <div class="quiqqer-simple-checkout-billing-diffContainer" style="display: none">
+<div class="quiqqer-simple-checkout-billing-diffContainer" style="display: none">
+    <div class="inner">
         <label class="quiqqer-order-customerData-edit-firstname">
             <span>
                 {locale group="quiqqer/frontend-users" var="firstname"}
@@ -43,14 +40,14 @@
                 {locale group="quiqqer/frontend-users" var="street_no"}
             </span>
             {if empty($Address->getAttribute('street_no'))}
-            <input type="text" name="billing_street" value="" autocomplete="shipping street-address">
-            <input type="text" name="billing_street_number" value="">
+                <input type="text" name="billing_street" value="" autocomplete="shipping street-address">
+                <input type="text" name="billing_street_number" value="">
             {else}
-            <input type="text"
-                   name="billing_street_no"
-                   autocomplete="address-line1"
-                   value="{$Address->getAttribute('street_no')|escape:'html'}"
-            />
+                <input type="text"
+                       name="billing_street_no"
+                       autocomplete="address-line1"
+                       value="{$Address->getAttribute('street_no')|escape:'html'}"
+                />
             {/if}
         </label>
 
@@ -86,6 +83,5 @@
             use-geo-location=true
             }
         </label>
-
     </div>
-</section>
+</div>

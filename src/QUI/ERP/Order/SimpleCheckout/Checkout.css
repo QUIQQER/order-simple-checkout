@@ -1,8 +1,10 @@
 .quiqqer-simple-checkout {
     --_gap: var(--gap, 3rem);
-    --_detailEntryBorder: var(--detailEntryBorder, 0.5rem);
-    --_detailEntryBg: var(--detailEntryBg, #fff);
-    --_detailEntrySpacing: var(--detailEntrySpacing, 0.5rem);
+    --_detailsEntryBorder: var(--detailsEntryBorder, 0.5rem);
+    --_detailsEntryBg: var(--detailsEntryBg, #fff);
+    --_detailsEntrySpacing: var(--detailsEntrySpacing, 0.5rem);
+    --_detailsEntryInnerPadding: var(--detailsEntryInnerPadding, 1rem);
+
     --_sectionSpacing: var(--sectionSpacing, 3rem);
     --_sectionPadding: var(--sectionPadding, 2rem);
 }

@@ -3,15 +3,15 @@
 }
 
 .quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry {
-    background-color: var(--_detailEntryBg);
-    margin-bottom: var(--_detailEntrySpacing);
-    border-radius: var(--_detailEntryBorder);
+    background-color: var(--_detailsEntryBg);
+    margin-bottom: var(--_detailsEntrySpacing);
+    border-radius: var(--_detailsEntryBorder);
     border-bottom: none;
 }
 
 .quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry:hover,
 .quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry.selected {
-    background-color: var(--_detailEntryBg) !important;
+    background-color: var(--_detailsEntryBg) !important;
     outline: 1px solid currentColor;
 }
 

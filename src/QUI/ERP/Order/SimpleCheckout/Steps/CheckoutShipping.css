@@ -3,14 +3,14 @@
 }
 
 .quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry {
-    background-color: var(--_detailEntryBg);
-    margin-bottom: var(--_detailEntrySpacing);
-    border-radius: var(--_detailEntryBorder);
+    background-color: var(--_detailsEntryBg);
+    margin-bottom: var(--_detailsEntrySpacing);
+    border-radius: var(--_detailsEntryBorder);
     border-bottom: none;
 }
 
 .quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry:hover,
 .quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry.selected {
-    background-color: var(--_detailEntryBg) !important;
+    background-color: var(--_detailsEntryBg) !important;
     outline: 1px solid currentColor;
 }
