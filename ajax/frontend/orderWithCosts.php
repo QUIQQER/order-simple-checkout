@@ -62,6 +62,7 @@ QUI::$Ajax->registerFunction(
             $DefaultAddress->setAttribute('street_no', $InvoiceAddress->getAttribute('street_no'));
             $DefaultAddress->setAttribute('zip', $InvoiceAddress->getAttribute('zip'));
             $DefaultAddress->setAttribute('city', $InvoiceAddress->getAttribute('city'));
+            $DefaultAddress->setAttribute('country', $InvoiceAddress->getAttribute('country'));
 
             $DefaultAddress->save(QUI::getUsers()->getSystemUser());
             $Order->setInvoiceAddress($DefaultAddress);
@@ -84,6 +85,7 @@ QUI::$Ajax->registerFunction(
             $DefaultAddress->setAttribute('street_no', $DeliveryAddress->getAttribute('street_no'));
             $DefaultAddress->setAttribute('zip', $DeliveryAddress->getAttribute('zip'));
             $DefaultAddress->setAttribute('city', $DeliveryAddress->getAttribute('city'));
+            $DefaultAddress->setAttribute('country', $DeliveryAddress->getAttribute('country'));
             $DefaultAddress->save(QUI::getUsers()->getSystemUser());
         } elseif (method_exists($SessionUser, 'addAddress')) {
             // add new address
