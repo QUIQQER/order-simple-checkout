@@ -2,7 +2,8 @@
     display: none;
 }
 
-.quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry {
+.quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry,
+.quiqqer-order-processing-payments .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry {
     background-color: var(--_detailsEntryBg);
     margin-bottom: var(--_detailsEntrySpacing);
     border-radius: var(--_detailsEntryBorder);
@@ -10,7 +11,8 @@
 }
 
 .quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry:hover,
-.quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry.selected {
+.quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list .quiqqer-order-step-payments-list-entry.selected,
+.quiqqer-simple-checkout .quiqqer-order-step-payments-list-entry:hover{
     background-color: var(--_detailsEntryBg) !important;
     outline: 1px solid currentColor;
 }
@@ -20,6 +22,7 @@
 }
 
 /* workaround, it should be fixed in cologne */
-.quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list-entry-select {
-    flex-grow: 1 !important;
+.quiqqer-simple-checkout-data-payment .quiqqer-order-step-payments-list-entry-select,
+.quiqqer-order-processing-payments .quiqqer-order-step-payments-list-entry-select {
+    padding-inline: 20px;
 }
