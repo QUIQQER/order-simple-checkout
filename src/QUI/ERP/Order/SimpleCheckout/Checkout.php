@@ -170,7 +170,8 @@ class Checkout extends QUI\Control
             'step' => $current,
             'url' => $OrderProcess->getStepUrl($current),
             'hash' => $OrderProcess->getStepHash(),
-            'orderHash' => $Order->getHash()
+            'orderHash' => $Order->getHash(),
+            'productCount' => $Order->getArticles()->count(),
         ];
     }
 

@@ -315,6 +315,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     // for the OrderProcess.js
                     if (this.getElm().getElement('form')) {
                         this.getElm().getElement('form').set('data-order-hash', result.orderHash);
+                        this.getElm().getElement('form').set('data-products-count', result.productCount);
                     }
 
                     moofx(Container).animate({
