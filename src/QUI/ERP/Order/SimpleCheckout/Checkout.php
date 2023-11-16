@@ -27,7 +27,8 @@ class Checkout extends QUI\Control
         $this->setAttributes([
             'orderHash' => false,
             'template' => false,
-            'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout'
+            'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
+            'data-qui-load-hash-from-url' => 0
         ]);
 
         $this->addCSSClass('quiqqer-simple-checkout');
