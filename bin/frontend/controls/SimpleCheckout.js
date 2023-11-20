@@ -49,8 +49,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onImport: function() {
-            console.log('$onImport');
-
             this.Loader = new QUILoader().inject(this.getElm());
             this.$setAnchor();
 
@@ -107,7 +105,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                     return this.$loadGUI();
                 }
-                
+
                 if (typeof orderData !== 'undefined' &&
                     typeof orderData.data !== 'undefined' &&
                     orderData.data &&
@@ -132,8 +130,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onInject: function() {
-            console.log('$onInject');
-
             this.$loadProducts().then(() => {
                 return this.$loadCheckout();
             }).catch((err) => {
