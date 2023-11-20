@@ -107,9 +107,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                     return this.$loadGUI();
                 }
-
+                
                 if (typeof orderData !== 'undefined' &&
                     typeof orderData.data !== 'undefined' &&
+                    orderData.data &&
                     typeof orderData.data.orderedWithCosts !== 'undefined' &&
                     orderData.data.orderedWithCosts
                 ) {
