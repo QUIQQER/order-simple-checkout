@@ -49,6 +49,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onImport: function() {
+            console.log('$onImport');
+
             this.Loader = new QUILoader().inject(this.getElm());
             this.$setAnchor();
 
@@ -97,32 +99,40 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             // check order status
             this.$loadOrder().then((orderData) => {
-                if (!orderData) {
+                // orderData === false = no permission for this order
+                if (orderData === false) {
                     // normal load
+                    window.location.hash = '';
+                    this.setAttribute('orderHash', '');
+
                     return this.$loadGUI();
                 }
 
-                switch (parseInt(orderData.status)) {
-                    case 1: // PAYMENT_STATUS_PAID
-                    case 2: // PAYMENT_STATUS_PART
-                        // show payment step
-                        return this.$loadPayment();
+                if (typeof orderData !== 'undefined' &&
+                    typeof orderData.data !== 'undefined' &&
+                    typeof orderData.data.orderedWithCosts !== 'undefined' &&
+                    orderData.data.orderedWithCosts
+                ) {
+                    // show payment step
+                    return this.$loadPayment();
                 }
 
-                // normal load
-                if (parseInt(orderData.status) === 0) {
-                    return this.$loadGUI();
-                }
-
-                // some errors
-                // @todo show errors?
                 return this.$loadGUI();
             }).then(() => {
                 this.Loader.hide();
+
+                moofx([
+                    this.getElm().getElements('form'),
+                    this.getElm().getElements('.quiqqer-simple-checkout-orderDetails')
+                ]).animate({
+                    opacity: 1
+                });
             });
         },
 
         $onInject: function() {
+            console.log('$onInject');
+
             this.$loadProducts().then(() => {
                 return this.$loadCheckout();
             }).catch((err) => {
@@ -260,6 +270,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     'package_quiqqer_order-simple-checkout_ajax_frontend_getPaymentStep',
                     (result) => {
                         const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
+
+                        // for the OrderProcess.js
+                        if (this.getElm().getElement('form')) {
+                            this.getElm().getElement('form').set('data-order-hash', result.orderHash);
+                            this.getElm().getElement('form').set('data-products-count', result.productCount);
+                        }
 
                         moofx(Container).animate({
                             opacity: 0
@@ -489,7 +505,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
-                    this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
+                    if (this.getElm().getElement('.quiqqer-simple-checkout-basket__inner')) {
+                        this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
+                    }
+
                     this.Loader.hide();
                     resolve();
                 }, {

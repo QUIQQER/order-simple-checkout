@@ -12,17 +12,14 @@ QUI::$Ajax->registerFunction(
 
         try {
             $Order = $OrderHandler->getOrderByHash($orderHash);
+            $Customer = $Order->getCustomer();
+            $customerId = $Customer->getId();
 
-            if (
-                QUI\Permissions\Permission::isAdmin($User)
-                || QUI\Permissions\Permission::isSU($User)
-            ) {
+            if ($User->getId() === $customerId) {
                 return $Order->toArray();
             }
 
-            if ($User->getId() === $Order->getCustomer()->getId()) {
-                return $Order->toArray();
-            }
+            return false;
         } catch (QUI\Exception $exception) {
         }
 
