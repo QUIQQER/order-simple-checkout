@@ -24,8 +24,18 @@ QUI::$Ajax->registerFunction(
         $Checkout = new Checkout(['orderHash' => $orderHash]);
         $Order = $Checkout->getOrder();
 
+        $ErpAddress = new Address([
+            'salutation' => $orderData['salutation'],
+            'firstname' => $orderData['firstname'],
+            'lastname' => $orderData['lastname'],
+            'street_no' => $orderData['street_no'],
+            'zip' => $orderData['zip'],
+            'city' => $orderData['city'],
+            'country' => $orderData['country']
+        ]);
+
         if (isset($orderData['billing_address']) && $orderData['billing_address'] === 'different') {
-            $Order->setDeliveryAddress(new Address($orderData));
+            $Order->setDeliveryAddress($ErpAddress);
 
             // invoice address / billing address
             if (isset($orderData['billing_street']) && isset($orderData['billing_street_number'])) {
@@ -43,7 +53,7 @@ QUI::$Ajax->registerFunction(
                 ])
             );
         } else {
-            $Order->setInvoiceAddress(new Address($orderData));
+            $Order->setInvoiceAddress($ErpAddress);
             $Order->removeDeliveryAddress();
         }
 

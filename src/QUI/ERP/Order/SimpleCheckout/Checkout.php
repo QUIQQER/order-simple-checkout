@@ -145,12 +145,26 @@ class Checkout extends QUI\Control
         return true;
     }
 
+    /**
+     * @throws QUI\ERP\Order\Exception
+     * @throws QUI\Permissions\Exception
+     * @throws Exception
+     */
     public function orderWithCosts(): array
     {
         $OrderInProcess = $this->getOrder();
         $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
         $Order->setData('orderedWithCosts', true);
         $Order->save(QUI::getUsers()->getSystemUser());
+        $this->setAttribute('orderHash', $Order->getHash());
+
+        return $this->getOrderProcessStep();
+    }
+
+    public function getOrderProcessStep(): array
+    {
+        $OrderHandler = QUI\ERP\Order\Handler::getInstance();
+        $Order = $OrderHandler->getOrderByHash($this->getAttribute('orderHash'));
 
         // init order process
         $OrderProcess = new QUI\ERP\Order\OrderProcess([

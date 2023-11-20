@@ -56,14 +56,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 this.setAttribute('loadHashFromUrl', true);
             }
 
-            const hideLoader = () => {
-                this.Loader.hide();
-            };
-
-            const showLoader = () => {
-                this.Loader.show();
-            };
-
             this.getElm().getElements('a.log-in').addEvent('click', (e) => {
                 e.stop();
 
@@ -102,6 +94,83 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }
 
             this.Loader.show();
+
+            // check order status
+            this.$loadOrder().then((orderData) => {
+                if (!orderData) {
+                    // normal load
+                    return this.$loadGUI();
+                }
+
+                switch (parseInt(orderData.status)) {
+                    case 1: // PAYMENT_STATUS_PAID
+                    case 2: // PAYMENT_STATUS_PART
+                        // show payment step
+                        return this.$loadPayment();
+                }
+
+                // normal load
+                if (parseInt(orderData.status) === 0) {
+                    return this.$loadGUI();
+                }
+
+                // some errors
+                // @todo show errors?
+                return this.$loadGUI();
+            }).then(() => {
+                this.Loader.hide();
+            });
+        },
+
+        $onInject: function() {
+            this.$loadProducts().then(() => {
+                return this.$loadCheckout();
+            }).catch((err) => {
+                console.error(err);
+                this.getElm().set('html', '');
+
+                if (this.getElm().getParent('.qui-window-popup')) {
+                    this.fireEvent('loadedError', [this]);
+                    return;
+                }
+
+                require([
+                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                ], (Login) => {
+                    new Login({
+                        events: {
+                            onSuccess: () => {
+
+                            }
+                        }
+                    }).open();
+                });
+            });
+        },
+
+        $loadOrder: function() {
+            if (this.getAttribute('orderHash')) {
+                return new Promise((resolve, reject) => {
+                    QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_getOrder', resolve, {
+                        'package': 'quiqqer/order-simple-checkout',
+                        orderHash: this.getAttribute('orderHash'),
+                        onError: reject
+                    });
+                });
+            }
+
+            return Promise.resolve();
+        },
+
+        $loadGUI: function() {
+            const hideLoader = () => {
+                this.Loader.hide();
+            };
+
+            const showLoader = () => {
+                this.Loader.show();
+            };
+
 
             let SetCurrency = Promise.resolve();
 
@@ -185,30 +254,48 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $onInject: function() {
-            this.$loadProducts().then(() => {
-                return this.$loadCheckout();
-            }).catch((err) => {
-                console.error(err);
-                this.getElm().set('html', '');
+        $loadPayment: function() {
+            return new Promise((resolve, reject) => {
+                QUIAjax.post(
+                    'package_quiqqer_order-simple-checkout_ajax_frontend_getPaymentStep',
+                    (result) => {
+                        const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
 
-                if (this.getElm().getParent('.qui-window-popup')) {
-                    this.fireEvent('loadedError', [this]);
-                    return;
-                }
+                        moofx(Container).animate({
+                            opacity: 0
+                        }, {
+                            callback: () => {
+                                Container.set('html', result.html);
 
-                require([
-                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
-                ], (Login) => {
-                    new Login({
-                        events: {
-                            onSuccess: () => {
+                                QUI.parse(Container).then(() => {
+                                    moofx(Container).animate({
+                                        opacity: 1
+                                    }, {
+                                        callback: () => {
+                                            if (typeof Container.scrollIntoView === 'function') {
+                                                Container.scrollIntoView({
+                                                    behavior: 'smooth',
+                                                    block: 'center',
+                                                    inline: 'start'
+                                                });
+                                            }
 
+                                            resolve();
+                                        }
+                                    });
+                                });
                             }
-                        }
-                    }).open();
-                });
+                        });
+                    },
+                    {
+                        'package': 'quiqqer/order-simple-checkout',
+                        orderHash: this.getAttribute('orderHash'),
+                        onError: reject
+                    }
+                );
             });
+
+
         },
 
         $loadProducts: function() {
@@ -323,7 +410,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }, {
                         callback: () => {
                             Container.set('html', result.html);
-                            Container.getElement('[]');
 
                             QUI.parse(Container).then(() => {
                                 moofx(Container).animate({
