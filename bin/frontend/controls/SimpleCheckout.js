@@ -118,6 +118,31 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 return this.$loadGUI();
             }).then(() => {
+                // Terms of Service
+                this.getElm().getElements('a[data-project]').addEvent('click', function(e) {
+                    let Target = e.target;
+
+                    if (Target.nodeName !== 'A') {
+                        Target = Target.getParent('a');
+                    }
+
+                    if (!Target.get('data-project') || !Target.get('data-lang') || !Target.get('data-id')) {
+                        return;
+                    }
+
+                    e.stop();
+
+                    require(['package/quiqqer/controls/bin/site/Window'], function(Win) {
+                        new Win({
+                            showTitle: true,
+                            project: Target.get('data-project'),
+                            lang: Target.get('data-lang'),
+                            id: Target.get('data-id')
+                        }).open();
+                    });
+                });
+
+
                 this.Loader.hide();
 
                 moofx([
