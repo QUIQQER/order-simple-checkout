@@ -1,12 +1,14 @@
 .quiqqer-simple-checkout {
     --_gap: var(--gap, 3rem);
-    --_detailsEntryBorder: var(--detailsEntryBorder, 0.5rem);
-    --_detailsEntryBg: var(--detailsEntryBg, #fff);
-    --_detailsEntrySpacing: var(--detailsEntrySpacing, 0.5rem);
-    --_detailsEntryInnerPadding: var(--detailsEntryInnerPadding, 1rem);
-
     --_sectionSpacing: var(--sectionSpacing, 3rem);
     --_sectionPadding: var(--sectionPadding, 2rem);
+
+    --_order-listEntry-padding: var(--order-listEntry-padding, 1rem);
+    --_order-listEntry-bg: var(--order-listEntry-bg, #ffffff);
+    --_order-listEntry-bg--hover: var(--order-listEntry-bg--hover, #ffffff);
+    --_order-listEntry-radius: var(--order-listEntry-radius, 0.25rem);
+    --_order-listEntry-gap: var(--order-listEntry-gap, 0.25rem 2rem);
+    --_order-listEntry-spacing: var(--order-listEntry-spacing, 0.5rem);
 }
 
 @media screen and (max-width: 767px) {
@@ -180,4 +182,15 @@
 
 [data-nobody-log-in="1"] .quiqqer-order-ordering-timeline {
     display: none;
+}
+
+/**************/
+/* list entry */
+/**************/
+@media screen and (min-width: 768px) {
+    .quiqqer-simple-checkout .quiqqer-order-step-payments-list-entry,
+    .quiqqer-simple-checkout .quiqqer-order-step-shipping-list-entry {
+        grid-template-columns: auto max(25%, 150px) 1fr;
+        grid-template-areas: 'select icon text' '. . price';
+    }
 }

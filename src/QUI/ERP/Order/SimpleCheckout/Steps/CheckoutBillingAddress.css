@@ -5,10 +5,14 @@
 }
 
 .quiqqer-simple-checkout-billing__entry {
-    padding: var(--_detailsEntryInnerPadding);
-    background-color: var(--_detailsEntryBg);
-    margin-bottom: var(--_detailsEntrySpacing);
-    border-radius: var(--_detailsEntryBorder);
+    background-color: var(--_order-listEntry-bg);
+    gap: var(--_order-listEntry-gap);
+    padding: var(--_order-listEntry-padding);
+    border-radius: var(--_order-listEntry-radius);
+}
+
+.quiqqer-simple-checkout-billing__entry:not(:last-child) {
+    margin-bottom: var(--_order-listEntry-spacing, 0.25rem);
 }
 
 .quiqqer-simple-checkout-billing__entry input {
@@ -43,7 +47,6 @@
     width: 100%;
 }
 
-
 .quiqqer-simple-checkout-billing label .qui-select {
     float: initial;
     width: 100%;
@@ -64,9 +67,8 @@
     flex: 1 0 calc(25% - var(--form-gap));
 }
 
-
 .quiqqer-simple-checkout-billing__entry:hover,
 .quiqqer-simple-checkout-billing__entry.selected {
-    background-color: var(--_detailsEntryBg);
+    background-color: var(--_order-listEntry-bg--hover);
     outline: 1px solid currentColor;
 }
