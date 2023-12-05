@@ -4,6 +4,7 @@ $Site->setAttribute('nocache', true);
 
 try {
     $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout([
+        'data-qui-load-hash-from-url' => 1
     ]);
 
     $Engine->assign([

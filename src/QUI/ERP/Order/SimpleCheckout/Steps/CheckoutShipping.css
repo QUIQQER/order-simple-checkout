@@ -2,15 +2,7 @@
     display: none;
 }
 
-.quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry {
-    background-color: var(--_detailEntryBg);
-    margin-bottom: var(--_detailEntrySpacing);
-    border-radius: var(--_detailEntryBorder);
-    border-bottom: none;
-}
-
-.quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry:hover,
-.quiqqer-simple-checkout-data-shipping .quiqqer-order-step-shipping-list .quiqqer-order-step-shipping-list-entry.selected {
-    background-color: var(--_detailEntryBg) !important;
+.quiqqer-order-step-shipping-list-entry:hover,
+.quiqqer-order-step-shipping-list-entry.selected {
     outline: 1px solid currentColor;
 }

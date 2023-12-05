@@ -21,13 +21,15 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         ],
 
         options: {
-            orderHash: false
+            orderHash: false,
+            loadHashFromUrl: false
         },
 
         initialize: function(options) {
             this.parent(options);
 
             this.$Delivery = null;
+            this.$Billing = null;
             this.$Shipping = null;
             this.$Payment = null;
             this.Loader = null;
@@ -40,17 +42,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             QUI.addEvent('onQuiqqerCurrencyChange', (Instance, curr) => {
                 this.setCurrency(curr.code);
             });
+
+            if (!this.getAttribute('orderHash') && window.location.hash) {
+                this.setAttribute('orderHash', window.location.hash.replace('#', ''));
+            }
         },
 
         $onImport: function() {
             this.Loader = new QUILoader().inject(this.getElm());
+            this.$setAnchor();
 
-            const hideLoader = () => {
-                this.Loader.hide();
-            };
-            const showLoader = () => {
-                this.Loader.show();
-            };
+            if (parseInt(this.getElm().get('data-qui-load-hash-from-url')) === 1) {
+                this.setAttribute('loadHashFromUrl', true);
+            }
 
             this.getElm().getElements('a.log-in').addEvent('click', (e) => {
                 e.stop();
@@ -91,6 +95,115 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.Loader.show();
 
+            // check order status
+            this.$loadOrder().then((orderData) => {
+                // orderData === false = no permission for this order
+                if (orderData === false) {
+                    // normal load
+                    window.location.hash = '';
+                    this.setAttribute('orderHash', '');
+
+                    return this.$loadGUI();
+                }
+
+                if (typeof orderData !== 'undefined' &&
+                    typeof orderData.data !== 'undefined' &&
+                    orderData.data &&
+                    typeof orderData.data.orderedWithCosts !== 'undefined' &&
+                    orderData.data.orderedWithCosts
+                ) {
+                    // show payment step
+                    return this.$loadPayment();
+                }
+
+                return this.$loadGUI();
+            }).then(() => {
+                // Terms of Service
+                this.getElm().getElements('a[data-project]').addEvent('click', function(e) {
+                    let Target = e.target;
+
+                    if (Target.nodeName !== 'A') {
+                        Target = Target.getParent('a');
+                    }
+
+                    if (!Target.get('data-project') || !Target.get('data-lang') || !Target.get('data-id')) {
+                        return;
+                    }
+
+                    e.stop();
+
+                    require(['package/quiqqer/controls/bin/site/Window'], function(Win) {
+                        new Win({
+                            showTitle: true,
+                            project: Target.get('data-project'),
+                            lang: Target.get('data-lang'),
+                            id: Target.get('data-id')
+                        }).open();
+                    });
+                });
+
+
+                this.Loader.hide();
+
+                moofx([
+                    this.getElm().getElements('form'),
+                    this.getElm().getElements('.quiqqer-simple-checkout-orderDetails')
+                ]).animate({
+                    opacity: 1
+                });
+            });
+        },
+
+        $onInject: function() {
+            this.$loadProducts().then(() => {
+                return this.$loadCheckout();
+            }).catch((err) => {
+                console.error(err);
+                this.getElm().set('html', '');
+
+                if (this.getElm().getParent('.qui-window-popup')) {
+                    this.fireEvent('loadedError', [this]);
+                    return;
+                }
+
+                require([
+                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                ], (Login) => {
+                    new Login({
+                        events: {
+                            onSuccess: () => {
+
+                            }
+                        }
+                    }).open();
+                });
+            });
+        },
+
+        $loadOrder: function() {
+            if (this.getAttribute('orderHash')) {
+                return new Promise((resolve, reject) => {
+                    QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_getOrder', resolve, {
+                        'package': 'quiqqer/order-simple-checkout',
+                        orderHash: this.getAttribute('orderHash'),
+                        onError: reject
+                    });
+                });
+            }
+
+            return Promise.resolve();
+        },
+
+        $loadGUI: function() {
+            const hideLoader = () => {
+                this.Loader.hide();
+            };
+
+            const showLoader = () => {
+                this.Loader.show();
+            };
+
+
             let SetCurrency = Promise.resolve();
 
             if (typeof window.DEFAULT_USER_CURRENCY !== 'undefined' &&
@@ -102,14 +215,16 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return Promise.all([
                     this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-delivery')),
                     this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-shipping')),
-                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-payment'))
+                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-payment')),
+                    this.$getControl(this.getElm().getElement('.quiqqer-simple-checkout-billing'))
                 ]);
             }).then((instances) => {
                 this.$Delivery = instances[0];
                 this.$Shipping = instances[1];
                 this.$Payment = instances[2];
+                this.$Billing = instances[3];
 
-                if (!this.$Delivery && !this.$Shipping && !this.$Payment) {
+                if (!this.$Delivery && !this.$Shipping && !this.$Payment && !this.$Billing) {
                     this.Loader.hide();
                     return;
                 }
@@ -117,6 +232,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 this.$Delivery.setAttribute('Checkout', this);
                 this.$Shipping.setAttribute('Checkout', this);
                 this.$Payment.setAttribute('Checkout', this);
+                this.$Billing.setAttribute('Checkout', this);
 
                 this.$Payment.addEvent('refreshBegin', showLoader);
                 this.$Payment.addEvent('refreshEnd', hideLoader);
@@ -150,6 +266,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.update().then(hideLoader);
                 });
 
+                this.$Billing.addEvent('change', () => {
+                    this.Loader.show();
+                    this.update().then(hideLoader);
+                });
+
                 this.getElm().getElement('[name="pay"]').addEvent('click', (e) => {
                     e.stop();
                     this.orderWithCosts();
@@ -165,31 +286,54 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $onInject: function() {
-            this.$loadProducts().then(() => {
-                return this.$loadCheckout();
-            }).catch((err) => {
-                console.error(err);
-                this.getElm().set('html', '');
+        $loadPayment: function() {
+            return new Promise((resolve, reject) => {
+                QUIAjax.post(
+                    'package_quiqqer_order-simple-checkout_ajax_frontend_getPaymentStep',
+                    (result) => {
+                        const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
 
-                if (this.getElm().getParent('.qui-window-popup')) {
-                    this.fireEvent('loadedError', [this]);
-                    return;
-                }
-
-                require([
-                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Login'
-                ], (Login) => {
-                    new Login({
-                        events: {
-                            onSuccess: () => {
-
-                            }
+                        // for the OrderProcess.js
+                        if (this.getElm().getElement('form')) {
+                            this.getElm().getElement('form').set('data-order-hash', result.orderHash);
+                            this.getElm().getElement('form').set('data-products-count', result.productCount);
                         }
-                    }).open();
-                });
 
+                        moofx(Container).animate({
+                            opacity: 0
+                        }, {
+                            callback: () => {
+                                Container.set('html', result.html);
+
+                                QUI.parse(Container).then(() => {
+                                    moofx(Container).animate({
+                                        opacity: 1
+                                    }, {
+                                        callback: () => {
+                                            if (typeof Container.scrollIntoView === 'function') {
+                                                Container.scrollIntoView({
+                                                    behavior: 'smooth',
+                                                    block: 'center',
+                                                    inline: 'start'
+                                                });
+                                            }
+
+                                            resolve();
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    },
+                    {
+                        'package': 'quiqqer/order-simple-checkout',
+                        orderHash: this.getAttribute('orderHash'),
+                        onError: reject
+                    }
+                );
             });
+
+
         },
 
         $loadProducts: function() {
@@ -199,6 +343,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
                         (orderHash) => {
                             this.setAttribute('orderHash', orderHash);
+                            this.$setAnchor();
                             resolve();
                         },
                         {
@@ -214,6 +359,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $loadCheckout: function() {
+            this.$setAnchor();
+
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl', (html) => {
                     const Ghost = new Element('div', {
@@ -288,10 +435,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts', (result) => {
                     const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
                     this.setAttribute('orderHash', result.orderHash);
+                    this.$setAnchor();
 
                     // for the OrderProcess.js
                     if (this.getElm().getElement('form')) {
                         this.getElm().getElement('form').set('data-order-hash', result.orderHash);
+                        this.getElm().getElement('form').set('data-products-count', result.productCount);
                     }
 
                     moofx(Container).animate({
@@ -299,7 +448,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }, {
                         callback: () => {
                             Container.set('html', result.html);
-                            Container.getElement('[]');
 
                             QUI.parse(Container).then(() => {
                                 moofx(Container).animate({
@@ -307,6 +455,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                 }, {
                                     callback: () => {
                                         this.Loader.hide();
+
+                                        if (typeof Container.scrollIntoView === 'function') {
+                                            Container.scrollIntoView({
+                                                behavior: 'smooth',
+                                                block: 'center',
+                                                inline: 'start'
+                                            });
+                                        }
                                     }
                                 });
                             });
@@ -314,7 +470,17 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    onError: (err) => {
+                        if (typeof err.getMessage === 'function') {
+                            this.$showError(err.getMessage());
+                            this.Loader.hide();
+                            return;
+                        }
+
+                        console.error(err);
+                        this.Loader.hide();
+                    }
                 });
             });
         },
@@ -344,12 +510,27 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
+        $setAnchor: function() {
+            if (!this.getAttribute('loadHashFromUrl')) {
+                return;
+            }
+
+            if (!this.getAttribute('orderHash')) {
+                return;
+            }
+
+            window.location.hash = this.getAttribute('orderHash');
+        },
+
         $refreshBasket: function() {
             this.Loader.show();
 
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
-                    this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
+                    if (this.getElm().getElement('.quiqqer-simple-checkout-basket__inner')) {
+                        this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
+                    }
+
                     this.Loader.hide();
                     resolve();
                 }, {
@@ -357,6 +538,15 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     orderHash: this.getAttribute('orderHash')
                 });
             });
+        },
+
+        $showError: function(message) {
+            // @todo michael -> schönere error message
+            QUI.getMessageHandler().then((MH) => {
+                MH.addError(message);
+            });
+
+            console.error(message);
         },
 
         update: function() {
@@ -372,7 +562,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderData: JSON.encode(orderData),
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    onError: (err) => {
+                        if (typeof err.getMessage === 'function') {
+                            this.$showError(err.getMessage());
+                            this.Loader.hide();
+                            resolve();
+                            return;
+                        }
+
+                        console.error(err);
+                        this.Loader.hide();
+                        resolve();
+                    }
                 });
             });
         },
