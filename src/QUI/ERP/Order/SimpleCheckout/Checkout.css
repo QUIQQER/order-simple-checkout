@@ -1,10 +1,14 @@
 .quiqqer-simple-checkout {
     --_gap: var(--gap, 3rem);
-    --_detailEntryBorder: var(--detailEntryBorder, 0.5rem);
-    --_detailEntryBg: var(--detailEntryBg, #fff);
-    --_detailEntrySpacing: var(--detailEntrySpacing, 0.5rem);
     --_sectionSpacing: var(--sectionSpacing, 3rem);
     --_sectionPadding: var(--sectionPadding, 2rem);
+
+    --_order-listEntry-padding: var(--order-listEntry-padding, 1rem);
+    --_order-listEntry-bg: var(--order-listEntry-bg, #ffffff);
+    --_order-listEntry-bg--hover: var(--order-listEntry-bg--hover, #ffffff);
+    --_order-listEntry-radius: var(--order-listEntry-radius, 0.25rem);
+    --_order-listEntry-gap: var(--order-listEntry-gap, 0.25rem 2rem);
+    --_order-listEntry-spacing: var(--order-listEntry-spacing, 0.5rem);
 }
 
 @media screen and (max-width: 767px) {
@@ -69,28 +73,11 @@
 }
 
 /* section */
-.simpleCheckout-detail-section {
+.simpleCheckout-details-section {
     margin-bottom: var(--_sectionSpacing);
     padding: var(--_sectionPadding);
 
     background-color: #f8f8f8;
-}
-
-.simpleCheckout-detail-sectionn .simpleCheckoutCard-subheader {
-    text-align: center;
-    position: relative;
-    background: #fff;
-    display: inline-block;
-    top: -2rem;
-    padding-inline: 1em;
-    margin-bottom: 0;
-}
-
-@media screen and (max-width: 767px) {
-    .simpleCheckout-detail-sectionn .simpleCheckoutCard-subheader {
-        transform: translateX(-50%);
-        left: 50%;
-    }
 }
 
 .quiqqer-simple-checkout-data-or {
@@ -195,4 +182,15 @@
 
 [data-nobody-log-in="1"] .quiqqer-order-ordering-timeline {
     display: none;
+}
+
+/**************/
+/* list entry */
+/**************/
+@media screen and (min-width: 768px) {
+    .quiqqer-simple-checkout .quiqqer-order-step-payments-list-entry,
+    .quiqqer-simple-checkout .quiqqer-order-step-shipping-list-entry {
+        grid-template-columns: auto max(25%, 150px) 1fr;
+        grid-template-areas: 'select icon text' '. . price';
+    }
 }

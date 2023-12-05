@@ -1,0 +1,74 @@
+.quiqqer-simple-checkout-billing label {
+    display: block;
+    cursor: pointer;
+    clear: both;
+}
+
+.quiqqer-simple-checkout-billing__entry {
+    background-color: var(--_order-listEntry-bg);
+    gap: var(--_order-listEntry-gap);
+    padding: var(--_order-listEntry-padding);
+    border-radius: var(--_order-listEntry-radius);
+}
+
+.quiqqer-simple-checkout-billing__entry:not(:last-child) {
+    margin-bottom: var(--_order-listEntry-spacing, 0.25rem);
+}
+
+.quiqqer-simple-checkout-billing__entry input {
+    vertical-align: middle;
+}
+
+.quiqqer-simple-checkout-billing-diffContainer {
+    overflow: hidden;
+}
+
+.quiqqer-simple-checkout-billing-diffContainer > .inner {
+    margin-top: 1rem;
+}
+
+.quiqqer-simple-checkout-billing-diffContainer > .inner,
+.quiqqer-order-customerData-edit-street_no__container {
+    --form-gap: 1rem;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--form-gap);
+}
+
+.quiqqer-simple-checkout-billing-diffContainer label {
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-billing label select,
+.quiqqer-simple-checkout-billing label input[type="text"],
+.quiqqer-simple-checkout-billing label input[type="tel"],
+.quiqqer-simple-checkout-billing label input[type="fax"] {
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-billing label .qui-select {
+    float: initial;
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-firstname,
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-lastname,
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-zip,
+.quiqqer-simple-checkout-billing-diffContainer .quiqqer-order-customerData-edit-city {
+    flex: 1 0 calc(50% - var(--form-gap));
+}
+
+.quiqqer-order-customerData-edit-street_no__container input[name="billing_street"] {
+    flex: 1 0 calc(75% - var(--form-gap));
+}
+
+.quiqqer-order-customerData-edit-street_no__container input[name="billing_street_number"] {
+    flex: 1 0 calc(25% - var(--form-gap));
+}
+
+.quiqqer-simple-checkout-billing__entry:hover,
+.quiqqer-simple-checkout-billing__entry.selected {
+    background-color: var(--_order-listEntry-bg--hover);
+    outline: 1px solid currentColor;
+}

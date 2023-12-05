@@ -54,6 +54,19 @@
             <de><![CDATA[Jetzt einloggen]]></de>
             <en><![CDATA[Log in]]></en>
         </locale>
+        <locale name="ordering.step.title.Billing">
+            <de><![CDATA[Rechnungsadresse]]></de>
+            <en><![CDATA[Billing]]></en>
+        </locale>
+        <locale name="ordering.step.title.Billing.same">
+            <de><![CDATA[Gleiche Adresse wie die Lieferadresse]]></de>
+            <en><![CDATA[Same as shipping address]]></en>
+        </locale>
+        <locale name="ordering.step.title.Billing.different">
+            <de><![CDATA[Eine andere Rechnungsadresse verwenden]]></de>
+            <en><![CDATA[Use a different billing address]]></en>
+        </locale>
+
     </groups>
 
 </locales>

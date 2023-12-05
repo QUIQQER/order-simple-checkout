@@ -69,9 +69,9 @@
     {assign var=r value=""}
     {if $settings.salutation.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="salutation"}
-                {if $settings.salutation.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="salutation"}
+        {if $settings.salutation.required}*{/if}
+    </span>
     <input type="text"
            name="salutation"
            autocomplete
@@ -87,9 +87,9 @@
     {assign var=r value=""}
     {if $settings.firstname.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="firstname"}
-                {if $settings.firstname.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="firstname"}
+        {if $settings.firstname.required}*{/if}
+    </span>
     <input type="text"
            name="firstname"
            autocomplete="given-name"
@@ -104,9 +104,9 @@
     {assign var=r value=""}
     {if $settings.lastname.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="lastname"}
-                {if $settings.lastname.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="lastname"}
+        {if $settings.lastname.required}*{/if}
+    </span>
     <input type="text"
            name="lastname"
            autocomplete="family-name"
@@ -121,9 +121,9 @@
     {assign var=r value=""}
     {if $settings.street_no.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="street_no"}
-                {if $settings.street_no.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="street_no"}
+        {if $settings.street_no.required}*{/if}
+    </span>
     {if empty($Address->getAttribute('street_no'))}
     <input type="text" name="street" value="" autocomplete="shipping street-address" {$r}>
     <input type="text" name="street_number" value="">
@@ -143,9 +143,9 @@
     {assign var=r value=""}
     {if $settings.zip.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="zip"}
-                {if $settings.zip.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="zip"}
+        {if $settings.zip.required}*{/if}
+    </span>
     <input type="text"
            name="zip"
            autocomplete="postal-code"
@@ -160,9 +160,9 @@
     {assign var=r value=""}
     {if $settings.city.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="city"}
-                {if $settings.city.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="city"}
+        {if $settings.city.required}*{/if}
+    </span>
     <input type="text"
            name="city"
            autocomplete="city-name locality"
@@ -174,10 +174,10 @@
 
 {if $settings.country.show}
 <label class="quiqqer-order-customerData-edit-country">
-            <span>
-                {locale group="quiqqer/frontend-users" var="country"}
-                {if $settings.country.required}*{/if}
-            </span>
+    <span>
+        {locale group="quiqqer/frontend-users" var="country"}
+        {if $settings.country.required}*{/if}
+    </span>
     {control name="country" control="QUI\Countries\Controls\Select"
     selected=$Address->getAttribute('country')
     required=$settings.country.required
@@ -191,9 +191,9 @@
     {assign var=r value=""}
     {if $settings.phone.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="phone"}
-                {if $settings.phone.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="phone"}
+        {if $settings.phone.required}*{/if}
+    </span>
     <input type="tel"
            name="tel"
            autocomplete="tel"
@@ -208,9 +208,9 @@
     {assign var=r value=""}
     {if $settings.mobile.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="mobile"}
-                {if $settings.mobile.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="mobile"}
+        {if $settings.mobile.required}*{/if}
+    </span>
     <input type="tel"
            name="mobile"
            autocomplete="mobile"
@@ -225,9 +225,9 @@
     {assign var=r value=""}
     {if $settings.fax.required}{assign var=r value="required"}{/if}
     <span>
-                {locale group="quiqqer/frontend-users" var="fax"}
-                {if $settings.fax.required}*{/if}
-            </span>
+        {locale group="quiqqer/frontend-users" var="fax"}
+        {if $settings.fax.required}*{/if}
+    </span>
     <input type="tel"
            name="fax"
            autocomplete="fax"

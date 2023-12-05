@@ -73,9 +73,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.getElm().set('html', Ghost.getFirst('div').get('html'));
                     Ghost.getElements('style').inject(this.getElm());
 
-                    this.$registerEvents();
-                    this.fireEvent('refreshEnd', [this]);
-                    resolve();
+                    QUI.parse(this.getElm()).then(() => {
+                        this.$registerEvents();
+                        this.fireEvent('refreshEnd', [this]);
+                        resolve();
+                    });
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('Checkout').getAttribute('orderHash')

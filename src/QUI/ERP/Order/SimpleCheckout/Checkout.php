@@ -6,6 +6,7 @@ use QUI;
 use QUI\ERP\Order\Controls\Checkout\Login;
 use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
+use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
@@ -26,7 +27,8 @@ class Checkout extends QUI\Control
         $this->setAttributes([
             'orderHash' => false,
             'template' => false,
-            'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout'
+            'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
+            'data-qui-load-hash-from-url' => 0
         ]);
 
         $this->addCSSClass('quiqqer-simple-checkout');
@@ -101,6 +103,7 @@ class Checkout extends QUI\Control
             'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
+            'BillingAddress' => new CheckoutBillingAddress($this),
             'Shipping' => new CheckoutShipping($this),
             'Payment' => new CheckoutPayment($this),
             'termsAndConditions' => $termsAndConditions
@@ -142,12 +145,26 @@ class Checkout extends QUI\Control
         return true;
     }
 
+    /**
+     * @throws QUI\ERP\Order\Exception
+     * @throws QUI\Permissions\Exception
+     * @throws Exception
+     */
     public function orderWithCosts(): array
     {
-        $OrderProcess = $this->getOrder();
-        $Order = $OrderProcess->createOrder(QUI::getUsers()->getSystemUser());
+        $OrderInProcess = $this->getOrder();
+        $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
         $Order->setData('orderedWithCosts', true);
         $Order->save(QUI::getUsers()->getSystemUser());
+        $this->setAttribute('orderHash', $Order->getHash());
+
+        return $this->getOrderProcessStep();
+    }
+
+    public function getOrderProcessStep(): array
+    {
+        $OrderHandler = QUI\ERP\Order\Handler::getInstance();
+        $Order = $OrderHandler->getOrderByHash($this->getAttribute('orderHash'));
 
         // init order process
         $OrderProcess = new QUI\ERP\Order\OrderProcess([
@@ -167,7 +184,8 @@ class Checkout extends QUI\Control
             'step' => $current,
             'url' => $OrderProcess->getStepUrl($current),
             'hash' => $OrderProcess->getStepHash(),
-            'orderHash' => $Order->getHash()
+            'orderHash' => $Order->getHash(),
+            'productCount' => $Order->getArticles()->count(),
         ];
     }
 
