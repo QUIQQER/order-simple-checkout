@@ -1,6 +1,6 @@
 # Order Simple Checkout
 
-![Order Simple Checkout](bin/images/Readme.png);
+![Order Simple Checkout](bin/images/Readme.png)
 
 The QUIQQER Simple Checkout plugin is a seamless extension for your QUIQQER system that simplifies and speeds up the
 checkout process. With this plugin, your customers can complete their purchase on a single page, eliminating multi-step
