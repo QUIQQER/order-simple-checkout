@@ -8,6 +8,11 @@ QUI::$Ajax->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts',
     function ($orderHash) {
         $SessionUser = QUI::getUserBySession();
+        $userIsGuest = false;
+
+        if ($SessionUser->getId() === 6) {
+            $userIsGuest = true;
+        }
 
         $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout([
             'orderHash' => $orderHash
@@ -87,12 +92,13 @@ QUI::$Ajax->registerFunction(
             $DefaultAddress->setAttribute('city', $DeliveryAddress->getAttribute('city'));
             $DefaultAddress->setAttribute('country', $DeliveryAddress->getAttribute('country'));
             $DefaultAddress->save(QUI::getUsers()->getSystemUser());
-        } elseif (method_exists($SessionUser, 'addAddress')) {
+        } elseif (method_exists($SessionUser, 'addAddress') && !$userIsGuest) {
             // add new address
             $NewAddress = $SessionUser->addAddress($InvoiceAddress->getAttributes());
             $Order->setInvoiceAddress($NewAddress);
-            $Order->save(QUI::getUsers()->getSystemUser());
         }
+
+        $Order->save(QUI::getUsers()->getSystemUser());
 
         return $Checkout->orderWithCosts();
     },

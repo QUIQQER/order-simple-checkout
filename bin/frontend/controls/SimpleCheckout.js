@@ -558,6 +558,54 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_update', (isValid) => {
                     PayButton.disabled = !isValid;
 
+                    const Delivery = this.getElm().getElement('.quiqqer-simple-checkout-data-delivery');
+                    const Shipping = this.getElm().getElement('.quiqqer-simple-checkout-data-shipping');
+                    const Payment = this.getElm().getElement('.quiqqer-simple-checkout-data-payment');
+
+                    if (!isValid) {
+                        QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_validate', (missing) => {
+                            if (Delivery) {
+                                if (missing.indexOf('address') !== -1) {
+                                    Delivery.addClass('quiqqer-simple-checkout-require');
+                                } else {
+                                    Delivery.removeClass('quiqqer-simple-checkout-require');
+                                }
+                            }
+
+                            if (Shipping) {
+                                if (missing.indexOf('shipping') !== -1) {
+                                    Shipping.addClass('quiqqer-simple-checkout-require');
+                                } else {
+                                    Shipping.removeClass('quiqqer-simple-checkout-require');
+                                }
+                            }
+
+                            if (Payment) {
+                                if (missing.indexOf('payment') !== -1) {
+                                    Payment.addClass('quiqqer-simple-checkout-require');
+                                } else {
+                                    Payment.removeClass('quiqqer-simple-checkout-require');
+                                }
+                            }
+                        }, {
+                            'package': 'quiqqer/order-simple-checkout',
+                            orderData: JSON.encode(orderData),
+                            orderHash: this.getAttribute('orderHash')
+                        });
+                    } else {
+                        if (Delivery) {
+                            Delivery.removeClass('quiqqer-simple-checkout-require');
+                        }
+
+                        if (Shipping) {
+                            Shipping.removeClass('quiqqer-simple-checkout-require');
+                        }
+
+                        if (Payment) {
+                            Payment.removeClass('quiqqer-simple-checkout-require');
+                        }
+                    }
+
                     this.$refreshBasket().then(resolve);
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
