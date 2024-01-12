@@ -198,6 +198,7 @@ class Checkout extends QUI\Control
 
         // init order process
         $OrderProcess = new QUI\ERP\Order\OrderProcess([
+            'Order' => $Order,
             'orderHash' => $Order->getHash(),
             'step' => 'Processing'
         ]);

@@ -58,9 +58,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         this.$onChange();
                     }
                 });
+
+                BusinessType.fireEvent('change');
             }
 
-            BusinessType.fireEvent('change');
             this.getElm().getElements('input').addEvent('change', this.$onChange);
             loaded = true;
         },
