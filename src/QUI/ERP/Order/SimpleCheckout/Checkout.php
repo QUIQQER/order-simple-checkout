@@ -145,6 +145,36 @@ class Checkout extends QUI\Control
         return true;
     }
 
+    public function gatherMissingOrderDetails(): array
+    {
+        $missing = [];
+
+        // check address
+        try {
+            $Order = $this->getOrder();
+
+            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
+                $Order->getInvoiceAddress()
+            );
+        } catch (QUI\Exception $exception) {
+            $missing[] = 'address';
+        }
+
+        // check payment
+        $Payment = $Order->getPayment();
+
+        if (!$Payment) {
+            $missing[] = 'payment';
+        }
+
+        // check shipping
+        if (QUI::getPackageManager()->isInstalled('quiqqer/shipping') && !$Order->getShipping()) {
+            $missing[] = 'shipping';
+        }
+
+        return $missing;
+    }
+
     /**
      * @throws QUI\ERP\Order\Exception
      * @throws QUI\Permissions\Exception
@@ -168,6 +198,7 @@ class Checkout extends QUI\Control
 
         // init order process
         $OrderProcess = new QUI\ERP\Order\OrderProcess([
+            'Order' => $Order,
             'orderHash' => $Order->getHash(),
             'step' => 'Processing'
         ]);
