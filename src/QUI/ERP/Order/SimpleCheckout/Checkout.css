@@ -24,6 +24,10 @@
     }
 }
 
+.quiqqer-simple-checkout-require {
+    border: 1px solid red;
+}
+
 /*******************************/
 /* order details (only mobile) */
 /*******************************/
