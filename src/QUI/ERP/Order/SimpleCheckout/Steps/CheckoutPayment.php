@@ -13,6 +13,10 @@ class CheckoutPayment extends QUI\Control implements CheckoutStepInterface
 {
     protected Checkout $Checkout;
 
+    /**
+     * @param Checkout $Checkout
+     * @param mixed[] $attributes
+     */
     public function __construct(Checkout $Checkout, array $attributes = [])
     {
         $this->Checkout = $Checkout;

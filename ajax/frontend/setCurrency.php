@@ -17,8 +17,8 @@ QUI::getAjax()->registerFunction(
         $Order = $Checkout->getOrder();
         $Currency = QUI\ERP\Currency\Handler::getCurrency($currency);
 
-        $Order->setCurrency($Currency);
-        $Order->save();
+        $Order?->setCurrency($Currency);
+        $Order?->save();
     },
     ['orderHash', 'currency']
 );

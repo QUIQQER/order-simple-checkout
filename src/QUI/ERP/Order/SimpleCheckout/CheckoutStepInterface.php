@@ -14,7 +14,7 @@ interface CheckoutStepInterface
      * Constructor for the class.
      *
      * @param Checkout $Checkout An instance of the Checkout class.
-     * @param array $attributes [optional] An array of attributes (default: empty array).
+     * @param mixed[] $attributes [optional] An array of attributes (default: empty array).
      */
     public function __construct(Checkout $Checkout, array $attributes = []);
 }

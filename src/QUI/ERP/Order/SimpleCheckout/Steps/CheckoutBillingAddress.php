@@ -23,7 +23,7 @@ class CheckoutBillingAddress extends QUI\Control implements CheckoutStepInterfac
      * Constructor method for the SimpleCheckoutDelivery class.
      *
      * @param Checkout $Checkout
-     * @param array $attributes
+     * @param mixed[] $attributes
      * @return void
      */
     public function __construct(Checkout $Checkout, array $attributes = [])
@@ -69,7 +69,7 @@ class CheckoutBillingAddress extends QUI\Control implements CheckoutStepInterfac
      */
     protected function getDeliveryAddress(): ?QUI\ERP\Address
     {
-        return $this->Checkout->getOrder()->getDeliveryAddress();
+        return $this->Checkout->getOrder()?->getDeliveryAddress();
     }
 
     /**
@@ -79,8 +79,16 @@ class CheckoutBillingAddress extends QUI\Control implements CheckoutStepInterfac
      */
     public function validate(): void
     {
-        QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
-            $this->Checkout->getOrder()->getInvoiceAddress()
-        );
+        $Address = $this->Checkout->getOrder()?->getInvoiceAddress();
+
+        if ($Address instanceof QUI\Users\Address) {
+            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress($Address);
+        } else {
+            throw new QUI\ERP\Order\Exception([
+                'quiqqer/order',
+                'exception.missing.address.field',
+                ['field' => QUI::getLocale()->get('quiqqer/order', 'firstname')]
+            ]);
+        }
     }
 }

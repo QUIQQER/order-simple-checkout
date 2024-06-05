@@ -24,6 +24,9 @@ use function file_exists;
  */
 class Checkout extends QUI\Control
 {
+    /**
+     * @param mixed[] $attributes
+     */
     public function __construct(array $attributes = [])
     {
         $this->setAttributes([
@@ -78,9 +81,12 @@ class Checkout extends QUI\Control
         }
 
         // put the basket articles to the order in process, if the current order has no articles
-        if (!$this->getOrder()->getArticles()->count()) {
+        if (!$this->getOrder()?->getArticles()->count()) {
             $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
-            $Basket->toOrder($this->getOrder());
+
+            if ($this->getOrder()) {
+                $Basket->toOrder($this->getOrder());
+            }
         }
 
         $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
@@ -128,6 +134,10 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
+            if (!$Order) {
+                return false;
+            }
+
             QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
                 $Order->getInvoiceAddress()
             );
@@ -150,6 +160,9 @@ class Checkout extends QUI\Control
         return true;
     }
 
+    /**
+     * @return array<string>
+     */
     public function gatherMissingOrderDetails(): array
     {
         $missing = [];
@@ -159,9 +172,13 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
-            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
-                $Order->getInvoiceAddress()
-            );
+            if ($Order?->getInvoiceAddress()) {
+                QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
+                    $Order->getInvoiceAddress()
+                );
+            } else {
+                $missing[] = 'address';
+            }
         } catch (QUI\Exception) {
             $missing[] = 'address';
         }
@@ -188,6 +205,8 @@ class Checkout extends QUI\Control
     }
 
     /**
+     * @return mixed[]
+     *
      * @throws QUI\ERP\Order\Exception
      * @throws QUI\Permissions\Exception
      * @throws Exception
@@ -195,6 +214,14 @@ class Checkout extends QUI\Control
     public function orderWithCosts(): array
     {
         $OrderInProcess = $this->getOrder();
+
+        if (!$OrderInProcess) {
+            throw new QUI\ERP\Order\Exception(
+                QUI::getLocale()->get('quiqqer/order', 'exception.order.not.found'),
+                QUI\ERP\Order\Handler::ERROR_ORDER_NOT_FOUND
+            );
+        }
+
         $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
         $Order->setData('orderedWithCosts', true);
         $Order->save(QUI::getUsers()->getSystemUser());
@@ -204,6 +231,7 @@ class Checkout extends QUI\Control
     }
 
     /**
+     * @return mixed[]
      * @throws QUI\ERP\Order\Basket\Exception
      * @throws \Exception
      */
@@ -220,11 +248,7 @@ class Checkout extends QUI\Control
         ]);
 
         $result = $OrderProcess->create();
-        $current = false;
-
-        if ($OrderProcess->getCurrentStep()) {
-            $current = $OrderProcess->getCurrentStep()->getName();
-        }
+        $current = $OrderProcess->getCurrentStep()->getName();
 
         return [
             'html' => $result,

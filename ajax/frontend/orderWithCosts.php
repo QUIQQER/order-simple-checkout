@@ -19,13 +19,20 @@ QUI::getAjax()->registerFunction(
         ]);
 
         $Order = $Checkout->getOrder();
+
+        if (!$Order) {
+            throw new QUI\Exception('Checkout has no order');
+        }
+
         $InvoiceAddress = $Order->getInvoiceAddress();
         $DefaultAddress = $SessionUser->getStandardAddress();
         $hasDeliveryAddress = $Order->hasDeliveryAddress();
 
-        $isSameAddress = function (QUI\Users\Address $a, QUI\Users\Address $b) {
+        $isSameAddress = function (?QUI\Users\Address $a, ?QUI\Users\Address $b) {
             if (
-                $a->getAttribute('firstname') === $b->getAttribute('firstname')
+                $a
+                && $b
+                && $a->getAttribute('firstname') === $b->getAttribute('firstname')
                 && $a->getAttribute('lastname') === $b->getAttribute('lastname')
                 && $a->getAttribute('street_no') === $b->getAttribute('street_no')
                 && $a->getAttribute('zip') === $b->getAttribute('zip')
@@ -53,7 +60,8 @@ QUI::getAjax()->registerFunction(
 
         // if default address is empty, we set it
         if (
-            $DefaultAddress->getAttribute('firstname') === ''
+            $DefaultAddress
+            && $DefaultAddress->getAttribute('firstname') === ''
             && $DefaultAddress->getAttribute('lastname') === ''
             && $DefaultAddress->getAttribute('street_no') === ''
             && $DefaultAddress->getAttribute('zip') === ''
@@ -73,7 +81,8 @@ QUI::getAjax()->registerFunction(
             $Order->setInvoiceAddress($DefaultAddress);
             $Order->save(QUI::getUsers()->getSystemUser());
         } elseif (
-            $DefaultAddress->getAttribute('firstname') === ''
+            $DefaultAddress
+            && $DefaultAddress->getAttribute('firstname') === ''
             && $DefaultAddress->getAttribute('lastname') === ''
             && $DefaultAddress->getAttribute('street_no') === ''
             && $DefaultAddress->getAttribute('zip') === ''
@@ -95,7 +104,10 @@ QUI::getAjax()->registerFunction(
         } elseif (method_exists($SessionUser, 'addAddress') && !$userIsGuest) {
             // add new address
             $NewAddress = $SessionUser->addAddress($InvoiceAddress->getAttributes());
-            $Order->setInvoiceAddress($NewAddress);
+
+            if ($NewAddress) {
+                $Order->setInvoiceAddress($NewAddress);
+            }
         }
 
         $Order->save(QUI::getUsers()->getSystemUser());

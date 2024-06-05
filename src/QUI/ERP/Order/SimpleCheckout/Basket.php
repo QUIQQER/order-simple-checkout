@@ -11,6 +11,8 @@ class Basket extends QUI\Control
     protected Checkout $Checkout;
 
     /**
+     * @param Checkout $Checkout
+     * @param mixed[] $attributes
      */
     public function __construct(Checkout $Checkout, array $attributes = [])
     {
@@ -29,10 +31,10 @@ class Basket extends QUI\Control
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $Order = $this->Checkout->getOrder();
-        $Order->recalculate(); // because of price factors
-        $Articles = $Order->getArticles();
+        $Order?->recalculate(); // because of price factors
+        $Articles = $Order?->getArticles();
 
-        if (!$Articles->count()) {
+        if (!$Articles || !$Articles->count()) {
             $Engine->assign([
                 'basketEmpty' => true
             ]);

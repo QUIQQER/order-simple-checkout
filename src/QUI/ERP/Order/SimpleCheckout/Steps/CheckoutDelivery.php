@@ -26,7 +26,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      * Constructor method for the SimpleCheckoutDelivery class.
      *
      * @param Checkout $Checkout
-     * @param array $attributes
+     * @param mixed[] $attributes
      * @return void
      */
     public function __construct(Checkout $Checkout, array $attributes = [])
@@ -55,10 +55,6 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         $User = QUI::getUserBySession();
 
         $isUserB2B = function () use ($User) {
-            if (!$User) {
-                return '';
-            }
-
             if ($User->getAttribute('quiqqer.erp.isNettoUser') === QUI\ERP\Utils\User::IS_NETTO_USER) {
                 return ' selected="selected"';
             }
@@ -89,9 +85,9 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         // frontend users address profile settings
         try {
             $Conf = QUI::getPackage('quiqqer/frontend-users')->getConfig();
-            $settings = $Conf->getValue('profile', 'addressFields');
+            $settings = $Conf?->getValue('profile', 'addressFields');
 
-            if (!empty($settings)) {
+            if (!empty($settings) && is_string($settings)) {
                 $settings = json_decode($settings, true);
             }
         } catch (QUI\Exception) {
@@ -136,11 +132,11 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         $User = QUI::getUserBySession();
         $Order = $this->Checkout->getOrder();
 
-        $Address = $Order->getInvoiceAddress();
-        $attributes = $Address->getAttributes();
+        $Address = $Order?->getInvoiceAddress();
+        $attributes = $Address?->getAttributes();
 
         // is not empty
-        if (count($attributes) > 3) {
+        if ($attributes && count($attributes) > 3) {
             return $Address;
         }
 
@@ -169,8 +165,16 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      */
     public function validate(): void
     {
-        QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
-            $this->Checkout->getOrder()->getInvoiceAddress()
-        );
+        $Address = $this->Checkout->getOrder()?->getInvoiceAddress();
+
+        if ($Address instanceof QUI\Users\Address) {
+            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress($Address);
+        } else {
+            throw new QUI\ERP\Order\Exception([
+                'quiqqer/order',
+                'exception.missing.address.field',
+                ['field' => QUI::getLocale()->get('quiqqer/order', 'firstname')]
+            ]);
+        }
     }
 }
