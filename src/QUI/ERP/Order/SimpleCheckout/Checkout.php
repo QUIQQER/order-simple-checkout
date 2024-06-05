@@ -3,6 +3,7 @@
 namespace QUI\ERP\Order\SimpleCheckout;
 
 use QUI;
+use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\Controls\Checkout\Login;
 use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
@@ -12,6 +13,7 @@ use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
 use QUI\Exception;
 
+use function class_exists;
 use function dirname;
 use function file_exists;
 
@@ -22,7 +24,10 @@ use function file_exists;
  */
 class Checkout extends QUI\Control
 {
-    public function __construct($attributes = [])
+    /**
+     * @param mixed[] $attributes
+     */
+    public function __construct(array $attributes = [])
     {
         $this->setAttributes([
             'orderHash' => false,
@@ -53,7 +58,10 @@ class Checkout extends QUI\Control
                 return $Engine->fetch($templateLogin);
             }
 
-            if (!QUI\ERP\Order\Guest\GuestOrder::isActive()) {
+            if (
+                class_exists('QUI\ERP\Order\Guest\GuestOrder')
+                && !QUI\ERP\Order\Guest\GuestOrder::isActive()
+            ) {
                 return $Engine->fetch($templateLogin);
             }
 
@@ -73,9 +81,12 @@ class Checkout extends QUI\Control
         }
 
         // put the basket articles to the order in process, if the current order has no articles
-        if (!$this->getOrder()->getArticles()->count()) {
+        if (!$this->getOrder()?->getArticles()->count()) {
             $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
-            $Basket->toOrder($this->getOrder());
+
+            if ($this->getOrder()) {
+                $Basket->toOrder($this->getOrder());
+            }
         }
 
         $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
@@ -123,10 +134,14 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
+            if (!$Order) {
+                return false;
+            }
+
             QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
                 $Order->getInvoiceAddress()
             );
-        } catch (QUI\Exception $exception) {
+        } catch (QUI\Exception) {
             return false;
         }
 
@@ -145,37 +160,53 @@ class Checkout extends QUI\Control
         return true;
     }
 
+    /**
+     * @return array<string>
+     */
     public function gatherMissingOrderDetails(): array
     {
         $missing = [];
+        $Order = null;
 
         // check address
         try {
             $Order = $this->getOrder();
 
-            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
-                $Order->getInvoiceAddress()
-            );
-        } catch (QUI\Exception $exception) {
+            if ($Order?->getInvoiceAddress()) {
+                QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
+                    $Order->getInvoiceAddress()
+                );
+            } else {
+                $missing[] = 'address';
+            }
+        } catch (QUI\Exception) {
             $missing[] = 'address';
         }
 
-        // check payment
-        $Payment = $Order->getPayment();
-
-        if (!$Payment) {
+        if (!$Order) {
             $missing[] = 'payment';
-        }
 
-        // check shipping
-        if (QUI::getPackageManager()->isInstalled('quiqqer/shipping') && !$Order->getShipping()) {
-            $missing[] = 'shipping';
+            if (QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
+                $missing[] = 'shipping';
+            }
+        } else {
+            $Payment = $Order->getPayment();
+
+            if (!$Payment) {
+                $missing[] = 'payment';
+            }
+
+            if (QUI::getPackageManager()->isInstalled('quiqqer/shipping') && !$Order->getShipping()) {
+                $missing[] = 'shipping';
+            }
         }
 
         return $missing;
     }
 
     /**
+     * @return mixed[]
+     *
      * @throws QUI\ERP\Order\Exception
      * @throws QUI\Permissions\Exception
      * @throws Exception
@@ -183,14 +214,27 @@ class Checkout extends QUI\Control
     public function orderWithCosts(): array
     {
         $OrderInProcess = $this->getOrder();
+
+        if (!$OrderInProcess) {
+            throw new QUI\ERP\Order\Exception(
+                QUI::getLocale()->get('quiqqer/order', 'exception.order.not.found'),
+                QUI\ERP\Order\Handler::ERROR_ORDER_NOT_FOUND
+            );
+        }
+
         $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
         $Order->setData('orderedWithCosts', true);
         $Order->save(QUI::getUsers()->getSystemUser());
-        $this->setAttribute('orderHash', $Order->getHash());
+        $this->setAttribute('orderHash', $Order->getUUID());
 
         return $this->getOrderProcessStep();
     }
 
+    /**
+     * @return mixed[]
+     * @throws QUI\ERP\Order\Basket\Exception
+     * @throws \Exception
+     */
     public function getOrderProcessStep(): array
     {
         $OrderHandler = QUI\ERP\Order\Handler::getInstance();
@@ -199,23 +243,19 @@ class Checkout extends QUI\Control
         // init order process
         $OrderProcess = new QUI\ERP\Order\OrderProcess([
             'Order' => $Order,
-            'orderHash' => $Order->getHash(),
+            'orderHash' => $Order->getUUID(),
             'step' => 'Processing'
         ]);
 
         $result = $OrderProcess->create();
-        $current = false;
-
-        if ($OrderProcess->getCurrentStep()) {
-            $current = $OrderProcess->getCurrentStep()->getName();
-        }
+        $current = $OrderProcess->getCurrentStep()->getName();
 
         return [
             'html' => $result,
             'step' => $current,
             'url' => $OrderProcess->getStepUrl($current),
             'hash' => $OrderProcess->getStepHash(),
-            'orderHash' => $Order->getHash(),
+            'orderHash' => $Order->getUUID(),
             'productCount' => $Order->getArticles()->count(),
         ];
     }
@@ -234,7 +274,7 @@ class Checkout extends QUI\Control
         if ($this->getAttribute('orderHash')) {
             try {
                 return $Orders->getOrderInProcessByHash($this->getAttribute('orderHash'));
-            } catch (QUI\Exception $exception) {
+            } catch (QUI\Exception) {
             }
         }
 
@@ -245,7 +285,7 @@ class Checkout extends QUI\Control
             if (!$OrderInProcess->getOrderId()) {
                 $Order = $OrderInProcess;
             }
-        } catch (QUI\Exception $Exception) {
+        } catch (QUI\Exception) {
         }
 
         if ($Order === null) {
@@ -270,6 +310,7 @@ class Checkout extends QUI\Control
      * Get the shipping html for the current order.
      *
      * @return string The shipping information
+     * @throws \Exception
      */
     public function getShipping(): string
     {
@@ -290,6 +331,7 @@ class Checkout extends QUI\Control
      * Get the payment html for the current order.
      *
      * @return string The shipping information
+     * @throws \Exception
      */
     public function getPayments(): string
     {
@@ -306,6 +348,12 @@ class Checkout extends QUI\Control
         }
     }
 
+    /**
+     * @throws ExceptionBasketNotFound
+     * @throws QUI\ERP\Order\Basket\Exception
+     * @throws QUI\Database\Exception
+     * @throws \Exception
+     */
     public function getBasket(): string
     {
         $Basket = new Basket($this);

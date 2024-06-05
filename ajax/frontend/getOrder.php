@@ -4,7 +4,7 @@
  * This file contains package_quiqqer_order-simple-checkout_ajax_frontend_getOrder
  */
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getOrder',
     function ($orderHash) {
         $OrderHandler = QUI\ERP\Order\Handler::getInstance();
@@ -13,14 +13,14 @@ QUI::$Ajax->registerFunction(
         try {
             $Order = $OrderHandler->getOrderByHash($orderHash);
             $Customer = $Order->getCustomer();
-            $customerId = $Customer->getId();
+            $customerId = $Customer->getUUID();
 
-            if ($User->getId() === $customerId) {
+            if ($User->getUUID() === $customerId) {
                 return $Order->toArray();
             }
 
             return false;
-        } catch (QUI\Exception $exception) {
+        } catch (QUI\Exception) {
         }
 
         return null;

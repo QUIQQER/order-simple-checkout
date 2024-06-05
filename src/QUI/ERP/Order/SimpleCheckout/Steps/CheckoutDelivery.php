@@ -6,6 +6,7 @@ use QUI;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Order\SimpleCheckout\CheckoutStepInterface;
 use QUI\Exception;
+use QUI\Users\Address;
 use QUI\Users\User;
 
 use function dirname;
@@ -25,10 +26,10 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      * Constructor method for the SimpleCheckoutDelivery class.
      *
      * @param Checkout $Checkout
-     * @param array $attributes
+     * @param mixed[] $attributes
      * @return void
      */
-    public function __construct(Checkout $Checkout, $attributes = [])
+    public function __construct(Checkout $Checkout, array $attributes = [])
     {
         $this->Checkout = $Checkout;
 
@@ -46,6 +47,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      *
      * @return string The HTML body content for the checkout delivery step.
      * @throws Exception
+     * @throws QUI\ERP\Order\Exception
      */
     public function getBody(): string
     {
@@ -53,10 +55,6 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         $User = QUI::getUserBySession();
 
         $isUserB2B = function () use ($User) {
-            if (!$User) {
-                return '';
-            }
-
             if ($User->getAttribute('quiqqer.erp.isNettoUser') === QUI\ERP\Utils\User::IS_NETTO_USER) {
                 return ' selected="selected"';
             }
@@ -87,12 +85,12 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         // frontend users address profile settings
         try {
             $Conf = QUI::getPackage('quiqqer/frontend-users')->getConfig();
-            $settings = $Conf->getValue('profile', 'addressFields');
+            $settings = $Conf?->getValue('profile', 'addressFields');
 
-            if (!empty($settings)) {
+            if (!empty($settings) && is_string($settings)) {
                 $settings = json_decode($settings, true);
             }
-        } catch (QUI\Exception $Exception) {
+        } catch (QUI\Exception) {
             $settings = [];
         }
 
@@ -125,18 +123,20 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
     /**
      * Retrieves the invoice address for the current user.
      *
-     * @return false|QUI\Users\Address|null
+     * @return Address|null
+     * @throws Exception
+     * @throws QUI\ERP\Order\Exception
      */
-    protected function getInvoiceAddress()
+    protected function getInvoiceAddress(): ?Address
     {
         $User = QUI::getUserBySession();
         $Order = $this->Checkout->getOrder();
 
-        $Address = $Order->getInvoiceAddress();
-        $attributes = $Address->getAttributes();
+        $Address = $Order?->getInvoiceAddress();
+        $attributes = $Address?->getAttributes();
 
         // is not empty
-        if (count($attributes) > 3) {
+        if ($attributes && count($attributes) > 3) {
             return $Address;
         }
 
@@ -163,10 +163,18 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      *
      * @throws QUI\ERP\Order\Exception|Exception
      */
-    public function validate()
+    public function validate(): void
     {
-        QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
-            $this->Checkout->getOrder()->getInvoiceAddress()
-        );
+        $Address = $this->Checkout->getOrder()?->getInvoiceAddress();
+
+        if ($Address instanceof QUI\Users\Address) {
+            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress($Address);
+        } else {
+            throw new QUI\ERP\Order\Exception([
+                'quiqqer/order',
+                'exception.missing.address.field',
+                ['field' => QUI::getLocale()->get('quiqqer/order', 'firstname')]
+            ]);
+        }
     }
 }

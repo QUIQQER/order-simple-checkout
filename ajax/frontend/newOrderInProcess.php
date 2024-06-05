@@ -4,10 +4,9 @@
  * This file contains package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess
  */
 
-use QUI\ERP\Order\Guest\GuestOrder;
 use QUI\ERP\Products\Handler\Products;
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
     function ($products) {
         $products = json_decode($products, true);
@@ -17,23 +16,24 @@ QUI::$Ajax->registerFunction(
         if (!count($products)) {
             // select the last order in processing
             try {
-                return $Orders->getLastOrderInProcessFromUser($this->getUser())->getHash();
-            } catch (QUI\Exception $exception) {
-                return QUI\ERP\Order\Factory::getInstance()->createOrderInProcess()->getHash();
+                return $Orders->getLastOrderInProcessFromUser($UserSession)->getUUID();
+            } catch (QUI\Exception) {
+                return QUI\ERP\Order\Factory::getInstance()->createOrderInProcess()->getUUID();
             }
         }
 
         if (
             QUI::getUsers()->isNobodyUser($UserSession)
             && QUI::getPackageManager()->isInstalled('quiqqer/order-guestorder')
-            && !GuestOrder::isActive()
+            && class_exists('QUI\ERP\Order\Guest\GuestOrder')
+            && !QUI\ERP\Order\Guest\GuestOrder::isActive()
         ) {
             throw new QUI\Exception('Please log in');
         }
 
         try {
             $OrderInProcess = QUI\ERP\Order\Factory::getInstance()->createOrderInProcess();
-        } catch (\Exception $exception) {
+        } catch (Exception) {
         }
 
         if (!isset($OrderInProcess)) {
@@ -71,14 +71,14 @@ QUI::$Ajax->registerFunction(
                 }
 
                 $OrderInProcess->addArticle($BasketProduct->toArticle());
-            } catch (\Exception $exception) {
+            } catch (Exception) {
                 continue;
             }
         }
 
         $OrderInProcess->save();
 
-        return $OrderInProcess->getHash();
+        return $OrderInProcess->getUUID();
     },
     ['products']
 );
