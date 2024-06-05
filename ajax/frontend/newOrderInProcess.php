@@ -16,7 +16,7 @@ QUI::$Ajax->registerFunction(
         if (!count($products)) {
             // select the last order in processing
             try {
-                return $Orders->getLastOrderInProcessFromUser($this->getUser())->getUUID();
+                return $Orders->getLastOrderInProcessFromUser($UserSession)->getUUID();
             } catch (QUI\Exception) {
                 return QUI\ERP\Order\Factory::getInstance()->createOrderInProcess()->getUUID();
             }
