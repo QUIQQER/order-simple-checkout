@@ -24,7 +24,7 @@ use function file_exists;
  */
 class Checkout extends QUI\Control
 {
-    public function __construct($attributes = [])
+    public function __construct(array $attributes = [])
     {
         $this->setAttributes([
             'orderHash' => false,

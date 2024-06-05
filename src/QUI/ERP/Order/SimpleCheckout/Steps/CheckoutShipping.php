@@ -12,7 +12,7 @@ class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
 {
     protected Checkout $Checkout;
 
-    public function __construct(Checkout $Checkout, $attributes = [])
+    public function __construct(Checkout $Checkout, array $attributes = [])
     {
         $this->Checkout = $Checkout;
 

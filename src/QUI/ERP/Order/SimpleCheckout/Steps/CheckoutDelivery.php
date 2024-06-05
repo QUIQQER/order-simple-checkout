@@ -29,7 +29,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      * @param array $attributes
      * @return void
      */
-    public function __construct(Checkout $Checkout, $attributes = [])
+    public function __construct(Checkout $Checkout, array $attributes = [])
     {
         $this->Checkout = $Checkout;
 

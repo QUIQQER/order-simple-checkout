@@ -12,7 +12,7 @@ class Basket extends QUI\Control
 
     /**
      */
-    public function __construct(Checkout $Checkout, $attributes = [])
+    public function __construct(Checkout $Checkout, array $attributes = [])
     {
         $this->Checkout = $Checkout;
 
@@ -53,7 +53,7 @@ class Basket extends QUI\Control
         $Engine->assign([
             'basketEmpty' => false,
             'UniqueArticles' => $UniqueArticles,
-            'basketHtml'     => $basketHtml
+            'basketHtml' => $basketHtml
         ]);
 
         return $Engine->fetch(dirname(__FILE__) . '/Basket.html');
