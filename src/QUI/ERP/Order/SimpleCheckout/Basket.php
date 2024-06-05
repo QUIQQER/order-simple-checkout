@@ -3,8 +3,6 @@
 namespace QUI\ERP\Order\SimpleCheckout;
 
 use QUI;
-use QUI\ERP\Order\Basket\Exception;
-use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 
 use function dirname;
 
@@ -13,9 +11,6 @@ class Basket extends QUI\Control
     protected Checkout $Checkout;
 
     /**
-     * @throws ExceptionBasketNotFound
-     * @throws Exception
-     * @throws QUI\Database\Exception
      */
     public function __construct(Checkout $Checkout, $attributes = [])
     {

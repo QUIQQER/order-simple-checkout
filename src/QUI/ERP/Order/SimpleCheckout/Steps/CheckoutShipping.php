@@ -36,10 +36,9 @@ class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
 
         try {
             $Delivery->validate();
-        } catch (QUI\Exception $exception) {
+        } catch (QUI\Exception) {
             return $Engine->fetch(dirname(__FILE__) . '/CheckoutShipping.html');
         }
-
 
         $Shipping = new QUI\ERP\Shipping\Order\Shipping([
             'Order' => $this->Checkout->getOrder()

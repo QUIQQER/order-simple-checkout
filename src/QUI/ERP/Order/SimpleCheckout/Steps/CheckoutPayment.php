@@ -33,10 +33,9 @@ class CheckoutPayment extends QUI\Control implements CheckoutStepInterface
 
         try {
             $Delivery->validate();
-        } catch (QUI\Exception $exception) {
+        } catch (QUI\Exception) {
             return $Engine->fetch(dirname(__FILE__) . '/CheckoutPayment.html');
         }
-
 
         $Payment = new Payment([
             'Order' => $this->Checkout->getOrder()

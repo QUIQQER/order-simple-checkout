@@ -3,6 +3,7 @@
 namespace QUI\ERP\Order\SimpleCheckout\Steps;
 
 use QUI;
+use QUI\ERP\Address;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Order\SimpleCheckout\CheckoutStepInterface;
 use QUI\Exception;
@@ -44,6 +45,7 @@ class CheckoutBillingAddress extends QUI\Control implements CheckoutStepInterfac
      *
      * @return string The HTML body content for the checkout delivery step.
      * @throws Exception
+     * @throws QUI\ERP\Order\Exception
      */
     public function getBody(): string
     {
@@ -61,7 +63,9 @@ class CheckoutBillingAddress extends QUI\Control implements CheckoutStepInterfac
     /**
      * Retrieves the invoice address for the current user.
      *
-     * @return null|QUI\ERP\Address
+     * @return null|Address
+     * @throws Exception
+     * @throws QUI\ERP\Order\Exception
      */
     protected function getDeliveryAddress(): ?QUI\ERP\Address
     {
@@ -73,7 +77,7 @@ class CheckoutBillingAddress extends QUI\Control implements CheckoutStepInterfac
      *
      * @throws QUI\ERP\Order\Exception|Exception
      */
-    public function validate()
+    public function validate(): void
     {
         QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
             $this->Checkout->getOrder()->getInvoiceAddress()

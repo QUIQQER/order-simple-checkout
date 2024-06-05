@@ -6,6 +6,7 @@ use QUI;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Order\SimpleCheckout\CheckoutStepInterface;
 use QUI\Exception;
+use QUI\Users\Address;
 use QUI\Users\User;
 
 use function dirname;
@@ -46,6 +47,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      *
      * @return string The HTML body content for the checkout delivery step.
      * @throws Exception
+     * @throws QUI\ERP\Order\Exception
      */
     public function getBody(): string
     {
@@ -92,7 +94,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
             if (!empty($settings)) {
                 $settings = json_decode($settings, true);
             }
-        } catch (QUI\Exception $Exception) {
+        } catch (QUI\Exception) {
             $settings = [];
         }
 
@@ -125,9 +127,11 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
     /**
      * Retrieves the invoice address for the current user.
      *
-     * @return false|QUI\Users\Address|null
+     * @return Address|null
+     * @throws Exception
+     * @throws QUI\ERP\Order\Exception
      */
-    protected function getInvoiceAddress()
+    protected function getInvoiceAddress(): ?Address
     {
         $User = QUI::getUserBySession();
         $Order = $this->Checkout->getOrder();
@@ -163,7 +167,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      *
      * @throws QUI\ERP\Order\Exception|Exception
      */
-    public function validate()
+    public function validate(): void
     {
         QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
             $this->Checkout->getOrder()->getInvoiceAddress()
