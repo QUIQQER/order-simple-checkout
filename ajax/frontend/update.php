@@ -8,7 +8,7 @@ use QUI\ERP\Address;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Shipping\Shipping;
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_update',
     function ($orderHash, $orderData) {
         $orderData = json_decode($orderData, true);

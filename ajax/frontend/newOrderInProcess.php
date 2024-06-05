@@ -6,7 +6,7 @@
 
 use QUI\ERP\Products\Handler\Products;
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
     function ($products) {
         $products = json_decode($products, true);

@@ -4,7 +4,7 @@
  * This file contains package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts
  */
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts',
     function ($orderHash) {
         $SessionUser = QUI::getUserBySession();

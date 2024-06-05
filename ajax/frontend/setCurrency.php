@@ -6,7 +6,7 @@
 
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_setCurrency',
     function ($orderHash, $currency) {
         if (!QUI::getUserBySession()->getId()) {
