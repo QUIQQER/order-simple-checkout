@@ -69,4 +69,15 @@
 
     </groups>
 
+    <groups name="quiqqer/order-simple-checkout" datatype="js">
+        <locale name="SimpleCheckoutWindow.btn.continue">
+            <de><![CDATA[Weiter]]></de>
+            <en><![CDATA[Continue]]></en>
+        </locale>
+        <locale name="SimpleCheckoutWindow.btn.cancel">
+            <de><![CDATA[Abbrechen]]></de>
+            <en><![CDATA[Cancel]]></en>
+        </locale>
+    </groups>
+
 </locales>

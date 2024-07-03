@@ -97,14 +97,16 @@ class Checkout extends QUI\Control
         $BasketForHeader = new Basket($this);
         $BasketForHeader->setAttribute('basketForHeader', true);
 
+        $isShippingInstalled = QUI::getPackageManager()->isInstalled('quiqqer/shipping');
+
         $Engine->assign([
             'Order' => $this->getOrder(),
             'Basket' => new Basket($this),
             'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
             'Delivery' => new CheckoutDelivery($this),
-            'BillingAddress' => new CheckoutBillingAddress($this),
-            'Shipping' => new CheckoutShipping($this),
+            'BillingAddress' => $isShippingInstalled ? new CheckoutBillingAddress($this) : false,
+            'Shipping' => $isShippingInstalled ? new CheckoutShipping($this) : false,
             'Payment' => new CheckoutPayment($this),
             'termsAndConditions' => $termsAndConditions
         ]);

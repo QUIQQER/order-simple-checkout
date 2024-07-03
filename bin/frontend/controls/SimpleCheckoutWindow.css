@@ -1,0 +1,19 @@
+.SimpleCheckoutWindow .SimpleCheckoutWindow-btn-cancel {
+    color: grey;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.SimpleCheckoutWindow .SimpleCheckoutWindow-btn-close {
+    float: right !important;
+}
+
+.SimpleCheckoutWindow .buttons-multiple {
+    display: flex;
+    float: none !important;
+    justify-content: space-between;
+}
+
+.SimpleCheckoutWindow .SimpleCheckoutWindow-btn-payToOrder {
+    order: 1;
+}
