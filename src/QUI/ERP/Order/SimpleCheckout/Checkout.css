@@ -1,7 +1,9 @@
 .quiqqer-simple-checkout {
     --_gap: var(--gap, 3rem);
+    --_sticky-positionTop: var(--sticky-positionTop, 1.5rem);
     --_sectionSpacing: var(--sectionSpacing, 3rem);
     --_sectionPadding: var(--sectionPadding, 2rem);
+    --_sectionBgColor: var(--sectionBgColor, #f8f8f8);
 
     --_order-listEntry-padding: var(--order-listEntry-padding, 1rem);
     --_order-listEntry-bg: var(--order-listEntry-bg, #ffffff);
@@ -12,15 +14,10 @@
 }
 
 @media screen and (max-width: 767px) {
-    /**
-    1. Because of position fixed of .quiqqer-simple-checkout-data-pay on mobile.
-       This value is override by JavaScript
-     */
     .quiqqer-simple-checkout {
         --_gap: var(--gap, 1.5rem);
         --_sectionSpacing: var(--sectionSpacing, 1.5rem);
         --_sectionPadding: var(--sectionPadding, 1rem);
-        margin-bottom: 5rem; /* 1 */
     }
 }
 
@@ -101,32 +98,6 @@
     background-color: currentColor;
 }
 
-@media screen and (max-width: 767px) {
-    .quiqqer-simple-checkout-data-pay {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        z-index: 1;
-        background: #fff;
-        width: 100%;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-        padding: 1rem;
-    }
-}
-
-.quiqqer-simple-checkout-data-pay > .btn {
-    width: 100%;
-}
-
-.quiqqer-simple-checkout-data-pay .quiqqer-order-step-checkout-notice {
-    margin-bottom: 1rem;
-}
-
-.quiqqer-simple-checkout-data-pay .quiqqer-order-step-checkout-notice label {
-    background: transparent;
-    border: none;
-}
-
 .quiqqer-simple-checkout .quiqqer-order-ordering-timeline {
     display: none !important;
 }
@@ -135,19 +106,57 @@
 /* right: basket */
 /*****************/
 .quiqqer-simple-checkout-basket {
-    --_bg: var(--bg, #f8f8f8);
-    background: var(--_bg);
-    padding: var(--_sectionPadding);
-    align-self: start;
     position: sticky;
-    top: 1.5rem;
+    top: var(--_sticky-positionTop);
+    align-self: start;
+}
+
+.quiqqer-simple-checkout-basket__inner {
+    background: var(--_sectionBgColor);
+    padding: var(--_sectionPadding);
+}
+
+.quiqqer-simple-checkout-basket__pay {
+    margin-top: 1rem;
+}
+
+.quiqqer-simple-checkout-basket__pay > :where(.btn) {
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-basket__pay > :where(.quiqqer-order-step-checkout-notice) {
+    margin-bottom: 1rem;
+    background: var(--_sectionBgColor);
+    padding: var(--_sectionPadding);
+}
+
+.quiqqer-simple-checkout-basket__pay > :where(.quiqqer-order-step-checkout-notice) label {
+    display: block;
+    cursor: pointer;
+}
+
+.quiqqer-simple-checkout-basket__pay :where(.quiqqer-order-step-checkout-notice label) {
+    background: transparent;
+    border: none;
+}
+
+/**************************/
+/* Scroll to payments btn */
+/**************************/
+.quiqqer-simple-checkout__scrollToPaymentContainer {
+    margin-bottom: var(--_sectionSpacing);
+}
+
+.quiqqer-simple-checkout__scrollToPaymentBtn {
+    display: block;
+    width: 100%;
 }
 
 /******************************************/
 /* Order details for header (only mobile) */
 /******************************************/
 .quiqqer-simple-checkout-orderDetails {
-    background-color: #f8f8f8;
+    background-color: var(--_sectionBgColor);
     top: 0;
     padding: var(--_sectionPadding);
     margin-bottom: var(--_sectionSpacing);

@@ -10,10 +10,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     'qui/controls/Control',
     'qui/controls/loader/Loader',
     'qui/utils/Form',
+    'Locale',
     'Ajax'
 
-], function (QUI, QUIControl, QUILoader, QUIFormUtils, QUIAjax) {
+], function (QUI, QUIControl, QUILoader, QUIFormUtils, QUILocale, QUIAjax) {
     'use strict';
+
+    const lg = 'quiqqer/order-simple-checkout';
 
     return new Class({
 
@@ -23,7 +26,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         Binds: [
             'update',
             '$onInject',
-            '$onImport'
+            '$onImport',
+            'toggleAllProducts',
+            'scrollToPayment'
         ],
 
         options: {
@@ -41,6 +46,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$Payment       = null;
             this.Loader         = null;
             this.$PayToOrderBtn = null;
+            this.ScrollToPaymentBtn = null;
+
+            this.showAllProductsBtn = null;
 
             this.addEvents({
                 onImport: this.$onImport,
@@ -150,7 +158,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
                 });
 
-
                 this.Loader.hide();
 
                 moofx([
@@ -210,7 +217,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             const showLoader = () => {
                 this.Loader.show();
             };
-
 
             let SetCurrency = Promise.resolve();
 
@@ -297,7 +303,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.$PayToOrderBtn = null;
                 }
 
-                this.$setSpacingOnMobile();
+                this.ScrollToPaymentBtn =  this.getElm().querySelector('.quiqqer-simple-checkout__scrollToPaymentBtn');
+
+                if (this.ScrollToPaymentBtn) {
+                    this.ScrollToPaymentBtn.addEvent('click', this.scrollToPayment);
+                }
 
                 // load
                 this.$Delivery.fireEvent('change');
@@ -398,7 +408,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     QUI.parse(this.getElm()).then(() => {
                         this.fireEvent('loaded', [this]);
                         this.$onImport();
-                        this.$setSpacingOnMobile();
 
                         resolve();
                     });
@@ -557,6 +566,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
                     if (this.getElm().getElement('.quiqqer-simple-checkout-basket__inner')) {
                         this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
+
+                        this.showAllProductsBtn = this.getElm().querySelector('.articleList__btnShowMore');
+
+                        if (this.showAllProductsBtn) {
+                            this.showAllProductsBtn.addEvent('click', this.toggleAllProducts);
+                        }
                     }
 
                     this.Loader.hide();
@@ -662,21 +677,81 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         /**
-         * Calculate needed margin on mobile.
-         * Not pretty solution, needs to be reworked.
+         * Show or hide all products
+         *
+         * @param event
          */
-        $setSpacingOnMobile: function () {
-            if (QUI.getBodySize().x >= 768) {
+        toggleAllProducts: function (event) {
+            event.stop();
+
+            const Elm = this.getElm();
+            const HiddenList = Elm.querySelector('.articleList__hidden'),
+                InnerContainer = Elm.querySelector('.articleList__hiddenInner');
+
+            if (!HiddenList || !InnerContainer) {
                 return;
             }
 
-            const PayContainer = this.getElm().querySelector('.quiqqer-simple-checkout-data-pay');
+            if (HiddenList.offsetHeight > 0) {
+                this.hideHiddenArticles(HiddenList);
+                const max = this.showAllProductsBtn.getAttribute('data-qui-max');
 
-            if (!PayContainer) {
+                this.showAllProductsBtn.innerHTML = QUILocale.get(lg, 'ordering.btn.showAllProductsText.open', {
+                    max: max ? max : ''
+                });
+
                 return;
             }
 
-            this.getElm().setStyle('margin-bottom', PayContainer.offsetHeight + 'px');
+            this.showHiddenArticles(HiddenList, InnerContainer);
+
+            this.showAllProductsBtn.innerHTML = QUILocale.get(lg, 'ordering.btn.showAllProductsText.close');
+        },
+
+        /**
+         * Show hidden products
+         *
+         * @param ListNode
+         * @param InnerNode
+         */
+        showHiddenArticles: function (ListNode, InnerNode) {
+            moofx(ListNode).animate({
+                height: InnerNode.offsetHeight,
+                opacity: 1
+            });
+        },
+
+        /**
+         * Hide products
+         *
+         * @param ListNode
+         */
+        hideHiddenArticles: function (ListNode) {
+            moofx(ListNode).animate({
+                height: 0,
+                opacity: 0
+            });
+        },
+
+        /**
+         * Scroll to the payment section.
+         * If some requirements are missing, scroll to the next missing label.
+         *
+         * @param event
+         */
+        scrollToPayment: function (event) {
+            event.stop();
+
+            const Elm = this.getElm();
+            const SumNode = Elm.querySelector('.articles-sum-container');
+            const RequiredField = Elm.querySelector('.quiqqer-simple-checkout-require');
+
+            if (RequiredField) {
+                RequiredField.scrollIntoView({behavior: "smooth"});
+                return;
+            }
+
+            SumNode.scrollIntoView({behavior: "smooth"});
         }
     });
 });
