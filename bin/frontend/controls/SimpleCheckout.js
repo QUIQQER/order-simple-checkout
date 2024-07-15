@@ -718,6 +718,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             moofx(ListNode).animate({
                 height: InnerNode.offsetHeight,
                 opacity: 1
+            }, {
+                callback: () => {
+                    ListNode.style.height = null;
+                }
             });
         },
 
