@@ -24,20 +24,24 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         ],
 
         options: {
-            'class'    : 'SimpleCheckoutWindow',
-            closeButton: false
+            'class': 'SimpleCheckoutWindow',
+            closeButton: true
         },
 
         initialize: function (options) {
             this.setAttributes({
-                maxHeight: 800,
-                maxWidth : 1200
+                maxHeight: 10000, // workaround, qui popup
+                maxWidth : 10000, // does not support full screen
+                draggable: false,
+                resizable: false,
+                buttons: false,
+                closeButton: false,
+                title: false
             });
 
             this.parent(options);
             this.$Checkout      = null;
             this.$PayToOrderBtn = null;
-            this.$isOrdering    = false;
 
             this.addEvents({
                 onOpen: this.$onOpen
@@ -49,71 +53,32 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return;
             }
 
-            this.$Buttons.addClass('buttons-multiple');
-
-            this.$PayToOrderBtn = new QUIButton({
-                'class'  : 'SimpleCheckoutWindow-btn-payToOrder',
-                textimage: 'fas fa-shopping-cart',
-                disabled : true,
-                text     : QUILocale.get('quiqqer/order', 'ordering.btn.pay.to.order'),
-                title    : QUILocale.get('quiqqer/order', 'ordering.btn.pay.to.order'),
-                events   : {
-                    onClick: () => {
-                        this.$PayToOrderBtn.disable();
-
-                        this.$Checkout.orderWithCosts().catch((e) => {
-                            this.$PayToOrderBtn.enable();
-                        });
-                    }
-                }
-            });
-
-            const CancelBtn = new Element('button', {
-                'class': 'SimpleCheckoutWindow-btn-cancel',
-                html   : QUILocale.get('quiqqer/order-simple-checkout', 'SimpleCheckoutWindow.btn.cancel'),
-                events : {
-                    click: () => {
-                        this.fireEvent('cancel', [this]);
-                        this.close();
-                    }
-                }
-            }).inject(this.$Buttons);
-
-            this.addButton(this.$PayToOrderBtn);
-
             this.Loader.show();
             this.getContent().set('html', '');
 
+            new Element('button', {
+                'class': 'SimpleCheckoutWindow__btnClose',
+                html: '<i class="fa fa-times"></i>',
+                events: {
+                    click: () => {
+                        this.close();
+                    }
+                }
+            }).inject(this.getContent());
+
+            const CheckoutWrapper = new Element('div', {
+                'class': 'SimpleCheckoutWindow__checkoutWrapper',
+            }).inject(this.getContent());
+
             this.$Checkout = new SimpleCheckout({
                 products         : this.getAttribute('products'),
-                showPayToOrderBtn: false,
+                showPayToOrderBtn: true,
                 events           : {
                     onLoaded         : () => {
                         this.Loader.hide();
                     },
-                    onOrderStart     : () => {
-                        CancelBtn.disabled = true;
-                        this.$PayToOrderBtn.disable();
-                    },
                     onOrderSuccessful: () => {
-                        this.$Buttons.removeClass('buttons-multiple');
-                        CancelBtn.destroy();
-                        this.$PayToOrderBtn.destroy();
-
-                        this.addButton(new QUIButton({
-                            'class'  : 'SimpleCheckoutWindow-btn-close',
-                            textimage: 'fas fa-check',
-                            text     : QUILocale.get('quiqqer/order-simple-checkout', 'SimpleCheckoutWindow.btn.continue'),
-                            title    : QUILocale.get('quiqqer/order-simple-checkout', 'SimpleCheckoutWindow.btn.continue'),
-                            events   : {
-                                onClick: () => {
-                                    this.fireEvent('closeOrderSuccessful', [this]);
-                                    this.close();
-                                }
-                            }
-                        }));
-
-                        this.getContent().scrollToTop = 0;
+                        new Fx.Scroll(CheckoutWrapper).toTop();
                     },
                     onLoadedError    : () => {
                         require([
@@ -131,19 +96,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                 }
                             }).open();
                         });
-                    },
-                    onOrderValid     : () => {
-                        if (this.$isOrdering) {
-                            return;
-                        }
-
-                        this.$PayToOrderBtn.enable();
-                    },
-                    onOrderInvalid   : () => {
-                        this.$PayToOrderBtn.disable();
                     }
                 }
-            }).inject(this.getContent());
+            }).inject(CheckoutWrapper);
         }
     });
 });

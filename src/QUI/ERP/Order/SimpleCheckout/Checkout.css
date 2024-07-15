@@ -131,8 +131,9 @@
 }
 
 .quiqqer-simple-checkout-basket__pay > :where(.quiqqer-order-step-checkout-notice) label {
-    display: block;
+    display: flex;
     cursor: pointer;
+    align-items: baseline;
 }
 
 .quiqqer-simple-checkout-basket__pay :where(.quiqqer-order-step-checkout-notice label) {
@@ -207,3 +208,70 @@
         grid-template-areas: 'select icon text' '. . price';
     }
 }
+
+/*******/
+/* sum */
+/*******/
+:where(.quiqqer-simple-checkout) .quiqqer-order-control-order-total {
+    background-color: #f8f8f8;
+    margin-top: 0.5rem;
+    padding: 1rem;
+}
+
+:where(.quiqqer-simple-checkout) .quiqqer-order-control-order-information-orderData-table {
+    border: none;
+    float: none;
+    text-align: right;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+:where(.quiqqer-simple-checkout) .quiqqer-order-control-order-information-orderData-table tr {
+    border: none;
+}
+
+:where(.quiqqer-simple-checkout) .quiqqer-order-control-order-information-orderData-table td {
+    padding: 2px;
+    border: none;
+}
+
+:where(.quiqqer-simple-checkout) .articles-sum-row-sum,
+:where(.quiqqer-simple-checkout) .quiqqer-order-control-order-information-orderData-sum-title,
+:where(.quiqqer-simple-checkout) .quiqqer-order-control-order-information-orderData-value {
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+
+/***************/
+/* Finish step */
+/***************/
+.quiqqer-simple-checkout .quiqqer-order-profile-orders-order-articles-article-articleNo {
+    font-size: 0.875rem;
+    opacity: 0.5;
+}
+
+.quiqqer-simple-checkout .quiqqer-order-step-finish .quiqqer-order-control-order {
+    display: flow-root;
+    margin-top: 2rem;
+}
+
+.quiqqer-simple-checkout .quiqqer-order-control-order-information,
+.quiqqer-simple-checkout .quiqqer-order-control-order-articles {
+    padding: 1rem;
+    width: 100%;
+    background: #f8f8f8;
+}
+
+.quiqqer-simple-checkout .quiqqer-order-control-order-articles article {
+    margin-bottom: 0.5rem;
+    width: 100%;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.quiqqer-simple-checkout .quiqqer-order-profile-orders-order-articles-article-image {
+    max-height: 120px;
+    height: initial;
+}
+
