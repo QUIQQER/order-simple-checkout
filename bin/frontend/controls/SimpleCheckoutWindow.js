@@ -1,6 +1,7 @@
 /**
  * @event onCancel [this] - Fires if the users cancels the order process
  * @event onCloseOrderSuccessful [this] - Fires if the user closes the checkout window after a successful order
+ * @event showOrderSuccessInfo [SimpleCheckoutControl, this] - Fires if last step of successful order is shown
  */
 define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow', [
 
@@ -24,19 +25,20 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         ],
 
         options: {
-            'class': 'SimpleCheckoutWindow',
-            closeButton: true
+            'class'             : 'SimpleCheckoutWindow',
+            closeButton         : true,
+            showOrderSuccessInfo: true
         },
 
         initialize: function (options) {
             this.setAttributes({
-                maxHeight: 10000, // workaround, qui popup
-                maxWidth : 10000, // does not support full screen
-                draggable: false,
-                resizable: false,
-                buttons: false,
+                maxHeight  : 10000, // workaround, qui popup
+                maxWidth   : 10000, // does not support full screen
+                draggable  : false,
+                resizable  : false,
+                buttons    : false,
                 closeButton: false,
-                title: false
+                title      : false
             });
 
             this.parent(options);
@@ -58,8 +60,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             new Element('button', {
                 'class': 'SimpleCheckoutWindow__btnClose',
-                html: '<i class="fa fa-times"></i>',
-                events: {
+                html   : '<i class="fa fa-times"></i>',
+                events : {
                     click: () => {
                         this.close();
                     }
@@ -71,14 +73,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }).inject(this.getContent());
 
             this.$Checkout = new SimpleCheckout({
-                products         : this.getAttribute('products'),
-                showPayToOrderBtn: true,
-                events           : {
+                products            : this.getAttribute('products'),
+                showPayToOrderBtn   : true,
+                showOrderSuccessInfo: this.getAttribute('showOrderSuccessInfo'),
+                events              : {
                     onLoaded         : () => {
                         this.Loader.hide();
                     },
                     onOrderSuccessful: () => {
                         new Fx.Scroll(CheckoutWrapper).toTop();
+                        this.fireEvent('orderSuccessful', [this]);
+                    },
+                    onShowOrderSuccessInfo: (SimpleCheckoutControl) => {
+                        this.fireEvent('showOrderSuccessInfo', [SimpleCheckoutControl, this]);
                     },
                     onLoadedError    : () => {
                         require([
