@@ -3,9 +3,26 @@
 </h2>
 
 <div class="articleList">
+{assign var=counter value=0}
+{assign var=max value=$articles|count}
+{assign var=initialVisible value=2}
+
+{assign var=hideProducts value=false}
+{if $max > $initialVisible}
+    {assign var=hideProducts value=true}
+{/if}
+
 {foreach $articles as $Article}
     {assign var=Product value=\QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
     {assign var=calc value=$Article->getAttribute('calculated')}
+
+    {* open html tags for hidden articles *}
+    {if $hideProducts && $counter == $initialVisible}
+    <div class="articleList__hidden" style="height: 0; overflow: hidden;">
+        <div class="articleList__hiddenInner">
+    {/if}
+    {* END open html tags for hidden articles *}
+
     <section class="articleList-entry">
         <div class="articleList-entry__image">
             <a href="{$Product->getUrl()}">
@@ -77,9 +94,23 @@
             </div>
             {/if}
         </div>
-
     </section>
+
+    {* close html tags for hidden articles *}
+    {if $hideProducts && $counter == $max - 1}
+    </div>
+    </div>
+    {/if}
+    {* END close html tags for hidden articles *}
+
+    {assign var=counter value=$counter+1}
 {/foreach}
+
+{if $counter > $initialVisible}
+    <button class="articleList__btnShowMore" data-qui-max="{$max}" data-qui-hidden="{$max - $initialVisible}">
+        {locale group='quiqqer/order-simple-checkout' var='ordering.btn.showAllProductsText.open' max=$max hidden=$max - $initialVisible}
+    </button>
+{/if}
 </div>
 
 <!-- sum display -->

@@ -1,6 +1,6 @@
 {if !isset($Payment)}
     <div class="order-simple-checkout-payment--info">
-        Enter your delivery address to view available payment methods.
+        {locale group="quiqqer/order-simple-checkout" var="CheckoutPayment.enter_address_to_show_payment_options"}
     </div>
 {else}
     {$Payment->create()}

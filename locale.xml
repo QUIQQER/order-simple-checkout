@@ -67,6 +67,35 @@
             <en><![CDATA[Use a different billing address]]></en>
         </locale>
 
+        lCheckoutPayment.enter_address_to_show_payment_options
+        <locale name="CheckoutPayment.enter_address_to_show_payment_options">
+            <de><![CDATA[Bitte geben Sie Ihre Adresse an, um verfügbare Zahlungsmethoden angezeigt zu bekommen.]]></de>
+            <en><![CDATA[Please enter your address to view available payment methods.]]></en>
+        </locale>
+
+        <locale name="ordering.btn.showAllProductsText.open">
+            <de><![CDATA[Alle Produkte anzeigen ([max]) <i class="fa-solid fa-chevron-down"></i>]]></de>
+            <en><![CDATA[Show all products ([max]) <i class="fa-solid fa-chevron-down"></i>]]></en>
+        </locale>
+        <locale name="ordering.btn.showAllProductsText.close">
+            <de><![CDATA[Weniger anzeigen <i class="fa-solid fa-chevron-up"></i>]]></de>
+            <en><![CDATA[Show less <i class="fa-solid fa-chevron-up"></i>]]></en>
+        </locale>
+        <locale name="ordering.btn.continueWithPurchase">
+            <de><![CDATA[Mit Einkauf fortfahren <i class="fa-solid fa-chevron-down"></i>]]></de>
+            <en><![CDATA[Continue with purchase <i class="fa-solid fa-chevron-down"></i>]]></en>
+        </locale>
+    </groups>
+
+    <groups name="quiqqer/order-simple-checkout" datatype="js">
+        <locale name="SimpleCheckoutWindow.btn.continue">
+            <de><![CDATA[Weiter]]></de>
+            <en><![CDATA[Continue]]></en>
+        </locale>
+        <locale name="SimpleCheckoutWindow.btn.cancel">
+            <de><![CDATA[Abbrechen]]></de>
+            <en><![CDATA[Cancel]]></en>
+        </locale>
     </groups>
 
 </locales>
