@@ -29,8 +29,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $registerEvents: function() {
-            this.getElm().getElements('[type="radio"]').addEvent('change', this.$onChange);
-            this.getElm().getElements('[type="radio"]').forEach((Node) => {
+            const Elm = this.getElm();
+            const PaymentOptionElms = Elm.getElements('[name="payment"]');
+
+            PaymentOptionElms.addEvent('change', this.$onChange);
+            PaymentOptionElms.forEach((Node) => {
+                Node.required = true;
+
                 Node.getParent('.quiqqer-order-step-payments-list-entry').addEvent('click', (e) => {
                     let Target = e.target;
 

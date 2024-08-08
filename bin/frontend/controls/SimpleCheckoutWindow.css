@@ -1,0 +1,36 @@
+.SimpleCheckoutWindow .qui-window-popup-content {
+    padding: 0
+}
+
+.SimpleCheckoutWindow__btnClose {
+    position: fixed;
+    top: 0;
+    right: 0.5rem;
+    background: none;
+    color: inherit;
+    border: none;
+}
+
+/* order process */
+.SimpleCheckoutWindow__checkoutWrapper {
+    padding: 3rem 1rem 1rem;
+}
+
+@media screen and (min-width: 768px) {
+    .SimpleCheckoutWindow__checkoutWrapper {
+        overflow: auto;
+        height: 100%;
+        padding: 3rem 2rem 2rem;
+    }
+
+    .SimpleCheckoutWindow__btnClose {
+        right: 1rem;
+    }
+}
+
+.SimpleCheckoutWindow .quiqqer-simple-checkout {
+    --_sticky-positionTop: var(--sticky-positionTop, 0);
+
+    margin-inline: auto;
+    max-width: 1300px;
+}

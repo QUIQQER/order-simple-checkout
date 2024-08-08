@@ -1,6 +1,13 @@
 <div class="quiqqer-simple-checkout-orderDetails" style="opacity: 0">
     {$BasketForHeader->create()}
 </div>
+
+<div class="hide-on-desktop quiqqer-simple-checkout__scrollToPaymentContainer">
+    <button class="quiqqer-simple-checkout__scrollToPaymentBtn btn btn-primary btn-sm btn-small">
+        {locale group="quiqqer/order-simple-checkout" var="ordering.btn.continueWithPurchase"}
+    </button>
+</div>
+
 <form method="post" action="" style="opacity: 0">
 
     <div class="quiqqer-simple-checkout-container">
@@ -61,12 +68,14 @@
                     {$Delivery->create()}
                 </div>
 
+                {if $Shipping}
                 <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-details-section">
                     <h2 class="simpleCheckoutCard-subheader">
                         {locale group="quiqqer/shipping" var="ordering.step.title.Shipping"}
                     </h2>
                     {$Shipping->create()}
                 </div>
+                {/if}
 
                 <div class="quiqqer-simple-checkout-data-payment simpleCheckout-details-section">
                     <h2 class="simpleCheckoutCard-subheader">
@@ -75,31 +84,33 @@
                     {$Payment->create()}
                 </div>
 
+                {if $BillingAddress}
                 <div class="quiqqer-simple-checkout-data-billing simpleCheckout-details-section">
                     <h2 class="simpleCheckoutCard-subheader">
                         {locale group="quiqqer/order-simple-checkout" var="ordering.step.title.Billing"}
                     </h2>
                     {$BillingAddress->create()}
                 </div>
-
-                <div class="quiqqer-simple-checkout-data-pay">
-                    <div class="quiqqer-order-step-checkout-notice">
-                        <label>
-                            <input type="checkbox" name="termsAndConditions" required/>
-                            {$termsAndConditions}
-                        </label>
-                    </div>
-
-                    <button name="pay" disabled class="btn btn-primary btn-lg btn-large">
-                        {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
-                    </button>
-                </div>
+                {/if}
             </div>
         </section>
 
         <section class="quiqqer-simple-checkout-basket">
             <div class="quiqqer-simple-checkout-basket__inner">
                 {$Basket->create()}
+            </div>
+
+            <div class="quiqqer-simple-checkout-basket__pay">
+                <div class="quiqqer-order-step-checkout-notice">
+                    <label>
+                        <input type="checkbox" name="termsAndConditions" required/>
+                        {$termsAndConditions}
+                    </label>
+                </div>
+
+                <button name="pay" class="btn btn-primary btn-lg btn-large">
+                    {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
+                </button>
             </div>
         </section>
     </div>

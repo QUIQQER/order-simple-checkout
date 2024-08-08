@@ -1,51 +1,93 @@
+/**
+ * @event onCancel [this] - Fires if the users cancels the order process
+ * @event onCloseOrderSuccessful [this] - Fires if the user closes the checkout window after a successful order
+ * @event showOrderSuccessInfo [SimpleCheckoutControl, this] - Fires if last step of successful order is shown
+ */
 define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow', [
 
     'qui/QUI',
     'qui/controls/windows/Popup',
-    'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout'
+    'qui/controls/buttons/Button',
+    'Locale',
+    'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
+    'css!package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow.css',
 
-], function(QUI, QUIWindow, SimpleCheckout) {
+], function (QUI, QUIWindow, QUIButton, QUILocale, SimpleCheckout) {
     'use strict';
 
     return new Class({
 
         Extends: QUIWindow,
-        Type: 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow',
+        Type   : 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow',
 
         Binds: [
             '$onOpen'
         ],
 
-        initialize: function(options) {
+        options: {
+            'class'             : 'SimpleCheckoutWindow',
+            closeButton         : true,
+            showOrderSuccessInfo: true
+        },
+
+        initialize: function (options) {
             this.setAttributes({
-                maxHeight: 800,
-                maxWidth: 1200
+                maxHeight  : 10000, // workaround, qui popup
+                maxWidth   : 10000, // does not support full screen
+                draggable  : false,
+                resizable  : false,
+                buttons    : false,
+                closeButton: false,
+                title      : false
             });
 
             this.parent(options);
-            this.$Checkout = null;
+            this.$Checkout      = null;
+            this.$PayToOrderBtn = null;
 
             this.addEvents({
                 onOpen: this.$onOpen
             });
         },
 
-        $onOpen: function() {
+        $onOpen: function () {
             if (this.$Checkout) {
                 return;
             }
 
             this.Loader.show();
             this.getContent().set('html', '');
-            this.getContent().setStyle('padding', 0);
+
+            new Element('button', {
+                'class': 'SimpleCheckoutWindow__btnClose',
+                html   : '<i class="fa fa-times"></i>',
+                events : {
+                    click: () => {
+                        this.close();
+                    }
+                }
+            }).inject(this.getContent());
+
+            const CheckoutWrapper = new Element('div', {
+                'class': 'SimpleCheckoutWindow__checkoutWrapper',
+            }).inject(this.getContent());
 
             this.$Checkout = new SimpleCheckout({
-                products: this.getAttribute('products'),
-                events: {
-                    onLoaded: () => {
+                products            : this.getAttribute('products'),
+                showPayToOrderBtn   : true,
+                showOrderSuccessInfo: this.getAttribute('showOrderSuccessInfo'),
+                events              : {
+                    onLoaded         : () => {
                         this.Loader.hide();
                     },
-                    onLoadedError: () => {
+                    onOrderSuccessful: () => {
+                        new Fx.Scroll(CheckoutWrapper).toTop();
+                        this.fireEvent('orderSuccessful', [this]);
+                    },
+                    onShowOrderSuccessInfo: (SimpleCheckoutControl) => {
+                        this.fireEvent('showOrderSuccessInfo', [SimpleCheckoutControl, this]);
+                    },
+                    onLoadedError    : () => {
                         require([
                             'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
                         ], (LoginWindow) => {
@@ -61,10 +103,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                 }
                             }).open();
                         });
-
                     }
                 }
-            }).inject(this.getContent());
+            }).inject(CheckoutWrapper);
         }
     });
 });
