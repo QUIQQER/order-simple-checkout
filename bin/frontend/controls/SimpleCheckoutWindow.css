@@ -1,7 +1,16 @@
+@media screen and (min-width: 768px) {
+    .SimpleCheckoutWindow .qui-window-popup-content,
+    .SimpleCheckoutWindow .qui-window-popup-sheet-content {
+        padding: 2rem;
+    }
+}
+
 .SimpleCheckoutWindow .SimpleCheckoutWindow-btn-cancel {
-    color: grey;
     cursor: pointer;
-    font-size: 12px;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
 }
 
 .SimpleCheckoutWindow .SimpleCheckoutWindow-btn-close {
@@ -12,8 +21,30 @@
     display: flex;
     float: none !important;
     justify-content: space-between;
+    height: auto !important;
+    padding-inline: 1rem;
 }
 
 .SimpleCheckoutWindow .SimpleCheckoutWindow-btn-payToOrder {
     order: 1;
+}
+
+/* order process */
+.SimpleCheckoutWindow .quiqqer-simple-checkout-basket {
+    top: 0;
+}
+
+.SimpleCheckoutWindow .articles-sum-container {
+    --_bg: #fff;
+    font-size: .875rem;
+    text-align: right;
+}
+
+.SimpleCheckoutWindow .articles-sum tr,
+.SimpleCheckoutWindow .articles-sum td {
+    border-width: 0;
+}
+
+.SimpleCheckoutWindow .quiqqer-simple-checkout-data-pay {
+
 }

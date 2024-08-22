@@ -68,7 +68,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }
             });
 
-            const CancelBtn = new Element('span', {
+            const CancelBtn = new Element('button', {
                 'class': 'SimpleCheckoutWindow-btn-cancel',
                 html   : QUILocale.get('quiqqer/order-simple-checkout', 'SimpleCheckoutWindow.btn.cancel'),
                 events : {
@@ -83,7 +83,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.Loader.show();
             this.getContent().set('html', '');
-            this.getContent().setStyle('padding', 0);
 
             this.$Checkout = new SimpleCheckout({
                 products         : this.getAttribute('products'),
