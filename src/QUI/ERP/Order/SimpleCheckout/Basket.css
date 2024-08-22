@@ -147,7 +147,7 @@ ul.articleData__fields {
 /*******/
 /* sum */
 /*******/
-.articles-sum-container {
+:where(.quiqqer-simple-checkout) .articles-sum-container {
     background-color: var(--_bg);
     margin-top: 0.5rem;
     border-radius: 0.5rem;
@@ -159,7 +159,7 @@ ul.articleData__fields {
     float: none;
     text-align: right;
     margin-bottom: 0;
-    font-size: 0.925rem;
+    font-size: 1rem;
 }
 
 .articles-sum tr {
@@ -167,13 +167,8 @@ ul.articleData__fields {
 }
 
 .articles-sum td {
-    padding: 0;
+    padding: 2px;
     border: none;
-}
-
-.articles-sum-row-sum {
-    font-weight: bold;
-    font-size: 1.125rem;
 }
 
 /****************************/
