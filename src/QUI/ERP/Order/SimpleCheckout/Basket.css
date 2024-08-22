@@ -156,7 +156,7 @@ ul.articleData__fields {
 
 .articles-sum {
     border: none;
-    float: none;
+    width: 100%;
     text-align: right;
     margin-bottom: 0;
     font-size: 1rem;

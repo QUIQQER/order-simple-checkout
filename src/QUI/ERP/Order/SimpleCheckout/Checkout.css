@@ -134,6 +134,8 @@
     display: flex;
     cursor: pointer;
     align-items: baseline;
+    border: none;
+    padding: 0;
 }
 
 .quiqqer-simple-checkout-basket__pay :where(.quiqqer-order-step-checkout-notice label) {
