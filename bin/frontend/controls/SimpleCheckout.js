@@ -254,7 +254,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 if (this.$Shipping) {
                     this.$Shipping.setAttribute('Checkout', this);
                 }
-
                 this.$Payment.setAttribute('Checkout', this);
 
                 if (this.$Billing) {
