@@ -30,21 +30,6 @@
 }
 
 /* order process */
-.SimpleCheckoutWindow .quiqqer-simple-checkout-basket {
-    top: 0;
-}
-
-.SimpleCheckoutWindow .articles-sum-container {
-    --_bg: #fff;
-    font-size: .875rem;
-    text-align: right;
-}
-
-.SimpleCheckoutWindow .articles-sum tr,
-.SimpleCheckoutWindow .articles-sum td {
-    border-width: 0;
-}
-
-.SimpleCheckoutWindow .quiqqer-simple-checkout-data-pay {
-
+.SimpleCheckoutWindow .quiqqer-simple-checkout {
+    --_sticky-positionTop: var(--sticky-positionTop, 0);
 }

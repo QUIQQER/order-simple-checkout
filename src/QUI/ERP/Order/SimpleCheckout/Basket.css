@@ -1,3 +1,7 @@
+.quiqqer-simple-checkout-basket {
+    --_bg: var(--bg, #fff);
+}
+
 /***********/
 /* article */
 /***********/
@@ -9,8 +13,6 @@
 
 .articleList-entry__image,
 .articleList-entry__data {
-    --_bg: var(--bg, #fff);
-
     padding: 1rem;
     border-radius: 0.5rem;
     background-color: var(--_bg);
@@ -22,6 +24,20 @@
         display: grid;
         gap: var(--_gap);
     }
+}
+
+.articleList__btnShowMore {
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+}
+
+.articleList__btnShowMore,
+.articleList__btnShowMore:is(:hover, :active, :focus) {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: var(--qui-color-muted, inherit);
 }
 
 /*********/
@@ -121,26 +137,43 @@ ul.articleData__fields {
     grid-template-rows: 1fr;
 }
 
+/*******************/
+/* Hidden articles */
+/*******************/
+.articleList__hiddenInner {
+    display: flow-root;
+}
+
 /*******/
 /* sum */
 /*******/
-.quiqqer-simple-checkout-orderDetails .articles-sum,
-.quiqqer-simple-checkout-basket .articles-sum {
-    background: var(--_bg, #f8f8f8);
+.articles-sum-container {
+    background-color: var(--_bg);
+    margin-top: 0.5rem;
     border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+}
+
+.articles-sum {
     border: none;
     float: none;
+    text-align: right;
+    margin-bottom: 0;
+    font-size: 0.925rem;
 }
 
-.quiqqer-simple-checkout-orderDetails .articles-sum td,
-.quiqqer-simple-checkout-basket .articles-sum td {
-    padding-bottom: 0;
+.articles-sum tr {
+    border: none;
 }
 
-.quiqqer-simple-checkout-orderDetails .articles-sum-row-sum,
-.quiqqer-simple-checkout-basket .articles-sum-row-sum {
+.articles-sum td {
+    padding: 0;
+    border: none;
+}
+
+.articles-sum-row-sum {
     font-weight: bold;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
 }
 
 /****************************/
@@ -149,6 +182,8 @@ ul.articleData__fields {
 .quiqqer-simple-checkout-basket__toggleBasketBtn {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding-inline: 0;
     width: 100%;
 }
 
