@@ -458,9 +458,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     return;
                 }
 
-                // check if a product exists
-
-
                 this.Loader.show();
                 const Terms = this.getElm().getElement('[name="termsAndConditions"]');
 

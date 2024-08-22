@@ -24,6 +24,13 @@ QUI::getAjax()->registerFunction(
             throw new QUI\Exception('Checkout has no order');
         }
 
+        // no products
+        if (!$Order->getArticles()->count()) {
+            throw new QUI\Exception(
+                QUI::getLocale()->get('quiqqer/order-simple-checkout', 'exception.order.has.no.items')
+            );
+        }
+
         $InvoiceAddress = $Order->getInvoiceAddress();
         $DefaultAddress = $SessionUser->getStandardAddress();
         $hasDeliveryAddress = $Order->hasDeliveryAddress();
