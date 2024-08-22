@@ -10,39 +10,39 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     'qui/controls/buttons/Button',
     'Locale',
     'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
-    'css!package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow.css',
+    'css!package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow.css'
 
-], function (QUI, QUIWindow, QUIButton, QUILocale, SimpleCheckout) {
+], function(QUI, QUIWindow, QUIButton, QUILocale, SimpleCheckout) {
     'use strict';
 
     return new Class({
 
         Extends: QUIWindow,
-        Type   : 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow',
+        Type: 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow',
 
         Binds: [
             '$onOpen'
         ],
 
         options: {
-            'class'             : 'SimpleCheckoutWindow',
-            closeButton         : true,
+            'class': 'SimpleCheckoutWindow',
+            closeButton: true,
             showOrderSuccessInfo: true
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.setAttributes({
-                maxHeight  : 10000, // workaround, qui popup
-                maxWidth   : 10000, // does not support full screen
-                draggable  : false,
-                resizable  : false,
-                buttons    : false,
+                maxHeight: 10000, // workaround, qui popup
+                maxWidth: 10000, // does not support full screen
+                draggable: false,
+                resizable: false,
+                buttons: false,
                 closeButton: false,
-                title      : false
+                title: false
             });
 
             this.parent(options);
-            this.$Checkout      = null;
+            this.$Checkout = null;
             this.$PayToOrderBtn = null;
 
             this.addEvents({
@@ -50,7 +50,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $onOpen: function () {
+        $onOpen: function() {
             if (this.$Checkout) {
                 return;
             }
@@ -60,8 +60,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             new Element('button', {
                 'class': 'SimpleCheckoutWindow__btnClose',
-                html   : '<i class="fa fa-times"></i>',
-                events : {
+                html: '<i class="fa fa-times"></i>',
+                events: {
                     click: () => {
                         this.close();
                     }
@@ -69,15 +69,15 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }).inject(this.getContent());
 
             const CheckoutWrapper = new Element('div', {
-                'class': 'SimpleCheckoutWindow__checkoutWrapper',
+                'class': 'SimpleCheckoutWindow__checkoutWrapper'
             }).inject(this.getContent());
 
             this.$Checkout = new SimpleCheckout({
-                products            : this.getAttribute('products'),
-                showPayToOrderBtn   : true,
+                products: this.getAttribute('products'),
+                showPayToOrderBtn: true,
                 showOrderSuccessInfo: this.getAttribute('showOrderSuccessInfo'),
-                events              : {
-                    onLoaded         : () => {
+                events: {
+                    onLoaded: () => {
                         this.Loader.hide();
                     },
                     onOrderSuccessful: () => {
@@ -87,7 +87,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     onShowOrderSuccessInfo: (SimpleCheckoutControl) => {
                         this.fireEvent('showOrderSuccessInfo', [SimpleCheckoutControl, this]);
                     },
-                    onLoadedError    : () => {
+                    onLoadedError: () => {
                         require([
                             'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
                         ], (LoginWindow) => {
