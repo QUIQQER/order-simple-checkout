@@ -1,3 +1,7 @@
+/**
+ * @event onCancel [this] - Fires if the users cancels the order process
+ * @event onCloseOrderSuccessful [this] - Fires if the user closes the checkout window after a successful order
+ */
 define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutWindow', [
 
     'qui/QUI',
@@ -69,6 +73,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 html   : QUILocale.get('quiqqer/order-simple-checkout', 'SimpleCheckoutWindow.btn.cancel'),
                 events : {
                     click: () => {
+                        this.fireEvent('cancel', [this]);
                         this.close();
                     }
                 }
