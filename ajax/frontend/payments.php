@@ -4,7 +4,7 @@
  * This file contains package_quiqqer_order-simple-checkout_ajax_frontend_payments
  */
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_payments',
     function ($orderHash) {
         $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout([

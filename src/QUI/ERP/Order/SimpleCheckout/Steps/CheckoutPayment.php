@@ -13,7 +13,11 @@ class CheckoutPayment extends QUI\Control implements CheckoutStepInterface
 {
     protected Checkout $Checkout;
 
-    public function __construct(Checkout $Checkout, $attributes = [])
+    /**
+     * @param Checkout $Checkout
+     * @param mixed[] $attributes
+     */
+    public function __construct(Checkout $Checkout, array $attributes = [])
     {
         $this->Checkout = $Checkout;
 
@@ -33,10 +37,9 @@ class CheckoutPayment extends QUI\Control implements CheckoutStepInterface
 
         try {
             $Delivery->validate();
-        } catch (QUI\Exception $exception) {
+        } catch (QUI\Exception) {
             return $Engine->fetch(dirname(__FILE__) . '/CheckoutPayment.html');
         }
-
 
         $Payment = new Payment([
             'Order' => $this->Checkout->getOrder()

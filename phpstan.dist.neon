@@ -1,0 +1,18 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - src
+        - ajax
+        - types
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+    tipsOfTheDay: false
+    customRulesetUsed: true
+services:
+    -
+        class: \PHPStan\Rules\Properties\TypesAssignedToPropertiesRule
+        tags:
+            - phpstan.rules.rule

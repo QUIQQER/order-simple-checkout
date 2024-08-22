@@ -1,0 +1,21 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to static method getInstance\\(\\) on an unknown class QUI\\\\ERP\\\\Shipping\\\\Shipping\\.$#"
+			count: 1
+			path: ajax/frontend/update.php
+
+		-
+			message: "#^Parameter \\#1 \\$PermissionUser of method QUI\\\\ERP\\\\Order\\\\Order\\:\\:save\\(\\) expects null, QUI\\\\Users\\\\SystemUser given\\.$#"
+			count: 1
+			path: src/QUI/ERP/Order/SimpleCheckout/Checkout.php
+
+		-
+			message: "#^Instantiated class QUI\\\\ERP\\\\Shipping\\\\Order\\\\Shipping not found\\.$#"
+			count: 1
+			path: src/QUI/ERP/Order/SimpleCheckout/Steps/CheckoutShipping.php
+
+		-
+			message: "#^Class QUI\\\\Database\\\\Exception referenced with incorrect case\\: QUI\\\\DataBase\\\\Exception\\.$#"
+			count: 1
+			path: types/simpleCheckout.php

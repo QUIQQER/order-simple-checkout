@@ -8,7 +8,7 @@ use QUI\ERP\Address;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Shipping\Shipping;
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_update',
     function ($orderHash, $orderData) {
         $orderData = json_decode($orderData, true);
@@ -35,14 +35,14 @@ QUI::$Ajax->registerFunction(
         ]);
 
         if (isset($orderData['billing_address']) && $orderData['billing_address'] === 'different') {
-            $Order->setDeliveryAddress($ErpAddress);
+            $Order?->setDeliveryAddress($ErpAddress);
 
             // invoice address / billing address
             if (isset($orderData['billing_street']) && isset($orderData['billing_street_number'])) {
                 $orderData['billing_street_no'] = $orderData['billing_street'] . ' ' . $orderData['billing_street_number'];
             }
 
-            $Order->setInvoiceAddress(
+            $Order?->setInvoiceAddress(
                 new Address([
                     'firstname' => $orderData['billing_firstname'],
                     'lastname' => $orderData['billing_lastname'],
@@ -53,25 +53,25 @@ QUI::$Ajax->registerFunction(
                 ])
             );
         } else {
-            $Order->setInvoiceAddress($ErpAddress);
-            $Order->removeDeliveryAddress();
+            $Order?->setInvoiceAddress($ErpAddress);
+            $Order?->removeDeliveryAddress();
         }
 
         if (!empty($orderData['shipping']) && QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
-            $Order->setShipping(
+            $Order?->setShipping(
                 Shipping::getInstance()->getShippingEntry($orderData['shipping'])
             );
         } else {
-            $Order->removeShipping();
+            $Order?->removeShipping();
         }
 
         if (!empty($orderData['payment'])) {
-            $Order->setPayment($orderData['payment']);
+            $Order?->setPayment($orderData['payment']);
         } else {
-            $Order->clearPayment();
+            $Order?->clearPayment();
         }
 
-        $Order->save();
+        $Order?->save();
 
         return $Checkout->isValid();
     },

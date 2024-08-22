@@ -12,7 +12,11 @@ class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
 {
     protected Checkout $Checkout;
 
-    public function __construct(Checkout $Checkout, $attributes = [])
+    /**
+     * @param Checkout $Checkout
+     * @param mixed[] $attributes
+     */
+    public function __construct(Checkout $Checkout, array $attributes = [])
     {
         $this->Checkout = $Checkout;
 
@@ -36,10 +40,9 @@ class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
 
         try {
             $Delivery->validate();
-        } catch (QUI\Exception $exception) {
+        } catch (QUI\Exception) {
             return $Engine->fetch(dirname(__FILE__) . '/CheckoutShipping.html');
         }
-
 
         $Shipping = new QUI\ERP\Shipping\Order\Shipping([
             'Order' => $this->Checkout->getOrder()

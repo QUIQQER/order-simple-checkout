@@ -6,7 +6,7 @@
 
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 
-QUI::$Ajax->registerFunction(
+QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_validate',
     function ($orderHash) {
         $Checkout = new Checkout(['orderHash' => $orderHash]);

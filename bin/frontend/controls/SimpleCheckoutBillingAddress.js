@@ -9,7 +9,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     return new Class({
 
         Extends: QUIControl,
-        Type   : 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutBillingAddress',
+        Type: 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckoutBillingAddress',
 
         Binds: [
             '$onChange',

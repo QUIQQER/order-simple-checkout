@@ -85,6 +85,10 @@
             <de><![CDATA[Mit Einkauf fortfahren <i class="fa-solid fa-chevron-down"></i>]]></de>
             <en><![CDATA[Continue with purchase <i class="fa-solid fa-chevron-down"></i>]]></en>
         </locale>
+        <locale name="exception.order.has.no.items">
+            <de><![CDATA[Bitte füge Deiner Bestellung / Deinem Warenkorb Artikel hinzu.]]></de>
+            <en><![CDATA[Please add items to your order / shopping cart.]]></en>
+        </locale>
     </groups>
 
     <groups name="quiqqer/order-simple-checkout" datatype="js">
