@@ -4,7 +4,6 @@ whenQuiLoaded().then(() => {
     setActionUrl();
 
     function setActionUrl() {
-
         const ctaUrl = QUIQQER_LANDING_PAGE_CTA_URL;
 
         if (!ctaUrl) {
