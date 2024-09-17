@@ -14,6 +14,13 @@ use QUI\ERP\Products\Handler\Products;
 $productId = $Site->getAttribute('order.simple.productLandingPage.productId');
 $ctaUrl = $Site->getAttribute('order.simple.productLandingPage.ctaUrl');
 
+if (!$ctaUrl) {
+    $ctaUrl = '';
+}
+
+$ctaUrl = filter_var($ctaUrl, FILTER_SANITIZE_URL);
+$Template->extendHeader('<script>const QUIQQER_LANDING_PAGE_CTA_URL = "' . $ctaUrl . '";</script>');
+
 if (empty($productId)) {
     $Engine->assign('Product', null);
 } else {
@@ -27,9 +34,4 @@ if (empty($productId)) {
     } catch (\QUI\ERP\Products\Product\Exception) {
         $Engine->assign('Product', null);
     }
-}
-
-if ($ctaUrl) {
-    $ctaUrl = filter_var($ctaUrl, FILTER_SANITIZE_URL);
-    $Template->extendHeader('<script>QUIQQER_LANDING_PAGE_CTA_URL = "' . $ctaUrl . '";</script>');
 }
