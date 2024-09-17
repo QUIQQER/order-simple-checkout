@@ -2,11 +2,58 @@
 <site>
 
     <types>
-        <type type="types/simpleCheckout" icon="fa fa-shopping-cart ">
+        <type type="types/simpleCheckout" icon="fa fa-shopping-cart">
             <locale group="quiqqer/order-simple-checkout" var="admin.types.simpleCheckout"/>
             <desc>
-                <locale group="quiqqer/order-simple-checkout" var="admin.types.simpleCheckout.desc"/>
+                <locale group="quiqqer/order-simple-checkout" var="admin.types.simpleCheckout.description"/>
             </desc>
+        </type>
+
+        <type type="types/productLandingPage" icon="fa fa-store">
+            <locale group="quiqqer/order-simple-checkout" var="admin.types.productLandingPage"/>
+            <desc>
+                <locale group="quiqqer/order-simple-checkout" var="admin.types.productLandingPage.description"/>
+            </desc>
+            <attributes>
+                <attribute>order.simple.productLandingPage.productId</attribute>
+                <attribute>order.simple.productLandingPage.ctaUrl</attribute>
+            </attributes>
+
+            <settings>
+                <category name="product-landing-page">
+                    <settings>
+                        <title>
+                            <locale group="quiqqer/order-simple-checkout" var="order.simple.checkout.settings.title"/>
+                        </title>
+
+                        <input conf="order.simple.productLandingPage.productId"
+                               data-qui="package/quiqqer/products/bin/controls/products/Select"
+                               data-qui-options-max="1"
+                        >
+                            <text>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="order.simple.checkout.settings.productId"/>
+                            </text>
+                            <description>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="order.simple.checkout.settings.productId.description"/>
+                            </description>
+                        </input>
+
+                        <input conf="order.simple.productLandingPage.ctaUrl">
+                            <text>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="order.simple.checkout.settings.ctaUrl"/>
+                            </text>
+                            <description>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="order.simple.checkout.settings.ctaUrl.description"/>
+                            </description>
+                        </input>
+                    </settings>
+                </category>
+            </settings>
+
         </type>
     </types>
 
