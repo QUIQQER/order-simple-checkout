@@ -7,6 +7,7 @@ use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\Controls\Checkout\Login;
 use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
+use QUI\ERP\Order\OrderInterface;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
@@ -14,8 +15,10 @@ use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
 use QUI\Exception;
 
 use function class_exists;
+use function class_implements;
 use function dirname;
 use function file_exists;
+use function in_array;
 
 /**
  * Class Checkout
@@ -46,7 +49,6 @@ class Checkout extends QUI\Control
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $template = dirname(__FILE__) . '/Checkout.html';
-        $templateLogin = dirname(__FILE__) . '/Checkout.Login.html';
 
         if ($this->getAttribute('template') && file_exists($this->getAttribute('template'))) {
             $template = $this->getAttribute('template');
@@ -54,30 +56,9 @@ class Checkout extends QUI\Control
 
         // guest order
         if (QUI::getUsers()->isNobodyUser($this->getUser())) {
-            if (!QUI::getPackageManager()->isInstalled('quiqqer/order-simple-checkout')) {
-                return $Engine->fetch($templateLogin);
-            }
+            $DefaultOrderProcess = new QUI\ERP\Order\OrderProcess();
 
-            if (
-                class_exists('QUI\ERP\Order\Guest\GuestOrder')
-                && !QUI\ERP\Order\Guest\GuestOrder::isActive()
-            ) {
-                return $Engine->fetch($templateLogin);
-            }
-
-            // guest log in
-            $Engine->assign([
-                'Registration' => new Registration([
-                    'autofill' => false
-                ]),
-                'Login' => new Login()
-            ]);
-
-            $this->setAttribute('data-nobody-log-in', 1);
-
-            return $Engine->fetch(
-                OPT_DIR . 'quiqqer/order/src/QUI/ERP/Order/Controls/OrderProcess.Nobody.html'
-            );
+            return $DefaultOrderProcess->create();
         }
 
         // put the basket articles to the order in process, if the current order has no articles
@@ -278,6 +259,25 @@ class Checkout extends QUI\Control
                 return $Orders->getOrderInProcessByHash($this->getAttribute('orderHash'));
             } catch (QUI\Exception) {
             }
+        }
+
+        try {
+            $result = QUI::getEvents()->fireEvent('orderProcessGetOrder', [$this]);
+
+            if (!empty($result)) {
+                $OrderInstance = null;
+
+                foreach ($result as $entry) {
+                    if ($entry && in_array(OrderInterface::class, class_implements($entry))) {
+                        $OrderInstance = $entry;
+                    }
+                }
+
+                if ($OrderInstance && in_array(OrderInterface::class, class_implements($OrderInstance))) {
+                    return $OrderInstance;
+                }
+            }
+        } catch (\Exception) {
         }
 
         try {
