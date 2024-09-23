@@ -172,6 +172,26 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 ]).animate({
                     opacity: 1
                 });
+            }).catch((err) => {
+                console.error(err);
+                this.getElm().set('html', '');
+
+                if (this.getElm().getParent('.qui-window-popup')) {
+                    this.fireEvent('loadedError', [this]);
+                    return;
+                }
+
+                require([
+                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                ], (Login) => {
+                    new Login({
+                        events: {
+                            onSuccess: () => {
+                                location.reload()
+                            }
+                        }
+                    }).open();
+                });
             });
         },
 

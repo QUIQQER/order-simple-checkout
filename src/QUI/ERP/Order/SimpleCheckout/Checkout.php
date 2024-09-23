@@ -58,12 +58,12 @@ class Checkout extends QUI\Control
                 return $Engine->fetch($templateLogin);
             }
 
-            if (
-                class_exists('QUI\ERP\Order\Guest\GuestOrder')
-                && !QUI\ERP\Order\Guest\GuestOrder::isActive()
-            ) {
-                return $Engine->fetch($templateLogin);
-            }
+//            if (
+//                class_exists('QUI\ERP\Order\Guest\GuestOrder')
+//                && !QUI\ERP\Order\Guest\GuestOrder::isActive()
+//            ) {
+//                return $Engine->fetch($templateLogin);
+//            }
 
             // guest log in
             $Engine->assign([
