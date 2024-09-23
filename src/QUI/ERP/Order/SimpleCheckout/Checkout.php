@@ -7,6 +7,7 @@ use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\Controls\Checkout\Login;
 use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
+use QUI\ERP\Order\OrderInterface;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
@@ -14,8 +15,10 @@ use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
 use QUI\Exception;
 
 use function class_exists;
+use function class_implements;
 use function dirname;
 use function file_exists;
+use function in_array;
 
 /**
  * Class Checkout
@@ -256,6 +259,25 @@ class Checkout extends QUI\Control
                 return $Orders->getOrderInProcessByHash($this->getAttribute('orderHash'));
             } catch (QUI\Exception) {
             }
+        }
+
+        try {
+            $result = QUI::getEvents()->fireEvent('orderProcessGetOrder', [$this]);
+
+            if (!empty($result)) {
+                $OrderInstance = null;
+
+                foreach ($result as $entry) {
+                    if ($entry && in_array(OrderInterface::class, class_implements($entry))) {
+                        $OrderInstance = $entry;
+                    }
+                }
+
+                if ($OrderInstance && in_array(OrderInterface::class, class_implements($OrderInstance))) {
+                    return $OrderInstance;
+                }
+            }
+        } catch (\Exception) {
         }
 
         try {
