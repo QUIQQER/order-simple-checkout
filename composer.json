@@ -21,7 +21,9 @@
   "require": {
     "php": "^8",
     "quiqqer/order": "^2",
-    "quiqqer/frontend-users": "^2"
+    "quiqqer/frontend-users": "^2",
+    "quiqqer/gallery": "^2.1",
+    "quiqqer/presentation-bricks": "^2"
   },
   "autoload": {
     "psr-4": {

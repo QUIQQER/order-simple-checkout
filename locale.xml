@@ -14,6 +14,22 @@
             <de><![CDATA[Konto / Kontakt]]></de>
             <en><![CDATA[Account / Contact]]></en>
         </locale>
+        <locale name="area.productLandingPage.top.title">
+            <de><![CDATA[Produkt Landingpage: Zone vor dem Produkt]]></de>
+            <en><![CDATA[Product landing page: area before the product]]></en>
+        </locale>
+        <locale name="area.productLandingPage.top.description">
+            <de><![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
+            <en><![CDATA[Special brick area for the quick and easy creation of product landing pages.]]></en>
+        </locale>
+        <locale name="area.productLandingPage.bottom.title">
+            <de><![CDATA[Produkt Landingpage: Zone nach dem Produkt]]></de>
+            <en><![CDATA[Product landing page: area after the product]]></en>
+        </locale>
+        <locale name="area.productLandingPage.bottom.description">
+            <de><![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
+            <en><![CDATA[Special brick area for the quick and easy creation of product landing pages.]]></en>
+        </locale>
         <locale name="or">
             <de><![CDATA[ODER]]></de>
             <en><![CDATA[OR]]></en>
@@ -90,6 +106,74 @@
             <en><![CDATA[Please add items to your order / shopping cart.]]></en>
         </locale>
     </groups>
+
+    <groups name="quiqqer/order-simple-checkout" datatype="php">
+        <locale name="admin.types.simpleCheckout">
+            <de><![CDATA[Einfacher Bestellprozess]]></de>
+            <en><![CDATA[Simple ordering process]]></en>
+        </locale>
+        <locale name="admin.types.simpleCheckout.description">
+            <de><![CDATA[
+            Der einfache Bestellprozess bietet eine benutzerfreundliche Alternative zum Standard-Bestellprozess,
+            indem er eine strukturierte und intuitive Kaufabwicklung ermöglicht, die den Bedürfnissen von Kunden gerecht wird,
+            die nach einer schnellen und unkomplizierten Bestellung suchen.
+            ]]></de>
+            <en><![CDATA[
+            The simple ordering process offers a user-friendly alternative to the standard ordering process,
+            by providing a structured and intuitive checkout process that meets the needs of customers
+            who are looking for a quick and straightforward ordering process.
+            ]]></en>
+        </locale>
+
+        <locale name="admin.types.productLandingPage">
+            <de><![CDATA[Produkt Landing Page]]></de>
+            <en><![CDATA[Product Landing Page]]></en>
+        </locale>
+        <locale name="admin.types.productLandingPage.description">
+            <de><![CDATA[
+            Die Produkt-Landing-Page ist eine speziell konzipierte Seite, die es ermöglicht,
+            ein einzelnes Produkt in den Mittelpunkt zu stellen und es mit relevanten Inhalten und Bausteinen zu umgeben.
+            Durch die flexible Gestaltung der Seite können Sie verschiedene Bausteine über oder unter dem Produkt platzieren,
+            um eine ansprechende und überzeugende Präsentation zu schaffen.
+
+            Diese Seite ist ideal für die Promotion von Neuerscheinungen, Bestsellern oder speziellen Angeboten,
+            da sie es ermöglicht, das Produkt in einer klaren und fokussierten Weise zu präsentieren
+            und die Aufmerksamkeit der Besucher auf das Wesentliche zu lenken.
+            ]]></de>
+            <en><![CDATA[
+            The product landing page is a specially designed page that makes it possible to
+            to focus on a single product and surround it with relevant content and modules.
+            The flexible design of the page allows you to place different modules above or below the product,
+            to create an appealing and convincing presentation.
+
+            This page is ideal for promoting new releases, bestsellers or special offers,
+            as it makes it possible to present the product in a clear and focused way
+            and draw visitors' attention to the essentials.
+            ]]></en>
+        </locale>
+
+        <locale name="order.simple.checkout.settings.title">
+            <de><![CDATA[Produkt Landing Page]]></de>
+            <en><![CDATA[Product Landing Page]]></en>
+        </locale>
+        <locale name="order.simple.checkout.settings.productId">
+            <de><![CDATA[Produkt Id:]]></de>
+            <en><![CDATA[Product Id:]]></en>
+        </locale>
+        <locale name="order.simple.checkout.settings.productId.description">
+            <de><![CDATA[Wähle hier das Produkt aus, das auf der Seite angezeigt werden soll.]]></de>
+            <en><![CDATA[Select the product to be displayed on the page here.]]></en>
+        </locale>
+        <locale name="order.simple.checkout.settings.ctaUrl">
+            <de><![CDATA[Aktion-URL (CTA)]]></de>
+            <en><![CDATA[Action url (CTA)]]></en>
+        </locale>
+        <locale name="order.simple.checkout.settings.ctaUrl.description">
+            <de><![CDATA[Die hier festgelegte URL wird auf alle Buttons (Call To Actions) angewendet, die das Data-Attribut <code>data-qui-productLandingPage-cta="1"</code> enthalten. Dies kann eine interne URL, eine URL mit Produkt-ID oder ein Link zu einer externen Seite sein.]]></de>
+            <en><![CDATA[The URL defined here is applied to all buttons (Call To Actions) that contain the data attribute <code>data-qui-productLandingPage-cta="1"</code>. This can be an internal URL, a URL with a product ID or a link to an external page.]]></en>
+        </locale>
+    </groups>
+
 
     <groups name="quiqqer/order-simple-checkout" datatype="js">
         <locale name="SimpleCheckoutWindow.btn.continue">
