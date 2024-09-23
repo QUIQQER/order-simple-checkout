@@ -108,7 +108,7 @@ class Events
                     'type' => '\\QUI\\PresentationBricks\\Controls\\WallpaperTextArrow',
                     'title' => 'Produkt Landingpage - Header (mit Produktbild) - ' . QUI\Utils\Uuid::get(),
                     'description' => '(Generierter Baustein für Seite ' . $Site->getId() . ')',
-                    'content' => "<h1>Produkt Landing Page<br />\nf&uuml;r einen besonderer Artikel</h1>\n\n<p>Phasellus tempus. Integer tincidunt. Nam eget dui.. Praesent metus tellus, elementum eu, semper a, adipiscing nec, purus.</p>\n\n<p>&nbsp;</p>\n\n<p><a class=\"btn btn-primary btn-large btn-lg\" data-qui-productlandingpage-cta=\"1\" href=\"#\">Jetzt bestellen <i class=\"fa-solid fa-cart-shopping\"></i></a></p>\n",
+                    'content' => "<h1>Produkt Landing Page<br />\nf&uuml;r einen besonderen Artikel</h1>\n\n<p>Phasellus tempus. Integer tincidunt. Nam eget dui.. Praesent metus tellus, elementum eu, semper a, adipiscing nec, purus.</p>\n\n<p>&nbsp;</p>\n\n<p><a class=\"btn btn-primary btn-large btn-lg\" data-qui-productlandingpage-cta=\"1\" href=\"#\">Jetzt bestellen <i class=\"fa-solid fa-cart-shopping\"></i></a></p>\n",
                     'areas' => 'headerSuffix'
                 ],
                 'settings' => [
