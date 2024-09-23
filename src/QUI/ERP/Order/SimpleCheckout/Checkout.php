@@ -46,7 +46,6 @@ class Checkout extends QUI\Control
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $template = dirname(__FILE__) . '/Checkout.html';
-        $templateLogin = dirname(__FILE__) . '/Checkout.Login.html';
 
         if ($this->getAttribute('template') && file_exists($this->getAttribute('template'))) {
             $template = $this->getAttribute('template');
@@ -54,30 +53,9 @@ class Checkout extends QUI\Control
 
         // guest order
         if (QUI::getUsers()->isNobodyUser($this->getUser())) {
-            if (!QUI::getPackageManager()->isInstalled('quiqqer/order-simple-checkout')) {
-                return $Engine->fetch($templateLogin);
-            }
+            $DefaultOrderProcess = new QUI\ERP\Order\OrderProcess();
 
-            if (
-                class_exists('QUI\ERP\Order\Guest\GuestOrder')
-                && !QUI\ERP\Order\Guest\GuestOrder::isActive()
-            ) {
-                return $Engine->fetch($templateLogin);
-            }
-
-            // guest log in
-            $Engine->assign([
-                'Registration' => new Registration([
-                    'autofill' => false
-                ]),
-                'Login' => new Login()
-            ]);
-
-            $this->setAttribute('data-nobody-log-in', 1);
-
-            return $Engine->fetch(
-                OPT_DIR . 'quiqqer/order/src/QUI/ERP/Order/Controls/OrderProcess.Nobody.html'
-            );
+            return $DefaultOrderProcess->create();
         }
 
         // put the basket articles to the order in process, if the current order has no articles
