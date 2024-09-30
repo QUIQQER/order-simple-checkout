@@ -117,8 +117,21 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.Loader.show();
 
+            const urlParams = new URLSearchParams(window.location.search);
+            const product = urlParams.get('product');
+            let loaded;
+
+            if (product) {
+                loaded = this.$loadProducts().then(() => {
+                    return this.$loadOrder();
+                });
+            } else {
+                loaded = this.$loadOrder();
+            }
+
+
             // check order status
-            this.$loadOrder().then((orderData) => {
+            loaded.then((orderData) => {
                 // orderData === false = no permission for this order
                 if (orderData === false) {
                     // normal load
@@ -371,11 +384,22 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }
                 );
             });
-
-
         },
 
         $loadProducts: function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const product = urlParams.get('product');
+
+            // @todo url params - product
+            if (product) {
+                this.setAttribute('products', [
+                    {
+                        id: product,
+                        quantity: 1
+                    }
+                ]);
+            }
+
             if (this.getAttribute('products') && !this.getAttribute('orderHash')) {
                 return new Promise((resolve, reject) => {
                     QUIAjax.post(
