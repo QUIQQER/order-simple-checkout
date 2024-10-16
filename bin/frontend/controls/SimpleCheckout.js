@@ -153,30 +153,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 return this.$loadGUI();
             }).then(() => {
-                // Terms of Service
-                this.getElm().getElements('a[data-project]').addEvent('click', function(e) {
-                    let Target = e.target;
-
-                    if (Target.nodeName !== 'A') {
-                        Target = Target.getParent('a');
-                    }
-
-                    if (!Target.get('data-project') || !Target.get('data-lang') || !Target.get('data-id')) {
-                        return;
-                    }
-
-                    e.stop();
-
-                    require(['package/quiqqer/controls/bin/site/Window'], function(Win) {
-                        new Win({
-                            showTitle: true,
-                            project: Target.get('data-project'),
-                            lang: Target.get('data-lang'),
-                            id: Target.get('data-id')
-                        }).open();
-                    });
-                });
-
+                this.$parseTermsAndConditions();
                 this.Loader.hide();
 
                 moofx([
@@ -502,6 +479,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 this.fireEvent('orderStart', [this]);
 
+
                 // execute order
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts', (result) => {
                     const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
@@ -601,19 +579,71 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             window.location.hash = this.getAttribute('orderHash');
         },
 
+        $parseTermsAndConditions: function() {
+            // Terms of Service
+            this.getElm().getElements('a[data-project]').addEvent('click', function(e) {
+                let Target = e.target;
+
+                if (Target.nodeName !== 'A') {
+                    Target = Target.getParent('a');
+                }
+
+                if (!Target.get('data-project') || !Target.get('data-lang') || !Target.get('data-id')) {
+                    return;
+                }
+
+                e.stop();
+
+                require(['package/quiqqer/controls/bin/site/Window'], function(Win) {
+                    new Win({
+                        showTitle: true,
+                        project: Target.get('data-project'),
+                        lang: Target.get('data-lang'),
+                        id: Target.get('data-id')
+                    }).open();
+                });
+            });
+        },
+
         $refreshBasket: function() {
             this.Loader.show();
 
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
-                    if (this.getElm().getElement('.quiqqer-simple-checkout-basket__inner')) {
-                        this.getElm().getElement('.quiqqer-simple-checkout-basket__inner').set('html', basket);
+                    const Ghost = new Element('div', {
+                        html: basket
+                    });
+
+                    const basketCss = '.quiqqer-simple-checkout-basket__inner';
+                    const noticeCss = '.quiqqer-order-step-checkout-notice';
+
+                    if (this.getElm().querySelector(basketCss)) {
+                        this.getElm().querySelector(basketCss).set('html', Ghost.querySelector(basketCss).innerHTML);
 
                         this.showAllProductsBtn = this.getElm().querySelector('.articleList__btnShowMore');
 
                         if (this.showAllProductsBtn) {
                             this.showAllProductsBtn.addEvent('click', this.toggleAllProducts);
                         }
+                    }
+
+                    if (this.getElm().querySelector(noticeCss)) {
+                        const Notice = this.getElm().querySelector(noticeCss);
+                        const inputs = Notice.querySelectorAll('input');
+
+                        Notice.set('html', Ghost.querySelector(noticeCss).innerHTML);
+                        this.$parseTermsAndConditions();
+
+                        inputs.forEach((node) => {
+                            const NewNode = this.getElm().querySelector('[name="' + node.name + '"]');
+
+                            if (node.type === 'radio' || node.type === 'checkbox') {
+                                NewNode.checked = node.checked;
+                                return;
+                            }
+
+                            NewNode.value = node.value;
+                        });
                     }
 
                     this.Loader.hide();

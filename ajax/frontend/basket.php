@@ -11,7 +11,7 @@ QUI::getAjax()->registerFunction(
             'orderHash' => $orderHash
         ]);
 
-        return $Checkout->getBasket();
+        return $Checkout->getBody();
     },
     ['orderHash']
 );
