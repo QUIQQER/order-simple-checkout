@@ -10,7 +10,7 @@ QUI::getAjax()->registerFunction(
         $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout([
             'orderHash' => $orderHash
         ]);
-
+        QUI\System\Log::writeRecursive($_REQUEST, QUI\System\Log::LEVEL_ERROR);
         return $Checkout->getBody();
     },
     ['orderHash']

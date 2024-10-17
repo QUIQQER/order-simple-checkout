@@ -4,26 +4,37 @@
  * This file contains package_quiqqer_order-simple-checkout_ajax_frontend_getOrder
  */
 
+use QUI\ERP\Address;
+
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getOrder',
     function ($orderHash) {
         $OrderHandler = QUI\ERP\Order\Handler::getInstance();
         $User = QUI::getUserBySession();
+        $Address = $User->getStandardAddress();
+
+        $result = [
+            'order' => false,
+            'address' => $Address->getAttributes()
+        ];
 
         try {
             $Order = $OrderHandler->getOrderByHash($orderHash);
             $Customer = $Order->getCustomer();
             $customerId = $Customer->getUUID();
 
-            if ($User->getUUID() === $customerId) {
-                return $Order->toArray();
-            }
+            $Order->setInvoiceAddress($Address);
+            $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
+            $Order->save(QUI::getUserBySession());
 
-            return false;
+
+            if ($User->getUUID() === $customerId) {
+                $result['order'] = $Order->toArray();
+            }
         } catch (QUI\Exception) {
         }
 
-        return null;
+        return $result;
     },
     ['orderHash']
 );

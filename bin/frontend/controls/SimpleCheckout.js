@@ -131,7 +131,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
 
             // check order status
-            loaded.then((orderData) => {
+            loaded.then((data) => {
+                const orderData = data.order;
+
                 // orderData === false = no permission for this order
                 if (orderData === false) {
                     // normal load
