@@ -7,6 +7,7 @@
 use QUI\ERP\Address;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Shipping\Shipping;
+use QUI\System\Log;
 
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_update',
@@ -33,6 +34,10 @@ QUI::getAjax()->registerFunction(
             'city' => $orderData['city'],
             'country' => $orderData['country']
         ]);
+
+        if (isset($orderData['company'])) {
+            $ErpAddress->setAttribute('company', $orderData['company']);
+        }
 
         if (isset($orderData['billing_address']) && $orderData['billing_address'] === 'different') {
             $Order?->setDeliveryAddress($ErpAddress);
@@ -63,6 +68,25 @@ QUI::getAjax()->registerFunction(
             );
         } else {
             $Order?->removeShipping();
+        }
+
+        if (isset($orderData['businessType'])) {
+            try {
+                $Customer = $Order->getCustomer();
+                $User = QUI::getUsers()->get($Customer->getUUID());
+
+                if ($orderData['businessType'] === 'b2b') {
+                    $User->setAttribute('quiqqer.erp.isNettoUser', QUI\ERP\Utils\User::IS_NETTO_USER);
+                    $User->setCompanyStatus(true);
+                } else {
+                    $User->setAttribute('quiqqer.erp.isNettoUser', QUI\ERP\Utils\User::IS_BRUTTO_USER);
+                    $User->setCompanyStatus(false);
+                }
+
+                $User->save(QUI::getUsers()->getSystemUser());
+            } catch (QUI\Exception $Exception) {
+                Log::addError($Exception->getMessage());
+            }
         }
 
         if (!empty($orderData['payment'])) {

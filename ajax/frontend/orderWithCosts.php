@@ -44,6 +44,7 @@ QUI::getAjax()->registerFunction(
                 && $a->getAttribute('street_no') === $b->getAttribute('street_no')
                 && $a->getAttribute('zip') === $b->getAttribute('zip')
                 && $a->getAttribute('city') === $b->getAttribute('city')
+                && $a->getAttribute('company') === $b->getAttribute('company')
             ) {
                 return true;
             }
@@ -84,6 +85,10 @@ QUI::getAjax()->registerFunction(
             $DefaultAddress->setAttribute('city', $InvoiceAddress->getAttribute('city'));
             $DefaultAddress->setAttribute('country', $InvoiceAddress->getAttribute('country'));
 
+            if ($InvoiceAddress->getAttribute('company')) {
+                $DefaultAddress->setAttribute('company', $InvoiceAddress->getAttribute('company'));
+            }
+
             $DefaultAddress->save(QUI::getUsers()->getSystemUser());
             $Order->setInvoiceAddress($DefaultAddress);
             $Order->save(QUI::getUsers()->getSystemUser());
@@ -107,6 +112,11 @@ QUI::getAjax()->registerFunction(
             $DefaultAddress->setAttribute('zip', $DeliveryAddress->getAttribute('zip'));
             $DefaultAddress->setAttribute('city', $DeliveryAddress->getAttribute('city'));
             $DefaultAddress->setAttribute('country', $DeliveryAddress->getAttribute('country'));
+
+            if ($InvoiceAddress->getAttribute('company')) {
+                $DefaultAddress->setAttribute('company', $InvoiceAddress->getAttribute('company'));
+            }
+
             $DefaultAddress->save(QUI::getUsers()->getSystemUser());
         } elseif (method_exists($SessionUser, 'addAddress') && !$userIsGuest) {
             // add new address
