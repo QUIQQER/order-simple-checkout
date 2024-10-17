@@ -27,9 +27,8 @@ QUI::getAjax()->registerFunction(
             $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
             $Order->save(QUI::getUserBySession());
 
-
             if ($User->getUUID() === $customerId) {
-                $result['order'] = $Order->toArray();
+                $result['order'] = $OrderHandler->getOrderByHash($orderHash)->toArray();
             }
         } catch (QUI\Exception) {
         }
