@@ -15,7 +15,7 @@ QUI::getAjax()->registerFunction(
 
         $result = [
             'order' => false,
-            'address' => $Address->getAttributes()
+            'address' => $Address?->getAttributes() ?? false
         ];
 
         try {
@@ -23,13 +23,14 @@ QUI::getAjax()->registerFunction(
             $Customer = $Order->getCustomer();
             $customerId = $Customer->getUUID();
 
-            $Order->setInvoiceAddress($Address);
-            $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
-            $Order->save(QUI::getUserBySession());
-
+            if ($Address) {
+                $Order->setInvoiceAddress($Address);
+                $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
+                $Order->save(QUI::getUserBySession());
+            }
 
             if ($User->getUUID() === $customerId) {
-                $result['order'] = $Order->toArray();
+                $result['order'] = $OrderHandler->getOrderByHash($orderHash)->toArray();
             }
         } catch (QUI\Exception) {
         }

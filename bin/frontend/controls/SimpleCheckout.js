@@ -204,7 +204,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 });
             }
 
-            return Promise.resolve();
+            return Promise.resolve({
+                order: false
+            });
         },
 
         $loadGUI: function() {
