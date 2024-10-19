@@ -25,7 +25,7 @@ QUI::getAjax()->registerFunction(
         $Checkout = new Checkout(['orderHash' => $orderHash]);
         $Order = $Checkout->getOrder();
 
-        $ErpAddress = new Address([
+        $erpAddressData = [
             'salutation' => $orderData['salutation'],
             'firstname' => $orderData['firstname'],
             'lastname' => $orderData['lastname'],
@@ -33,11 +33,40 @@ QUI::getAjax()->registerFunction(
             'zip' => $orderData['zip'],
             'city' => $orderData['city'],
             'country' => $orderData['country']
-        ]);
+        ];
+
+        $ErpAddress = new Address($erpAddressData);
 
         if (isset($orderData['company'])) {
             $ErpAddress->setAttribute('company', $orderData['company']);
         }
+
+        // get user address
+        $Address = Checkout::getUserAddressByErpAddress($ErpAddress);
+
+        if (!$Address) {
+            // default address wird gegebenenfalls angepasst
+            $Address = QUI::getUserBySession()->getStandardAddress();
+        }
+
+        $erpAddressData['uuid'] = $Address->getUUID();
+        $erpAddressData['id'] = $Address->getId();
+        $ErpAddress = new Address($erpAddressData);
+
+        // save address
+        $Address->setAttribute('firstname', $ErpAddress->getAttribute('firstname'));
+        $Address->setAttribute('lastname', $ErpAddress->getAttribute('lastname'));
+        $Address->setAttribute('street_no', $ErpAddress->getAttribute('street_no'));
+        $Address->setAttribute('zip', $ErpAddress->getAttribute('zip'));
+        $Address->setAttribute('city', $ErpAddress->getAttribute('city'));
+        $Address->setAttribute('country', $ErpAddress->getAttribute('country'));
+
+        if ($ErpAddress->getAttribute('company')) {
+            $Address->setAttribute('company', $ErpAddress->getAttribute('company'));
+        }
+
+        $Address->save(QUI::getUsers()->getSystemUser());
+
 
         if (isset($orderData['billing_address']) && $orderData['billing_address'] === 'different') {
             $Order?->setDeliveryAddress($ErpAddress);
@@ -54,7 +83,8 @@ QUI::getAjax()->registerFunction(
                     'street_no' => $orderData['billing_street_no'],
                     'zip' => $orderData['billing_zip'],
                     'city' => $orderData['billing_city'],
-                    'country' => $orderData['billing_country']
+                    'country' => $orderData['billing_country'],
+                    'uuid' => $Address->getUUID()
                 ])
             );
         } else {
