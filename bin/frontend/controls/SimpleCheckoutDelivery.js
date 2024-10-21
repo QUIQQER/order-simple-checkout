@@ -19,6 +19,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.parent(options);
 
             this.$labels = [];
+            this.$Countries = null;
+            this.$changeTimeout = null;
 
             this.addEvents({
                 onImport: this.$onImport
@@ -32,16 +34,42 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             const VatId = this.getElm().getElement('.quiqqer-order-customerData-edit-vatId');
             const chUID = this.getElm().getElement('.quiqqer-order-customerData-edit-chUID');
 
+            VatId.setStyle('display', null);
+            chUID.setStyle('display', 'none');
+
+            // country change
+            const CountryNode = this.getElm().getElement('[name="country"]');
+
+            if (CountryNode) {
+                new Promise((resolve) => {
+                    if (CountryNode.get('data-quiid')) {
+                        resolve(QUI.Controls.getById(CountryNode.get('data-quiid')));
+                        return;
+                    }
+
+                    let checkInterval = setInterval(() => {
+                        if (CountryNode.get('data-quiid')) {
+                            clearInterval(checkInterval);
+                            resolve(QUI.Controls.getById(CountryNode.get('data-quiid')));
+                        }
+                    }, 10);
+                }).then((QUICountries) => {
+                    this.$Countries = QUICountries;
+
+                    this.$Countries.addEvent('change', () => {
+                        if (this.$Countries.getValue() === 'CH') {
+                            chUID.setStyle('display', null);
+                            VatId.setStyle('display', 'none');
+                        } else {
+                            chUID.setStyle('display', 'none');
+                            VatId.setStyle('display', null);
+                        }
+                    });
+                });
+            }
+
             if (Company) {
                 this.$labels.push(Company);
-            }
-
-            if (VatId) {
-                this.$labels.push(VatId);
-            }
-
-            if (chUID) {
-                this.$labels.push(chUID);
             }
 
             if (BusinessType) {
@@ -67,23 +95,34 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onChange: function() {
-            this.fireEvent('change');
+            if (this.$changeTimeout) {
+                clearTimeout(this.$changeTimeout);
+            }
+
+            this.$changeTimeout = setTimeout(() => {
+                this.fireEvent('change');
+            }, 50);
         },
 
         $hideB2B: function() {
-            this.$labels.forEach((Label) => {
+            const VatId = this.getElm().getElement('.quiqqer-order-customerData-edit-vatId');
+            const chUID = this.getElm().getElement('.quiqqer-order-customerData-edit-chUID');
+
+            const labels = this.$labels.concat([VatId, chUID]);
+
+            labels.forEach((Label) => {
                 Label.setStyle('position', 'relative');
                 Label.setStyle('overflow', 'hidden');
             });
 
-            moofx(this.$labels).animate({
+            moofx(labels).animate({
                 height: 0,
                 opacity: 0,
                 margin: 0,
                 padding: 0
             }, {
                 callback: () => {
-                    this.$labels.forEach((Label) => {
+                    labels.forEach((Label) => {
                         Label.setStyle('display', 'none');
                     });
                 }
@@ -91,7 +130,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $showB2B: function() {
-            this.$labels.forEach((Label) => {
+            const VatId = this.getElm().getElement('.quiqqer-order-customerData-edit-vatId');
+            const chUID = this.getElm().getElement('.quiqqer-order-customerData-edit-chUID');
+            const labels = this.$labels.concat([VatId, chUID]);
+
+            labels.forEach((Label) => {
                 Label.setStyle('position', 'relative');
                 Label.setStyle('opacity', 0);
                 Label.setStyle('display', null);
@@ -102,6 +145,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 moofx(Label).animate({
                     opacity: 1,
                     height: Label.getScrollSize().y
+                }, {
+                    callback: () => {
+                        if (this.$Countries) {
+                            this.$Countries.fireEvent('change');
+                        }
+                    }
                 });
             });
         }

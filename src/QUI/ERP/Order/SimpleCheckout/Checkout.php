@@ -372,4 +372,41 @@ class Checkout extends QUI\Control
     }
 
     //endregion
+
+    //region utils
+
+
+    public static function isSameAddress(?QUI\Users\Address $a, ?QUI\Users\Address $b): bool
+    {
+        if (
+            $a
+            && $b
+            && $a->getAttribute('firstname') === $b->getAttribute('firstname')
+            && $a->getAttribute('lastname') === $b->getAttribute('lastname')
+            && $a->getAttribute('street_no') === $b->getAttribute('street_no')
+            && $a->getAttribute('zip') === $b->getAttribute('zip')
+            && $a->getAttribute('city') === $b->getAttribute('city')
+            && $a->getAttribute('company') === $b->getAttribute('company')
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function getUserAddressByErpAddress(QUI\ERP\Address $ErpAddress): ?QUI\Users\Address
+    {
+        $SessionUser = QUI::getUserBySession();
+        $addresses = $SessionUser->getAddressList();
+
+        foreach ($addresses as $Address) {
+            if (self::isSameAddress($ErpAddress, $Address)) {
+                return $Address;
+            }
+        }
+
+        return null;
+    }
+
+    //endregion
 }

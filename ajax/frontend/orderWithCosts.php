@@ -4,6 +4,8 @@
  * This file contains package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts
  */
 
+use QUI\ERP\Order\SimpleCheckout\Checkout;
+
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts',
     function ($orderHash) {
@@ -14,7 +16,7 @@ QUI::getAjax()->registerFunction(
             $userIsGuest = true;
         }
 
-        $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout([
+        $Checkout = new Checkout([
             'orderHash' => $orderHash
         ]);
 
@@ -35,29 +37,12 @@ QUI::getAjax()->registerFunction(
         $DefaultAddress = $SessionUser->getStandardAddress();
         $hasDeliveryAddress = $Order->hasDeliveryAddress();
 
-        $isSameAddress = function (?QUI\Users\Address $a, ?QUI\Users\Address $b) {
-            if (
-                $a
-                && $b
-                && $a->getAttribute('firstname') === $b->getAttribute('firstname')
-                && $a->getAttribute('lastname') === $b->getAttribute('lastname')
-                && $a->getAttribute('street_no') === $b->getAttribute('street_no')
-                && $a->getAttribute('zip') === $b->getAttribute('zip')
-                && $a->getAttribute('city') === $b->getAttribute('city')
-                && $a->getAttribute('company') === $b->getAttribute('company')
-            ) {
-                return true;
-            }
-
-            return false;
-        };
-
         // check addresses
         if (method_exists($SessionUser, 'getAddressList')) {
             $addresses = $SessionUser->getAddressList();
 
             foreach ($addresses as $Address) {
-                if ($isSameAddress($InvoiceAddress, $Address)) {
+                if (Checkout::isSameAddress($InvoiceAddress, $Address)) {
                     $Order->setInvoiceAddress($Address);
                     $Order->save(QUI::getUsers()->getSystemUser());
 
