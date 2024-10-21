@@ -71,25 +71,27 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$Container.setStyle('display', null);
             const Inner = this.$Container.getElement('.inner');
 
-            return new Promise(() => {
+            return new Promise((resolve) => {
                 moofx(this.$Container).animate({
                     height: Inner.offsetHeight
                 }, {
                     callback: () => {
                         this.$Container.setStyle('height', null);
+                        resolve();
                     }
                 });
             });
         },
 
         $hideAddressContainer: function() {
-            return new Promise(() => {
+            return new Promise((resolve) => {
                 moofx(this.$Container).animate({
                     height: 0
                 }, {
                     callback: () => {
                         this.$Container.setStyle('height', 0);
                         this.$Container.setStyle('display', null);
+                        resolve();
                     }
                 });
             });
