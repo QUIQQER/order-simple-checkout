@@ -20,6 +20,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.$labels = [];
             this.$Countries = null;
+            this.$changeTimeout = null;
 
             this.addEvents({
                 onImport: this.$onImport
@@ -94,7 +95,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onChange: function() {
-            this.fireEvent('change');
+            if (this.$changeTimeout) {
+                clearTimeout(this.$changeTimeout);
+            }
+
+            this.$changeTimeout = setTimeout(() => {
+                this.fireEvent('change');
+            }, 50);
         },
 
         $hideB2B: function() {
