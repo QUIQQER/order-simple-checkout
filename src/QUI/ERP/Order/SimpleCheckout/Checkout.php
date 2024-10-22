@@ -63,7 +63,11 @@ class Checkout extends QUI\Control
 
         // put the basket articles to the order in process, if the current order has no articles
         if (!$this->getOrder()?->getArticles()->count()) {
-            $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+            try {
+                $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+            } catch (QUI\Exception) {
+                $Basket = QUI\ERP\Order\Factory::getInstance()->createBasket($this->getUser());
+            }
 
             if ($this->getOrder()) {
                 $Basket->toOrder($this->getOrder());
