@@ -19,6 +19,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         initialize: function(options) {
             this.parent(options);
 
+            this.$Loader = null;
+
             this.addEvents({
                 onImport: this.$onImport
             });
@@ -26,6 +28,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $onImport: function() {
             this.$registerEvents();
+
+            this.$Loader = new Element('span', {
+                'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
+            }).inject(this.getElm().getParent('.simpleCheckout-details-section'));
+
+            this.$Loader.style.display = 'none';
         },
 
         $registerEvents: function() {
@@ -53,9 +61,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         refresh: function() {
+            this.$Loader.style.display = '';
             this.fireEvent('refreshBegin', [this]);
 
-            // @todo loader
             if (!this.getAttribute('Checkout')) {
                 return new Promise((r) => {
                     (() => {
@@ -76,6 +84,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     QUI.parse(this.getElm()).then(() => {
                         this.$registerEvents();
                         this.fireEvent('refreshEnd', [this]);
+                        this.$Loader.style.display = 'none';
                         resolve();
                     });
                 }, {

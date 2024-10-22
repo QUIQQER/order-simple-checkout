@@ -84,6 +84,10 @@
             <de><![CDATA[Eine andere Rechnungsadresse verwenden]]></de>
             <en><![CDATA[Use a different billing address]]></en>
         </locale>
+        <locale name="ordering.step.title.CustomerData.addresses">
+            <de><![CDATA[Deine vorhandenen Addressen]]></de>
+            <en><![CDATA[Your existing addresses]]></en>
+        </locale>
 
         lCheckoutPayment.enter_address_to_show_payment_options
         <locale name="CheckoutPayment.enter_address_to_show_payment_options">

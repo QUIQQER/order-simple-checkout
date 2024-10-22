@@ -4,8 +4,6 @@ namespace QUI\ERP\Order\SimpleCheckout;
 
 use QUI;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
-use QUI\ERP\Order\Controls\Checkout\Login;
-use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\OrderInterface;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
@@ -63,7 +61,11 @@ class Checkout extends QUI\Control
 
         // put the basket articles to the order in process, if the current order has no articles
         if (!$this->getOrder()?->getArticles()->count()) {
-            $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+            try {
+                $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+            } catch (QUI\Exception) {
+                $Basket = QUI\ERP\Order\Factory::getInstance()->createBasket($this->getUser());
+            }
 
             if ($this->getOrder()) {
                 $Basket->toOrder($this->getOrder());
@@ -314,6 +316,27 @@ class Checkout extends QUI\Control
      * @return string The shipping information
      * @throws \Exception
      */
+    public function getDelivery(): string
+    {
+        $Delivery = new CheckoutDelivery($this);
+        $Output = new QUI\Output();
+        $result = $Delivery->create();
+        $css = QUI\Control\Manager::getCSS();
+
+        try {
+            return $Output->parse($css . $result);
+        } catch (QUI\Exception $exception) {
+            QUI\System\Log::writeException($exception);
+            return '';
+        }
+    }
+
+    /**
+     * Get the shipping html for the current order.
+     *
+     * @return string The shipping information
+     * @throws \Exception
+     */
     public function getShipping(): string
     {
         $Shipping = new CheckoutShipping($this);
@@ -369,43 +392,6 @@ class Checkout extends QUI\Control
             QUI\System\Log::writeException($exception);
             return '';
         }
-    }
-
-    //endregion
-
-    //region utils
-
-
-    public static function isSameAddress(?QUI\Users\Address $a, ?QUI\Users\Address $b): bool
-    {
-        if (
-            $a
-            && $b
-            && $a->getAttribute('firstname') === $b->getAttribute('firstname')
-            && $a->getAttribute('lastname') === $b->getAttribute('lastname')
-            && $a->getAttribute('street_no') === $b->getAttribute('street_no')
-            && $a->getAttribute('zip') === $b->getAttribute('zip')
-            && $a->getAttribute('city') === $b->getAttribute('city')
-            && $a->getAttribute('company') === $b->getAttribute('company')
-        ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static function getUserAddressByErpAddress(QUI\ERP\Address $ErpAddress): ?QUI\Users\Address
-    {
-        $SessionUser = QUI::getUserBySession();
-        $addresses = $SessionUser->getAddressList();
-
-        foreach ($addresses as $Address) {
-            if (self::isSameAddress($ErpAddress, $Address)) {
-                return $Address;
-            }
-        }
-
-        return null;
     }
 
     //endregion
