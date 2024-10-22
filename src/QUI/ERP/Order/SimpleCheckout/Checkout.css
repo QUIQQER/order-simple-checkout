@@ -79,6 +79,17 @@
     padding: var(--_sectionPadding);
 
     background-color: #f8f8f8;
+    position: relative;
+}
+
+.simpleCheckout-details-section-loader {
+    font-size: 24px;
+    line-height: 50px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    width: 50px;
 }
 
 .quiqqer-simple-checkout-data-or {

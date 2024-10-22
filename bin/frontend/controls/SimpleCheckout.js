@@ -46,10 +46,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$Billing = null;
             this.$Shipping = null;
             this.$Payment = null;
+
+            this.$BasketLoader = null;
             this.Loader = null;
+
             this.$PayToOrderBtn = null;
             this.ScrollToPaymentBtn = null;
-
             this.showAllProductsBtn = null;
 
             this.addEvents({
@@ -116,6 +118,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }
 
             this.Loader.show();
+
+            this.$BasketLoader = new Element('span', {
+                'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
+            }).inject(
+                this.getElm().getElement('.quiqqer-simple-checkout-basket')
+            );
 
             const urlParams = new URLSearchParams(window.location.search);
             const product = urlParams.get('product');
@@ -210,14 +218,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $loadGUI: function() {
-            const hideLoader = () => {
-                this.Loader.hide();
-            };
-
-            const showLoader = () => {
-                this.Loader.show();
-            };
-
             let SetCurrency = Promise.resolve();
 
             if (typeof window.DEFAULT_USER_CURRENCY !== 'undefined' &&
@@ -248,48 +248,38 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 if (this.$Shipping) {
                     this.$Shipping.setAttribute('Checkout', this);
                 }
+
                 this.$Payment.setAttribute('Checkout', this);
 
                 if (this.$Billing) {
                     this.$Billing.setAttribute('Checkout', this);
                 }
 
-                this.$Payment.addEvent('refreshBegin', showLoader);
-                this.$Payment.addEvent('refreshEnd', hideLoader);
-
                 this.$Delivery.addEvent('change', () => {
-                    this.Loader.show();
-
                     this.update().then(() => {
                         if (this.$Shipping) {
                             return this.$Shipping.refresh().then(() => {
                                 return this.$Payment.refresh();
-                            }).then(hideLoader);
+                            });
                         }
-
-                        this.$Payment.refresh().then(hideLoader);
                     });
                 });
 
                 if (this.$Shipping) {
                     this.$Shipping.addEvent('change', () => {
-                        this.Loader.show();
-
                         this.update().then(() => {
                             return this.$Payment.refresh();
-                        }).then(hideLoader);
+                        });
                     });
                 }
 
                 this.$Payment.addEvent('change', () => {
-                    this.Loader.show();
-                    this.update().then(hideLoader);
+                    this.update();
                 });
 
                 if (this.$Billing) {
                     this.$Billing.addEvent('change', () => {
-                        this.Loader.show();
-                        this.update().then(hideLoader);
+                        this.update();
                     });
                 }
 
@@ -417,6 +407,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     this.getElm().set('data-qui', Checkout.get('data-qui'));
                     this.getElm().set('html', Checkout.get('html'));
                     Ghost.getElements('style').inject(this.getElm());
+
 
                     QUI.parse(this.getElm()).then(() => {
                         this.fireEvent('loaded', [this]);
@@ -610,7 +601,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $refreshBasket: function() {
-            this.Loader.show();
+            //this.Loader.show();
+            this.$BasketLoader.style.display = '';
 
             return new Promise((resolve) => {
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_basket', (basket) => {
@@ -651,6 +643,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }
 
                     this.Loader.hide();
+                    this.$BasketLoader.style.display = 'none';
                     resolve();
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
