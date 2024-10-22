@@ -13,6 +13,7 @@ QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_update',
     function ($orderHash, $orderData) {
         $orderData = json_decode($orderData, true);
+        $User = QUI::getUserBySession();
 
         if (!is_array($orderData)) {
             return false;
@@ -42,11 +43,20 @@ QUI::getAjax()->registerFunction(
         }
 
         // get user address
-        $Address = Checkout::getUserAddressByErpAddress($ErpAddress);
-
-        if (!$Address) {
-            // default address wird gegebenenfalls angepasst
-            $Address = QUI::getUserBySession()->getStandardAddress();
+        if (isset($orderData['addresses'])) {
+            try {
+                $Address = $User->getAddress($orderData['addresses']);
+            } catch (QUI\Exception) {
+                $Address = $User->getStandardAddress();
+            }
+        } elseif (isset($orderData['address'])) {
+            try {
+                $Address = $User->getAddress($orderData['address']);
+            } catch (QUI\Exception) {
+                $Address = $User->getStandardAddress();
+            }
+        } else {
+            $Address = $User->getStandardAddress();
         }
 
         $erpAddressData['uuid'] = $Address->getUUID();

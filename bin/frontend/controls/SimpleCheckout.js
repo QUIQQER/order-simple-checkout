@@ -117,6 +117,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return;
             }
 
+            if (this.getElm().getElement('[data-qui="package/quiqqer/order/bin/frontend/controls/orderProcess/Login"]')) {
+                return;
+            }
+
             this.Loader.show();
 
             this.$BasketLoader = new Element('span', {
@@ -261,6 +265,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                             return this.$Shipping.refresh().then(() => {
                                 return this.$Payment.refresh();
                             });
+                        } else {
+                            return this.$Payment.refresh();
                         }
                     });
                 });
@@ -662,8 +668,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         update: function() {
+            this.$BasketLoader.style.display = '';
+
             return new Promise((resolve) => {
-                const orderData = QUIFormUtils.getFormData(this.getElm().getElement('form'));
+                const Form = this.getElm().getElement('form');
+                const orderData = QUIFormUtils.getFormData(Form);
+
+                // because of disabled
+                orderData.country = QUI.Controls.getById(Form.elements['country'].get('data-quiid')).getValue();
 
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_update', (isValid) => {
                     if (isValid) {

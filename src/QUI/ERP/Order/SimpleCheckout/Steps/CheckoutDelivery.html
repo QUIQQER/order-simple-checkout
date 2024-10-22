@@ -1,3 +1,20 @@
+{if count($addresses) > 1}
+<label class="quiqqer-order-customerData-edit-businessType">
+    <span>
+        {locale group="quiqqer/order-simple-checkout" var="ordering.step.title.CustomerData.addresses"}
+    </span>
+    <select name="addresses">
+        {foreach $addresses as $AddressEntry}
+        <option value="{$AddressEntry->getUUID()}"
+            {if $AddressEntry->getUUID() == $Address->getUUID()}selected="selected"{/if}
+        >{$AddressEntry->getText()}</option>
+        {/foreach}
+    </select>
+</label>
+{else}
+<input type="hidden" name="address" value="{$Address->getUUID()}" />
+{/if}
+
 {if $businessTypeIsChangeable}
 <label class="quiqqer-order-customerData-edit-businessType">
     <span>
