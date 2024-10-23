@@ -455,7 +455,23 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.Loader.show();
 
             return this.update().then(() => {
+                // check country, because input country is not focusable
+                if (typeof this.$Form.elements.country !== 'undefined') {
+                    const Countries = QUI.Controls.getById(this.$Form.elements.country.get('data-quiid'));
+
+                    if (this.$Form.elements.country.value === '') {
+                        this.$Form.elements.country.value = Countries.getValue();
+                    }
+
+                    if (this.$Form.elements.country.value === '') {
+                        Countries.focus();
+                        this.Loader.hide();
+                        return;
+                    }
+                }
+
                 if (!this.$Form.reportValidity()) {
+                    this.Loader.hide();
                     return;
                 }
 
