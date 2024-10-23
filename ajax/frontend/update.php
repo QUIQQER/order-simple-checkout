@@ -36,10 +36,8 @@ QUI::getAjax()->registerFunction(
             'country' => $orderData['country']
         ];
 
-        $ErpAddress = new Address($erpAddressData);
-
         if (isset($orderData['company'])) {
-            $ErpAddress->setAttribute('company', $orderData['company']);
+            $erpAddressData['company'] = $orderData['company'];
         }
 
         // get user address
@@ -62,21 +60,13 @@ QUI::getAjax()->registerFunction(
         $erpAddressData['uuid'] = $Address->getUUID();
         $erpAddressData['id'] = $Address->getId();
         $ErpAddress = new Address($erpAddressData);
+        $address = $ErpAddress->getAttributes();
 
-        // save address
-        $Address->setAttribute('firstname', $ErpAddress->getAttribute('firstname'));
-        $Address->setAttribute('lastname', $ErpAddress->getAttribute('lastname'));
-        $Address->setAttribute('street_no', $ErpAddress->getAttribute('street_no'));
-        $Address->setAttribute('zip', $ErpAddress->getAttribute('zip'));
-        $Address->setAttribute('city', $ErpAddress->getAttribute('city'));
-        $Address->setAttribute('country', $ErpAddress->getAttribute('country'));
-
-        if ($ErpAddress->getAttribute('company')) {
-            $Address->setAttribute('company', $ErpAddress->getAttribute('company'));
+        foreach ($address as $k => $v) {
+            $Address->setAttribute($k, $v);
         }
 
         $Address->save(QUI::getUsers()->getSystemUser());
-
 
         if (isset($orderData['billing_address']) && $orderData['billing_address'] === 'different') {
             $Order?->setDeliveryAddress($ErpAddress);
@@ -86,17 +76,21 @@ QUI::getAjax()->registerFunction(
                 $orderData['billing_street_no'] = $orderData['billing_street'] . ' ' . $orderData['billing_street_number'];
             }
 
-            $Order?->setInvoiceAddress(
-                new Address([
-                    'firstname' => $orderData['billing_firstname'],
-                    'lastname' => $orderData['billing_lastname'],
-                    'street_no' => $orderData['billing_street_no'],
-                    'zip' => $orderData['billing_zip'],
-                    'city' => $orderData['billing_city'],
-                    'country' => $orderData['billing_country'],
-                    'uuid' => $Address->getUUID()
-                ])
-            );
+            $billingAddress = [
+                'firstname' => $orderData['billing_firstname'],
+                'lastname' => $orderData['billing_lastname'],
+                'street_no' => $orderData['billing_street_no'],
+                'zip' => $orderData['billing_zip'],
+                'city' => $orderData['billing_city'],
+                'country' => $orderData['billing_country'],
+                'uuid' => $Address->getUUID()
+            ];
+
+            if (!empty($orderData['billing_company'])) {
+                $billingAddress['company'] = $orderData['billing_company'];
+            }
+
+            $Order?->setInvoiceAddress(new Address($billingAddress));
         } else {
             $Order?->setInvoiceAddress($ErpAddress);
             $Order?->removeDeliveryAddress();
@@ -123,7 +117,16 @@ QUI::getAjax()->registerFunction(
                     $User->setCompanyStatus(false);
                 }
 
+                if (isset($orderData['vatId'])) {
+                    $User->setAttribute('quiqqer.erp.euVatId', $orderData['vatId']);
+                }
+
+                if (isset($orderData['chUID'])) {
+                    $User->setAttribute('quiqqer.erp.chUID', $orderData['chUID']);
+                }
+
                 $User->save(QUI::getUsers()->getSystemUser());
+                $Order->setCustomer($User);
             } catch (QUI\Exception $Exception) {
                 Log::addError($Exception->getMessage());
             }
