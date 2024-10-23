@@ -126,6 +126,7 @@ QUI::getAjax()->registerFunction(
                 }
 
                 $User->save(QUI::getUsers()->getSystemUser());
+                $Order->setCustomer($User);
             } catch (QUI\Exception $Exception) {
                 Log::addError($Exception->getMessage());
             }
