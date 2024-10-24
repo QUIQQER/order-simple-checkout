@@ -208,16 +208,16 @@ class Checkout extends QUI\Control
             );
         }
 
-        $failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+        //$failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
 
-        if ($failedPaymentProcedure === 'execute') {
+        //if ($failedPaymentProcedure === 'execute') {
             $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
             $Order->setData('orderedWithCosts', true);
             $Order->save(QUI::getUsers()->getSystemUser());
             $this->setAttribute('orderHash', $Order->getUUID());
-
+        /*
             QUI::getSession()->set(
-                'termsAndConditions-' . $Order->getUUID(),
+                'termsAndConditions-' . $OrderInProcess->getUUID(),
                 1
             );
         } else {
@@ -228,7 +228,7 @@ class Checkout extends QUI\Control
 
             $this->setAttribute('orderHash', $OrderInProcess->getUUID());
         }
-
+        */
         return $this->getOrderProcessStep();
     }
 
