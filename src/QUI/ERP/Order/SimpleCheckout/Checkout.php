@@ -6,6 +6,7 @@ use QUI;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\OrderInterface;
+use QUI\ERP\Order\Settings;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
@@ -207,10 +208,16 @@ class Checkout extends QUI\Control
             );
         }
 
-        $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
-        $Order->setData('orderedWithCosts', true);
-        $Order->save(QUI::getUsers()->getSystemUser());
-        $this->setAttribute('orderHash', $Order->getUUID());
+        $failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+
+        if ($failedPaymentProcedure === 'execute') {
+            $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
+            $Order->setData('orderedWithCosts', true);
+            $Order->save(QUI::getUsers()->getSystemUser());
+            $this->setAttribute('orderHash', $Order->getUUID());
+        } else {
+            $this->setAttribute('orderHash', $OrderInProcess->getUUID());
+        }
 
         return $this->getOrderProcessStep();
     }
