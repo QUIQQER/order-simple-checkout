@@ -208,17 +208,27 @@ class Checkout extends QUI\Control
             );
         }
 
-        $failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+        //$failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
 
-        if ($failedPaymentProcedure === 'execute') {
+        //if ($failedPaymentProcedure === 'execute') {
             $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
             $Order->setData('orderedWithCosts', true);
             $Order->save(QUI::getUsers()->getSystemUser());
             $this->setAttribute('orderHash', $Order->getUUID());
+        /*
+            QUI::getSession()->set(
+                'termsAndConditions-' . $OrderInProcess->getUUID(),
+                1
+            );
         } else {
+            QUI::getSession()->set(
+                'termsAndConditions-' . $OrderInProcess->getUUID(),
+                1
+            );
+
             $this->setAttribute('orderHash', $OrderInProcess->getUUID());
         }
-
+        */
         return $this->getOrderProcessStep();
     }
 
