@@ -215,7 +215,17 @@ class Checkout extends QUI\Control
             $Order->setData('orderedWithCosts', true);
             $Order->save(QUI::getUsers()->getSystemUser());
             $this->setAttribute('orderHash', $Order->getUUID());
+
+            QUI::getSession()->set(
+                'termsAndConditions-' . $Order->getUUID(),
+                1
+            );
         } else {
+            QUI::getSession()->set(
+                'termsAndConditions-' . $OrderInProcess->getUUID(),
+                1
+            );
+
             $this->setAttribute('orderHash', $OrderInProcess->getUUID());
         }
 
