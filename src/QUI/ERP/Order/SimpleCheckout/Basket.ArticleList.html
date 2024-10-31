@@ -13,15 +13,47 @@
 {/if}
 
 {foreach $articles as $Article}
+    {if $Article->getAttribute('id') == -1}
+    <!-- text article -->
+    <section class="articleList-entry">
+        <div class="articleList-entry__image">
+            <!-- PLACEHOLDER BILD -->
+        </div>
+
+        <div class="articleList-entry__data">
+            <div class="articleData__title">
+                {$Article->getAttribute('title')|escape:'html'}
+            </div>
+
+            <div class="articleData__price">
+                <div class="quantity">
+                    {$Article->getAttribute('quantity')} {$Article->getQuantityUnit()} x
+                    {$Currency->format($calc.basisPrice)}
+                </div>
+                <div class="articleData__sum">
+                    <span class="articleData__sumValue fw-bolder">{$Currency->format($calc.sum)}</span>
+
+                    {if !empty($vatArray)}
+                    <div class="articleData__vat text-muted">
+                        {locale group="quiqqer/erp" var="article.list.articles.header.vat" Locale=$Locale}
+                        {$Article->getAttribute('vat')}%
+                    </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </section>
+    {else}
+    <!-- real products -->
     {assign var=Product value=\QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
     {assign var=calc value=$Article->getAttribute('calculated')}
 
-    {* open html tags for hidden articles *}
+    <!-- open html tags for hidden articles -->
     {if $hideProducts && $counter == $initialVisible}
     <div class="articleList__hidden" style="height: 0; overflow: hidden;">
         <div class="articleList__hiddenInner">
     {/if}
-    {* END open html tags for hidden articles *}
+    <!-- END open html tags for hidden articles -->
 
     <section class="articleList-entry">
         <div class="articleList-entry__image">
@@ -96,13 +128,14 @@
         </div>
     </section>
 
-    {* close html tags for hidden articles *}
+    <!-- close html tags for hidden articles -->
     {if $hideProducts && $counter == $max - 1}
     </div>
     </div>
     {/if}
-    {* END close html tags for hidden articles *}
+    <!-- END close html tags for hidden articles -->
 
+    {/if}
     {assign var=counter value=$counter+1}
 {/foreach}
 

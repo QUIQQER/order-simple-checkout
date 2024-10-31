@@ -35,6 +35,7 @@ class Checkout extends QUI\Control
             'orderHash' => false,
             'template' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
+            'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
         ]);
 

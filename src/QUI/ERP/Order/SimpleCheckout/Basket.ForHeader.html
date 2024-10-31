@@ -11,8 +11,14 @@
 
 <div class="quiqqer-simple-checkout-basket-articles">
     <div class="articleList">
-        <br>
+        <br />
         {foreach $articles as $Article}
+        {if $Article->getAttribute('id') == -1}
+        <!-- text article -->
+
+
+        {else}
+        <!-- real products -->
             {assign var=Product value=\QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
             {assign var=calc value=$Article->getAttribute('calculated')}
             <section class="articleList-entry">
@@ -29,9 +35,9 @@
                     </div>
 
                     <div class="articleData__artNo text-muted">
-                <span>
-                    {locale group="quiqqer/erp" var="article.list.articles.header.articleNo" Locale=$Locale}
-                </span>
+                        <span>
+                            {locale group="quiqqer/erp" var="article.list.articles.header.articleNo" Locale=$Locale}
+                        </span>
                         <span>{$Article->getAttribute('articleNo')}</span>
                     </div>
 
@@ -88,6 +94,7 @@
                 </div>
 
             </section>
+        {/if}
         {/foreach}
     </div>
 </div>

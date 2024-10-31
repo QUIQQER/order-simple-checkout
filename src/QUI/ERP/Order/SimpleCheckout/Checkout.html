@@ -96,9 +96,13 @@
         </section>
 
         <section class="quiqqer-simple-checkout-basket">
+            {template_event name="quiqqer::simple::order::basket::begin" Order=$Order}
+
             <div class="quiqqer-simple-checkout-basket__inner">
                 {$Basket->create()}
             </div>
+
+            {template_event name="quiqqer::simple::order::basket::middle" Order=$Order}
 
             <div class="quiqqer-simple-checkout-basket__pay">
                 <div class="quiqqer-order-step-checkout-notice">
@@ -112,6 +116,8 @@
                     {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
                 </button>
             </div>
+
+            {template_event name="quiqqer::simple::order::basket::end" Order=$Order}
         </section>
     </div>
 </form>
