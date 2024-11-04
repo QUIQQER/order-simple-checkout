@@ -11,6 +11,9 @@
     --_order-listEntry-radius: var(--order-listEntry-radius, 0.25rem);
     --_order-listEntry-gap: var(--order-listEntry-gap, 0.25rem 2rem);
     --_order-listEntry-spacing: var(--order-listEntry-spacing, 0.5rem);
+
+    --_bg: var(--bg, #fff);
+    --_imgWidth: var(--imgWidth, 80px);
 }
 
 @media screen and (max-width: 767px) {
@@ -159,6 +162,7 @@
 /**************************/
 .quiqqer-simple-checkout__scrollToPaymentContainer {
     margin-bottom: var(--_sectionSpacing);
+    width: 100%;
 }
 
 .quiqqer-simple-checkout__scrollToPaymentBtn {

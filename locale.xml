@@ -99,6 +99,10 @@
             <de><![CDATA[Alle Produkte anzeigen ([max]) <i class="fa-solid fa-chevron-down"></i>]]></de>
             <en><![CDATA[Show all products ([max]) <i class="fa-solid fa-chevron-down"></i>]]></en>
         </locale>
+        <locale name="ordering.btn.showOrderDetails">
+            <de><![CDATA[Bestelldetails]]></de>
+            <en><![CDATA[Order details]]></en>
+        </locale>
         <locale name="ordering.btn.showAllProductsText.close">
             <de><![CDATA[Weniger anzeigen <i class="fa-solid fa-chevron-up"></i>]]></de>
             <en><![CDATA[Show less <i class="fa-solid fa-chevron-up"></i>]]></en>
