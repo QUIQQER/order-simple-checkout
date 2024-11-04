@@ -5,6 +5,7 @@
  */
 
 use QUI\ERP\Address;
+use QUI\ERP\Order\SimpleCheckout\Checkout;
 
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getOrder',
@@ -20,19 +21,23 @@ QUI::getAjax()->registerFunction(
 
         try {
             $Order = $OrderHandler->getOrderByHash($orderHash);
-            $Customer = $Order->getCustomer();
-            $customerId = $Customer->getUUID();
-
-            if ($Address) {
-                $Order->setInvoiceAddress($Address);
-                $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
-                $Order->save(QUI::getUserBySession());
-            }
-
-            if ($User->getUUID() === $customerId) {
-                $result['order'] = $OrderHandler->getOrderByHash($orderHash)->toArray();
-            }
         } catch (QUI\Exception) {
+            $Checkout = new Checkout();
+            $Order = $Checkout->getOrder();
+            $orderHash = $Order->getUUID();
+        }
+
+        $Customer = $Order->getCustomer();
+        $customerId = $Customer->getUUID();
+
+        if ($Address) {
+            $Order->setInvoiceAddress($Address);
+            $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
+            $Order->save(QUI::getUserBySession());
+        }
+
+        if ($User->getUUID() === $customerId) {
+            $result['order'] = $OrderHandler->getOrderByHash($orderHash)->toArray();
         }
 
         return $result;
