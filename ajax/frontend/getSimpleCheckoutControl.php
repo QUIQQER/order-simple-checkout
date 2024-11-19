@@ -9,7 +9,9 @@ use QUI\ERP\Order\SimpleCheckout\Checkout;
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl',
     function ($orderHash, $settings) {
-        $settings = json_decode($settings, true);
+        if (!empty($settings)) {
+            $settings = json_decode($settings, true);
+        }
 
         if (!is_array($settings)) {
             $settings = [];
@@ -19,9 +21,14 @@ QUI::getAjax()->registerFunction(
             $settings['disableAddress'] = false;
         }
 
+        if (!isset($settings['disableProductLinks'])) {
+            $settings['disableProductLinks'] = 'default';
+        }
+
         $Checkout = new Checkout([
             'orderHash' => $orderHash,
-            'disableAddress' => $settings['disableAddress'] ?? false
+            'disableAddress' => $settings['disableAddress'],
+            'disableProductLinks' => $settings['disableProductLinks']
         ]);
 
         $Output = new QUI\Output();

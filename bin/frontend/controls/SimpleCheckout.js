@@ -38,7 +38,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             showOrderSuccessInfo: true,
             showBasketLink: true,
             disableAddress: false,
-            disableProductLinks: null
+            disableProductLinks: 'default'
         },
 
         initialize: function(options) {
@@ -673,7 +673,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     resolve();
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    settings: JSON.encode(this.getAttributes())
                 });
             });
         },
