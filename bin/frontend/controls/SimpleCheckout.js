@@ -36,7 +36,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             loadHashFromUrl: false,
             showPayToOrderBtn: true,
             showOrderSuccessInfo: true,
-            disableAddress: false
+            disableAddress: false,
+            disableProductLink: false
         },
 
         initialize: function(options) {

@@ -61,18 +61,26 @@
 
         <section class="articleList-entry">
             <div class="articleList-entry__image">
+                {if $disableProductLinks}
                 <a href="{$Product->getUrl()}">
+                {/if}
                     <img src="{$Product->getImage()->getSizeCacheUrl(160, 160)}" width="80" height="160"
                          alt="{$Article->getAttribute('title')|escape:'html'}"
                         class="articleList-entry__img" style="width: var(--_imgWidth);"
                     />
+                {if $disableProductLinks}
                 </a>
+                {/if}
             </div>
             <div class="articleList-entry__data">
                 <div class="articleData__title">
+                    {if $disableProductLinks}
                     <a href="{$Product->getUrl()}">
                         {$Article->getAttribute('title')|escape:'html'}
                     </a>
+                    {else}
+                        {$Article->getAttribute('title')|escape:'html'}
+                    {/if}
                 </div>
 
                 <div class="articleData__artNo text-muted">

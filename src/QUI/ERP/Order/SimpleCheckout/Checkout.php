@@ -31,10 +31,14 @@ class Checkout extends QUI\Control
      */
     public function __construct(array $attributes = [])
     {
+        // @todo product links global setting
+
+
         $this->setAttributes([
             'orderHash' => false,
             'template' => false,
             'disableAddress' => false,
+            'disableProductLinks' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
