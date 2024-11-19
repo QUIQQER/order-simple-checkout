@@ -119,6 +119,22 @@
             <de><![CDATA[Zurück zum Warenkorb]]></de>
             <en><![CDATA[Back to shopping cart]]></en>
         </locale>
+        <locale name="orderSimpleCheckout.settings.disableProductLinks">
+            <de><![CDATA[Keine Produktlinks]]></de>
+            <en><![CDATA[No product links]]></en>
+        </locale>
+        <locale name="orderSimpleCheckout.settings.disableProductLinks.description">
+            <de><![CDATA[
+            Wenn aktiviert, werden in der einfachen Kaufabwicklung (Simple Checkout) bei den Produkten keine Links angezeigt oder verwendet.
+            ]]></de>
+            <en><![CDATA[
+            If activated, no links are displayed or used for the products in the simple checkout.
+            ]]></en>
+        </locale>
+        <locale name="orderSimpleCheckout.settings.title">
+            <de><![CDATA[Simple Checkout - Einfache Kaufabwicklung]]></de>
+            <en><![CDATA[Simple Checkout]]></en>
+        </locale>
     </groups>
 
     <groups name="quiqqer/order-simple-checkout" datatype="php">

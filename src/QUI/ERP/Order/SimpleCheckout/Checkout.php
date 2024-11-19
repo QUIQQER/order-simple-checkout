@@ -31,14 +31,11 @@ class Checkout extends QUI\Control
      */
     public function __construct(array $attributes = [])
     {
-        // @todo product links global setting
-
-
         $this->setAttributes([
             'orderHash' => false,
             'template' => false,
             'disableAddress' => false,
-            'disableProductLinks' => false,
+            'disableProductLinks' => 'default',
             'showBasketLink' => true,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
@@ -49,6 +46,17 @@ class Checkout extends QUI\Control
         $this->addCSSFile(dirname(__FILE__) . '/Checkout.css');
 
         parent::__construct($attributes);
+
+        // default
+        if ($this->getAttribute('disableProductLinks') === 'default') {
+            try {
+                $defaultValue = (bool)QUI::getPackage('quiqqer/order-simple-checkout')
+                    ->getConfig()->getValue('orderSimpleCheckout', 'disableProductLinks');
+
+                $this->setAttribute('disableProductLinks', $defaultValue);
+            } catch (QUI\Exception) {
+            }
+        }
     }
 
     public function getBody(): string
