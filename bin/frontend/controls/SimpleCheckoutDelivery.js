@@ -111,8 +111,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 });
             }
 
-            VatId.setStyle('display', null);
-            chUID.setStyle('display', 'none');
+            VatId ? VatId.setStyle('display', null) : '';
+            chUID ? chUID.setStyle('display', 'none') : '';
 
             if (Company) {
                 this.$labels.push(Company);

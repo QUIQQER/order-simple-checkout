@@ -2,7 +2,7 @@
  * @event onOrderValid [this] - Fires as soon as all order requirements are met
  * @event onOrderInvalid [this] - Fires if the order requirements are not met
  * @event onOrderStart [this] - Fires as soon as the order starts to execute
- * @event onOrderSuccessfull [this] - Fires if the order was successfully executed
+ * @event onOrderSuccessful [this] - Fires if the order was successfully executed
  */
 define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout', [
 
@@ -35,7 +35,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             orderHash: false,
             loadHashFromUrl: false,
             showPayToOrderBtn: true,
-            showOrderSuccessInfo: true
+            showOrderSuccessInfo: true,
+            showBasketLink: true,
+            disableAddress: false,
+            disableProductLinks: 'default'
         },
 
         initialize: function(options) {
@@ -423,7 +426,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    settings: JSON.encode(this.getAttributes())
                 });
             });
         },
@@ -669,7 +673,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     resolve();
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    settings: JSON.encode(this.getAttributes())
                 });
             });
         },
@@ -691,7 +696,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 const orderData = QUIFormUtils.getFormData(Form);
 
                 // because of disabled
-                orderData.country = QUI.Controls.getById(Form.elements['country'].get('data-quiid')).getValue();
+                if (Form.elements['country']) {
+                    orderData.country = QUI.Controls.getById(Form.elements['country'].get('data-quiid')).getValue();
+                }
 
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_update', (isValid) => {
                     if (isValid) {

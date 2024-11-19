@@ -34,7 +34,11 @@ class Checkout extends QUI\Control
         $this->setAttributes([
             'orderHash' => false,
             'template' => false,
+            'disableAddress' => false,
+            'disableProductLinks' => 'default',
+            'showBasketLink' => true,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
+            'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
         ]);
 
@@ -42,6 +46,17 @@ class Checkout extends QUI\Control
         $this->addCSSFile(dirname(__FILE__) . '/Checkout.css');
 
         parent::__construct($attributes);
+
+        // default
+        if ($this->getAttribute('disableProductLinks') === 'default') {
+            try {
+                $defaultValue = (bool)QUI::getPackage('quiqqer/order-simple-checkout')
+                    ->getConfig()->getValue('orderSimpleCheckout', 'disableProductLinks');
+
+                $this->setAttribute('disableProductLinks', $defaultValue);
+            } catch (QUI\Exception) {
+            }
+        }
     }
 
     public function getBody(): string
@@ -94,7 +109,26 @@ class Checkout extends QUI\Control
 
         $isShippingInstalled = QUI::getPackageManager()->isInstalled('quiqqer/shipping');
 
+        // Basket
+        $BasketSite = null;
+
+        if ($this->getAttribute('showBasketLink')) {
+            $Project = QUI::getRewrite()->getProject();
+
+            $basketSites = $Project->getSites([
+                'where' => [
+                    'type' => 'quiqqer/order:types/shoppingCart'
+                ],
+                'limit' => 1
+            ]);
+
+            if (!empty($basketSites)) {
+                $BasketSite = $basketSites[0];
+            }
+        }
+
         $Engine->assign([
+            'this' => $this,
             'Order' => $this->getOrder(),
             'Basket' => new Basket($this),
             'BasketForHeader' => $BasketForHeader,
@@ -103,7 +137,8 @@ class Checkout extends QUI\Control
             'BillingAddress' => $isShippingInstalled ? new CheckoutBillingAddress($this) : false,
             'Shipping' => $isShippingInstalled ? new CheckoutShipping($this) : false,
             'Payment' => new CheckoutPayment($this),
-            'termsAndConditions' => $termsAndConditions
+            'termsAndConditions' => $termsAndConditions,
+            'BasketSite' => $BasketSite
         ]);
 
         return $Engine->fetch($template);
@@ -211,10 +246,10 @@ class Checkout extends QUI\Control
         //$failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
 
         //if ($failedPaymentProcedure === 'execute') {
-            $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
-            $Order->setData('orderedWithCosts', true);
-            $Order->save(QUI::getUsers()->getSystemUser());
-            $this->setAttribute('orderHash', $Order->getUUID());
+        $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
+        $Order->setData('orderedWithCosts', true);
+        $Order->save(QUI::getUsers()->getSystemUser());
+        $this->setAttribute('orderHash', $Order->getUUID());
         /*
             QUI::getSession()->set(
                 'termsAndConditions-' . $OrderInProcess->getUUID(),

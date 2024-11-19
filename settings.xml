@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiqqer>
+    <settings name="ERP">
+        <config>
+            <section name="orderSimpleCheckout">
+                <conf name="disableProductLinks">
+                    <type><![CDATA[bool]]></type>
+                    <defaultvalue>0</defaultvalue>
+                </conf>
+            </section>
+        </config>
+
+        <window name="ERP">
+            <title>
+                <locale group="quiqqer/erp" var="window.erp.title"/>
+            </title>
+            <params>
+                <icon>fa fa-sun-o</icon>
+            </params>
+
+            <categories>
+                <category name="order">
+                    <text>
+                        <locale group="quiqqer/order" var="window.erp.order.title"/>
+                    </text>
+                    <icon>fa fa-shopping-basket</icon>
+
+                    <settings title="orderSimpleCheckout" name="orderSimpleCheckout">
+                        <title>
+                            <locale group="quiqqer/order-simple-checkout" var="orderSimpleCheckout.settings.title"/>
+                        </title>
+
+                        <input type="checkbox" conf="orderSimpleCheckout.disableProductLinks">
+                            <text>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="orderSimpleCheckout.settings.disableProductLinks"/>
+                            </text>
+                            <description>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="orderSimpleCheckout.settings.disableProductLinks.description"
+                                />
+                            </description>
+                        </input>
+                    </settings>
+                </category>
+            </categories>
+        </window>
+
+    </settings>
+</quiqqer>
