@@ -39,6 +39,7 @@ class Checkout extends QUI\Control
             'template' => false,
             'disableAddress' => false,
             'disableProductLinks' => false,
+            'showBasketLink' => true,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
@@ -100,7 +101,26 @@ class Checkout extends QUI\Control
 
         $isShippingInstalled = QUI::getPackageManager()->isInstalled('quiqqer/shipping');
 
+        // Basket
+        $BasketSite = null;
+
+        if ($this->getAttribute('showBasketLink')) {
+            $Project = QUI::getRewrite()->getProject();
+
+            $basketSites = $Project->getSites([
+                'where' => [
+                    'type' => 'quiqqer/order:types/shoppingCart'
+                ],
+                'limit' => 1
+            ]);
+
+            if (!empty($basketSites)) {
+                $BasketSite = $basketSites[0];
+            }
+        }
+
         $Engine->assign([
+            'this' => $this,
             'Order' => $this->getOrder(),
             'Basket' => new Basket($this),
             'BasketForHeader' => $BasketForHeader,
@@ -109,7 +129,8 @@ class Checkout extends QUI\Control
             'BillingAddress' => $isShippingInstalled ? new CheckoutBillingAddress($this) : false,
             'Shipping' => $isShippingInstalled ? new CheckoutShipping($this) : false,
             'Payment' => new CheckoutPayment($this),
-            'termsAndConditions' => $termsAndConditions
+            'termsAndConditions' => $termsAndConditions,
+            'BasketSite' => $BasketSite
         ]);
 
         return $Engine->fetch($template);

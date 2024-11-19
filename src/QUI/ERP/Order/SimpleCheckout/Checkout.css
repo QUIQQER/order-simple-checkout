@@ -157,6 +157,14 @@
     border: none;
 }
 
+.quiqqer-simple-checkout-basket__link {
+    font-size: 12px;
+    text-align: right;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
 /**************************/
 /* Scroll to payments btn */
 /**************************/

@@ -2,7 +2,7 @@
  * @event onOrderValid [this] - Fires as soon as all order requirements are met
  * @event onOrderInvalid [this] - Fires if the order requirements are not met
  * @event onOrderStart [this] - Fires as soon as the order starts to execute
- * @event onOrderSuccessfull [this] - Fires if the order was successfully executed
+ * @event onOrderSuccessful [this] - Fires if the order was successfully executed
  */
 define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout', [
 
@@ -36,6 +36,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             loadHashFromUrl: false,
             showPayToOrderBtn: true,
             showOrderSuccessInfo: true,
+            showBasketLink: true,
             disableAddress: false,
             disableProductLink: false
         },
