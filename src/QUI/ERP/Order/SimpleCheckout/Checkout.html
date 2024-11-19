@@ -117,7 +117,9 @@
                 </button>
 
                 {if $this->getAttribute('showBasketLink') && $BasketSite}
-                    <a href="{url Site=$BasketSite}" class="quiqqer-simple-checkout-basket__link">Zurück zum Warenkorb</a>
+                    <a href="{url Site=$BasketSite}" class="quiqqer-simple-checkout-basket__link">
+                        {locale group="quiqqer/order" var="ordering.btn.continue.basket"}
+                    </a>
                 {/if}
             </div>
 

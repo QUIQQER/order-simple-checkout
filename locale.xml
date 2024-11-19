@@ -115,6 +115,10 @@
             <de><![CDATA[Bitte füge Deiner Bestellung / Deinem Warenkorb Artikel hinzu.]]></de>
             <en><![CDATA[Please add items to your order / shopping cart.]]></en>
         </locale>
+        <locale name="ordering.btn.continue.basket">
+            <de><![CDATA[Zurück zum Warenkorb]]></de>
+            <en><![CDATA[Back to shopping cart]]></en>
+        </locale>
     </groups>
 
     <groups name="quiqqer/order-simple-checkout" datatype="php">
