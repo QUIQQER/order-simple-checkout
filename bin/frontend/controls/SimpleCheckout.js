@@ -35,7 +35,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             orderHash: false,
             loadHashFromUrl: false,
             showPayToOrderBtn: true,
-            showOrderSuccessInfo: true
+            showOrderSuccessInfo: true,
+            disableAddress: false
         },
 
         initialize: function(options) {
@@ -423,7 +424,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
-                    orderHash: this.getAttribute('orderHash')
+                    orderHash: this.getAttribute('orderHash'),
+                    settings: JSON.encode(this.getAttributes())
                 });
             });
         },
@@ -691,7 +693,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 const orderData = QUIFormUtils.getFormData(Form);
 
                 // because of disabled
-                orderData.country = QUI.Controls.getById(Form.elements['country'].get('data-quiid')).getValue();
+                if (Form.elements['country']) {
+                    orderData.country = QUI.Controls.getById(Form.elements['country'].get('data-quiid')).getValue();
+                }
 
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_update', (isValid) => {
                     if (isValid) {

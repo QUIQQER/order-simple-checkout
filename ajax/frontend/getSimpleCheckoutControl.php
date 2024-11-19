@@ -8,9 +8,20 @@ use QUI\ERP\Order\SimpleCheckout\Checkout;
 
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl',
-    function ($orderHash) {
+    function ($orderHash, $settings) {
+        $settings = json_decode($settings, true);
+
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+
+        if (!isset($settings['disableAddress'])) {
+            $settings['disableAddress'] = false;
+        }
+
         $Checkout = new Checkout([
-            'orderHash' => $orderHash
+            'orderHash' => $orderHash,
+            'disableAddress' => $settings['disableAddress'] ?? false
         ]);
 
         $Output = new QUI\Output();
@@ -19,5 +30,5 @@ QUI::getAjax()->registerFunction(
 
         return $Output->parse($css . $result);
     },
-    ['orderHash']
+    ['orderHash', 'settings']
 );

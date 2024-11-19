@@ -106,6 +106,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         }
 
         $Engine->assign([
+            'Checkout' => $this->Checkout,
             'addresses' => $User->getAddressList(),
             'User' => $User,
             'Address' => $this->getInvoiceAddress(),

@@ -34,6 +34,7 @@ class Checkout extends QUI\Control
         $this->setAttributes([
             'orderHash' => false,
             'template' => false,
+            'disableAddress' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
@@ -212,10 +213,10 @@ class Checkout extends QUI\Control
         //$failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
 
         //if ($failedPaymentProcedure === 'execute') {
-            $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
-            $Order->setData('orderedWithCosts', true);
-            $Order->save(QUI::getUsers()->getSystemUser());
-            $this->setAttribute('orderHash', $Order->getUUID());
+        $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
+        $Order->setData('orderedWithCosts', true);
+        $Order->save(QUI::getUsers()->getSystemUser());
+        $this->setAttribute('orderHash', $Order->getUUID());
         /*
             QUI::getSession()->set(
                 'termsAndConditions-' . $OrderInProcess->getUUID(),
