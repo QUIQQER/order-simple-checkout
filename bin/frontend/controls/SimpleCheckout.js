@@ -219,6 +219,27 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 });
             }
 
+            if (!this.getAttribute('products') && !this.getAttribute('orderHash')) {
+                // load from basket
+                return new Promise((resolve) => {
+                    require(['package/quiqqer/order/bin/frontend/Basket'], (Basket) => {
+                        if (!Basket.isLoaded()) {
+                            Basket.addEvent('load', () => {
+                                resolve(Basket);
+                            });
+                        } else {
+                            resolve(Basket);
+                        }
+                    });
+                }).then((Basket) => {
+                    return Basket.toOrder();
+                }).then((orderHash) => {
+                    this.setAttribute('orderHash', orderHash);
+
+                    return this.$loadOrder();
+                });
+            }
+
             return Promise.resolve({
                 order: false
             });
