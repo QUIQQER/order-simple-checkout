@@ -68,7 +68,7 @@
                          alt="{$Article->getAttribute('title')|escape:'html'}"
                         class="articleList-entry__img" style="width: var(--_imgWidth);"
                     />
-                {if $disableProductLinks}
+                {if !$disableProductLinks}
                 </a>
                 {/if}
             </div>
