@@ -38,17 +38,21 @@
 
                 <div class="articleData__price">
                     <div class="quantity">
+                        {if $Article->getAttribute('displayPrice')}
                         {$Article->getAttribute('quantity')} {$Article->getQuantityUnit()} x
                         {$Currency->format($calc.basisPrice)}
+                        {/if}
                     </div>
                     <div class="articleData__sum">
-                        <span class="articleData__sumValue fw-bolder">{$Currency->format($calc.sum)}</span>
+                        {if $Article->getAttribute('displayPrice')}
+                            <span class="articleData__sumValue fw-bolder">{$Currency->format($calc.sum)}</span>
 
-                        {if !empty($vatArray)}
-                        <div class="articleData__vat text-muted">
-                            {locale group="quiqqer/erp" var="article.list.articles.header.vat" Locale=$Locale}
-                            {$Article->getAttribute('vat')}%
-                        </div>
+                            {if !empty($vatArray)}
+                            <div class="articleData__vat text-muted">
+                                {locale group="quiqqer/erp" var="article.list.articles.header.vat" Locale=$Locale}
+                                {$Article->getAttribute('vat')}%
+                            </div>
+                            {/if}
                         {/if}
                     </div>
                 </div>
