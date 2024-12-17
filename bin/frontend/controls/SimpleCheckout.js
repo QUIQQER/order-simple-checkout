@@ -535,8 +535,31 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }
 
                     this.fireEvent('orderSuccessful', [this]);
+                    const scripts = [];
+                    const Ghost = new Element('div', {
+                        html: result.html
+                    });
+
+                    // trigger js stuff
+                    Ghost.getElements('script').forEach(function(Script) {
+                        const New = new Element('script');
+
+                        if (Script.get('html')) {
+                            New.set('html', Script.get('html'));
+                        }
+
+                        if (Script.get('src')) {
+                            New.set('src', Script.get('src'));
+                        }
+
+                        scripts.push(New);
+                    });
 
                     if (!this.getAttribute('showOrderSuccessInfo')) {
+                        scripts.forEach((Script) => {
+                            Script.inject(Container);
+                        });
+
                         return;
                     }
 
@@ -545,6 +568,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }, {
                         callback: () => {
                             Container.set('html', result.html);
+
+                            scripts.forEach((Script) => {
+                                Script.inject(Container);
+                            });
 
                             QUI.parse(Container).then(() => {
                                 moofx(Container).animate({
