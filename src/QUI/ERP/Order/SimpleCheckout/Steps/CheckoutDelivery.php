@@ -137,6 +137,14 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         $Address = $Order?->getInvoiceAddress();
         $attributes = $Address?->getAttributes();
 
+        $attributes = array_filter($attributes, function ($value) {
+            if (!$value) {
+                return false;
+            }
+
+            return !empty(trim($value));
+        });
+
         // is not empty
         if ($attributes && count($attributes) > 3) {
             return $Address;
