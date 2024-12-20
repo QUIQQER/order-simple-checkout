@@ -686,6 +686,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                     const basketCss = '.quiqqer-simple-checkout-basket__inner';
                     const noticeCss = '.quiqqer-order-step-checkout-notice';
+                    const mobileBasketCss = '.quiqqer-simple-checkout-orderDetails';
 
                     if (this.getElm().querySelector(basketCss)) {
                         this.getElm().querySelector(basketCss).set('html', Ghost.querySelector(basketCss).innerHTML);
@@ -695,6 +696,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         if (this.showAllProductsBtn) {
                             this.showAllProductsBtn.addEvent('click', this.toggleAllProducts);
                         }
+                    }
+
+                    if (this.getElm().querySelector(mobileBasketCss)) {
+                        this.getElm().querySelector(mobileBasketCss).set('html', Ghost.querySelector(mobileBasketCss).innerHTML);
                     }
 
                     if (this.getElm().querySelector(noticeCss)) {
