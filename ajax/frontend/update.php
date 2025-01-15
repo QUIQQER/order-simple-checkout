@@ -41,6 +41,7 @@ QUI::getAjax()->registerFunction(
         }
 
         // get user address
+        // @todo nobody beachten
         if (isset($orderData['addresses'])) {
             try {
                 $Address = $User->getAddress($orderData['addresses']);
