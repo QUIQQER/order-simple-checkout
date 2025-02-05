@@ -11,6 +11,9 @@
     --_order-listEntry-radius: var(--order-listEntry-radius, 0.25rem);
     --_order-listEntry-gap: var(--order-listEntry-gap, 0.25rem 2rem);
     --_order-listEntry-spacing: var(--order-listEntry-spacing, 0.5rem);
+
+    --_bg: var(--bg, #fff);
+    --_imgWidth: var(--imgWidth, 80px);
 }
 
 @media screen and (max-width: 767px) {
@@ -79,6 +82,17 @@
     padding: var(--_sectionPadding);
 
     background-color: #f8f8f8;
+    position: relative;
+}
+
+.simpleCheckout-details-section-loader {
+    font-size: 24px;
+    line-height: 50px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    width: 50px;
 }
 
 .quiqqer-simple-checkout-data-or {
@@ -143,11 +157,20 @@
     border: none;
 }
 
+.quiqqer-simple-checkout-basket__link {
+    font-size: 12px;
+    text-align: right;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
 /**************************/
 /* Scroll to payments btn */
 /**************************/
 .quiqqer-simple-checkout__scrollToPaymentContainer {
     margin-bottom: var(--_sectionSpacing);
+    width: 100%;
 }
 
 .quiqqer-simple-checkout__scrollToPaymentBtn {

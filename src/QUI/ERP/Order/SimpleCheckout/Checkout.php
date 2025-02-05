@@ -4,9 +4,9 @@ namespace QUI\ERP\Order\SimpleCheckout;
 
 use QUI;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
-use QUI\ERP\Order\Controls\Checkout\Login;
-use QUI\ERP\Order\Controls\Checkout\Registration;
 use QUI\ERP\Order\OrderInProcess;
+use QUI\ERP\Order\OrderInterface;
+use QUI\ERP\Order\Settings;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
@@ -14,8 +14,10 @@ use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
 use QUI\Exception;
 
 use function class_exists;
+use function class_implements;
 use function dirname;
 use function file_exists;
+use function in_array;
 
 /**
  * Class Checkout
@@ -32,7 +34,11 @@ class Checkout extends QUI\Control
         $this->setAttributes([
             'orderHash' => false,
             'template' => false,
+            'disableAddress' => false,
+            'disableProductLinks' => 'default',
+            'showBasketLink' => true,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
+            'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
         ]);
 
@@ -40,13 +46,23 @@ class Checkout extends QUI\Control
         $this->addCSSFile(dirname(__FILE__) . '/Checkout.css');
 
         parent::__construct($attributes);
+
+        // default
+        if ($this->getAttribute('disableProductLinks') === 'default') {
+            try {
+                $defaultValue = (bool)QUI::getPackage('quiqqer/order-simple-checkout')
+                    ->getConfig()->getValue('orderSimpleCheckout', 'disableProductLinks');
+
+                $this->setAttribute('disableProductLinks', $defaultValue);
+            } catch (QUI\Exception) {
+            }
+        }
     }
 
     public function getBody(): string
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $template = dirname(__FILE__) . '/Checkout.html';
-        $templateLogin = dirname(__FILE__) . '/Checkout.Login.html';
 
         if ($this->getAttribute('template') && file_exists($this->getAttribute('template'))) {
             $template = $this->getAttribute('template');
@@ -54,35 +70,18 @@ class Checkout extends QUI\Control
 
         // guest order
         if (QUI::getUsers()->isNobodyUser($this->getUser())) {
-            if (!QUI::getPackageManager()->isInstalled('quiqqer/order-simple-checkout')) {
-                return $Engine->fetch($templateLogin);
-            }
+            $DefaultOrderProcess = new QUI\ERP\Order\OrderProcess();
 
-            if (
-                class_exists('QUI\ERP\Order\Guest\GuestOrder')
-                && !QUI\ERP\Order\Guest\GuestOrder::isActive()
-            ) {
-                return $Engine->fetch($templateLogin);
-            }
-
-            // guest log in
-            $Engine->assign([
-                'Registration' => new Registration([
-                    'autofill' => false
-                ]),
-                'Login' => new Login()
-            ]);
-
-            $this->setAttribute('data-nobody-log-in', 1);
-
-            return $Engine->fetch(
-                OPT_DIR . 'quiqqer/order/src/QUI/ERP/Order/Controls/OrderProcess.Nobody.html'
-            );
+            return $DefaultOrderProcess->create();
         }
 
         // put the basket articles to the order in process, if the current order has no articles
         if (!$this->getOrder()?->getArticles()->count()) {
-            $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+            try {
+                $Basket = QUI\ERP\Order\Handler::getInstance()->getBasketFromUser($this->getUser());
+            } catch (QUI\Exception) {
+                $Basket = QUI\ERP\Order\Factory::getInstance()->createBasket($this->getUser());
+            }
 
             if ($this->getOrder()) {
                 $Basket->toOrder($this->getOrder());
@@ -110,7 +109,26 @@ class Checkout extends QUI\Control
 
         $isShippingInstalled = QUI::getPackageManager()->isInstalled('quiqqer/shipping');
 
+        // Basket
+        $BasketSite = null;
+
+        if ($this->getAttribute('showBasketLink')) {
+            $Project = QUI::getRewrite()->getProject();
+
+            $basketSites = $Project->getSites([
+                'where' => [
+                    'type' => 'quiqqer/order:types/shoppingCart'
+                ],
+                'limit' => 1
+            ]);
+
+            if (!empty($basketSites)) {
+                $BasketSite = $basketSites[0];
+            }
+        }
+
         $Engine->assign([
+            'this' => $this,
             'Order' => $this->getOrder(),
             'Basket' => new Basket($this),
             'BasketForHeader' => $BasketForHeader,
@@ -119,7 +137,8 @@ class Checkout extends QUI\Control
             'BillingAddress' => $isShippingInstalled ? new CheckoutBillingAddress($this) : false,
             'Shipping' => $isShippingInstalled ? new CheckoutShipping($this) : false,
             'Payment' => new CheckoutPayment($this),
-            'termsAndConditions' => $termsAndConditions
+            'termsAndConditions' => $termsAndConditions,
+            'BasketSite' => $BasketSite
         ]);
 
         return $Engine->fetch($template);
@@ -224,11 +243,27 @@ class Checkout extends QUI\Control
             );
         }
 
+        //$failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+
+        //if ($failedPaymentProcedure === 'execute') {
         $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
         $Order->setData('orderedWithCosts', true);
         $Order->save(QUI::getUsers()->getSystemUser());
         $this->setAttribute('orderHash', $Order->getUUID());
+        /*
+            QUI::getSession()->set(
+                'termsAndConditions-' . $OrderInProcess->getUUID(),
+                1
+            );
+        } else {
+            QUI::getSession()->set(
+                'termsAndConditions-' . $OrderInProcess->getUUID(),
+                1
+            );
 
+            $this->setAttribute('orderHash', $OrderInProcess->getUUID());
+        }
+        */
         return $this->getOrderProcessStep();
     }
 
@@ -281,6 +316,25 @@ class Checkout extends QUI\Control
         }
 
         try {
+            $result = QUI::getEvents()->fireEvent('orderProcessGetOrder', [$this]);
+
+            if (!empty($result)) {
+                $OrderInstance = null;
+
+                foreach ($result as $entry) {
+                    if ($entry && in_array(OrderInterface::class, class_implements($entry))) {
+                        $OrderInstance = $entry;
+                    }
+                }
+
+                if ($OrderInstance && in_array(OrderInterface::class, class_implements($OrderInstance))) {
+                    return $OrderInstance;
+                }
+            }
+        } catch (\Exception) {
+        }
+
+        try {
             // select the last order in processing
             $OrderInProcess = $Orders->getLastOrderInProcessFromUser($this->getUser());
 
@@ -306,6 +360,27 @@ class Checkout extends QUI\Control
     public function getUser(): QUI\Interfaces\Users\User
     {
         return QUI::getUserBySession();
+    }
+
+    /**
+     * Get the shipping html for the current order.
+     *
+     * @return string The shipping information
+     * @throws \Exception
+     */
+    public function getDelivery(): string
+    {
+        $Delivery = new CheckoutDelivery($this);
+        $Output = new QUI\Output();
+        $result = $Delivery->create();
+        $css = QUI\Control\Manager::getCSS();
+
+        try {
+            return $Output->parse($css . $result);
+        } catch (QUI\Exception $exception) {
+            QUI\System\Log::writeException($exception);
+            return '';
+        }
     }
 
     /**

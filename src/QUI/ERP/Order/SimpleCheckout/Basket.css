@@ -1,7 +1,3 @@
-.quiqqer-simple-checkout-basket {
-    --_bg: var(--bg, #fff);
-}
-
 /***********/
 /* article */
 /***********/
@@ -15,6 +11,10 @@
 .articleList-entry__data {
     padding: 1rem;
     border-radius: 0.5rem;
+    background-color: var(--_bg);
+}
+
+.articleList-entry__data--forHeader {
     background-color: var(--_bg);
 }
 

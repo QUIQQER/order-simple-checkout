@@ -106,6 +106,8 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         }
 
         $Engine->assign([
+            'Checkout' => $this->Checkout,
+            'addresses' => $User->getAddressList(),
             'User' => $User,
             'Address' => $this->getInvoiceAddress(),
             'b2bSelected' => $isUserB2B(),
@@ -134,6 +136,14 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
 
         $Address = $Order?->getInvoiceAddress();
         $attributes = $Address?->getAttributes();
+
+        $attributes = array_filter($attributes, function ($value) {
+            if (!$value || is_array($value)) {
+                return false;
+            }
+
+            return !empty(trim($value));
+        });
 
         // is not empty
         if ($attributes && count($attributes) > 3) {

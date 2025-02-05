@@ -22,7 +22,7 @@ $ctaUrl = filter_var($ctaUrl, FILTER_SANITIZE_URL);
 $Template->extendHeader('<script>const QUIQQER_LANDING_PAGE_CTA_URL = "' . $ctaUrl . '";</script>');
 
 if (empty($productId)) {
-    $Engine->assign('Product', null);
+    $Engine->assign('ProductControl', null);
 } else {
     try {
         $Product = Products::getProduct($productId);
@@ -32,6 +32,6 @@ if (empty($productId)) {
 
         $Engine->assign('ProductControl', $ProductControl);
     } catch (\QUI\ERP\Products\Product\Exception) {
-        $Engine->assign('Product', null);
+        $Engine->assign('ProductControl', null);
     }
 }

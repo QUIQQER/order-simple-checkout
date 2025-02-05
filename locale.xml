@@ -19,7 +19,8 @@
             <en><![CDATA[Product landing page: area before the product]]></en>
         </locale>
         <locale name="area.productLandingPage.top.description">
-            <de><![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
+            <de>
+                <![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
             <en><![CDATA[Special brick area for the quick and easy creation of product landing pages.]]></en>
         </locale>
         <locale name="area.productLandingPage.bottom.title">
@@ -27,7 +28,8 @@
             <en><![CDATA[Product landing page: area after the product]]></en>
         </locale>
         <locale name="area.productLandingPage.bottom.description">
-            <de><![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
+            <de>
+                <![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
             <en><![CDATA[Special brick area for the quick and easy creation of product landing pages.]]></en>
         </locale>
         <locale name="or">
@@ -82,6 +84,10 @@
             <de><![CDATA[Eine andere Rechnungsadresse verwenden]]></de>
             <en><![CDATA[Use a different billing address]]></en>
         </locale>
+        <locale name="ordering.step.title.CustomerData.addresses">
+            <de><![CDATA[Deine vorhandenen Addressen]]></de>
+            <en><![CDATA[Your existing addresses]]></en>
+        </locale>
 
         lCheckoutPayment.enter_address_to_show_payment_options
         <locale name="CheckoutPayment.enter_address_to_show_payment_options">
@@ -92,6 +98,10 @@
         <locale name="ordering.btn.showAllProductsText.open">
             <de><![CDATA[Alle Produkte anzeigen ([max]) <i class="fa-solid fa-chevron-down"></i>]]></de>
             <en><![CDATA[Show all products ([max]) <i class="fa-solid fa-chevron-down"></i>]]></en>
+        </locale>
+        <locale name="ordering.btn.showOrderDetails">
+            <de><![CDATA[Bestelldetails]]></de>
+            <en><![CDATA[Order details]]></en>
         </locale>
         <locale name="ordering.btn.showAllProductsText.close">
             <de><![CDATA[Weniger anzeigen <i class="fa-solid fa-chevron-up"></i>]]></de>
@@ -104,6 +114,22 @@
         <locale name="exception.order.has.no.items">
             <de><![CDATA[Bitte füge Deiner Bestellung / Deinem Warenkorb Artikel hinzu.]]></de>
             <en><![CDATA[Please add items to your order / shopping cart.]]></en>
+        </locale>
+        <locale name="orderSimpleCheckout.settings.disableProductLinks">
+            <de><![CDATA[Keine Produktlinks]]></de>
+            <en><![CDATA[No product links]]></en>
+        </locale>
+        <locale name="orderSimpleCheckout.settings.disableProductLinks.description">
+            <de><![CDATA[
+            Wenn aktiviert, werden in der einfachen Kaufabwicklung (Simple Checkout) bei den Produkten keine Links angezeigt oder verwendet.
+            ]]></de>
+            <en><![CDATA[
+            If activated, no links are displayed or used for the products in the simple checkout.
+            ]]></en>
+        </locale>
+        <locale name="orderSimpleCheckout.settings.title">
+            <de><![CDATA[Simple Checkout - Einfache Kaufabwicklung]]></de>
+            <en><![CDATA[Simple Checkout]]></en>
         </locale>
     </groups>
 
@@ -168,9 +194,21 @@
             <de><![CDATA[Aktion-URL (CTA)]]></de>
             <en><![CDATA[Action url (CTA)]]></en>
         </locale>
-        <locale name="order.simple.checkout.settings.ctaUrl.description">
-            <de><![CDATA[Die hier festgelegte URL wird auf alle Buttons (Call To Actions) angewendet, die das Data-Attribut <code>data-qui-productLandingPage-cta="1"</code> enthalten. Dies kann eine interne URL, eine URL mit Produkt-ID oder ein Link zu einer externen Seite sein.]]></de>
-            <en><![CDATA[The URL defined here is applied to all buttons (Call To Actions) that contain the data attribute <code>data-qui-productLandingPage-cta="1"</code>. This can be an internal URL, a URL with a product ID or a link to an external page.]]></en>
+        <locale name="order.simple.checkout.settings.ctaUrl.description" html="true">
+            <de><![CDATA[
+            Die festgelegte URL wird auf alle Buttons (Call-to-Action) angewendet, die das Data-Attribut
+            <code>data-qui-productLandingPage-cta="1"</code> enthalten. Diese URL kann entweder eine interne Seite,
+            eine Seite mit einer Produkt-ID oder ein externer Link sein.<br /><br />
+
+            Zusätzlich kannst du auch ein Produkt direkt in den Warenkorb legen, indem du die URL /SIMPLE_CHECKOUT/?product=productId verwendest.
+            ]]></de>
+            <en><![CDATA[
+            The defined URL is applied to all buttons (call-to-action) that contain the data attribute
+            <code>data-qui-productLandingPage-cta=“1”</code>. This URL can either be an internal page,
+            a page with a product ID or an external link.<br /><br />
+
+            You can also add a product directly to your shopping cart by using the URL: /SIMPLE_CHECKOUT/?product=productId
+            ]]></en>
         </locale>
     </groups>
 

@@ -103,12 +103,39 @@ class Events
     {
         $Project = $Site->getProject();
         $Media = $Project->getMedia();
+        $PlaceholdersImage = $Media->getPlaceholderImage();
 
-        if (!$Media->getPlaceholderImage()) {
-            throw new QUI\Exception('Placeholder image is missing');
+        if (!$PlaceholdersImage) {
+            try {
+                $Media = $Project->getMedia();
+                $imageIds = $Media->getChildrenIds([
+                    'limit' => 1,
+                    'where' => [
+                        'type' => 'image',
+                        'active' => 1,
+                        'deleted' => 0
+                    ]
+                ]);
+
+                if (isset($imageIds[0])) {
+                    $Image = $Media->get($imageIds[0]);
+                } else {
+                    $RootFolder = $Media->firstChild();
+                    $Image = $RootFolder->uploadFile(
+                        OPT_DIR . 'quiqqer/order-simple-checkout/bin/images/demo/placeholder-image-vertical-grey.png'
+                    );
+                    $Image->activate();
+                }
+
+                $Config = QUI::getConfig('etc/projects.ini.php');
+                $Config->setValue($Project->getName(), 'placeholder', $Image->getUrl());
+                $Config->save();
+                $PlaceholdersImage = $Image;
+            } catch (QUI\Exception $Exception) {
+                QUI\System\Log::writeException($Exception);
+            }
         }
 
-        $PlaceholdersImage = $Media->getPlaceholderImage();
         $placeholderImage = $PlaceholdersImage->getUrl();
 
         return [
