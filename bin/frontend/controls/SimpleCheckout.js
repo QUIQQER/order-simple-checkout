@@ -186,7 +186,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 moofx([
                     this.getElm().getElements('form'),
-                    this.getElm().getElements('.quiqqer-simple-checkout-orderDetails')
+                    this.getElm().getElements('.quiqqer-simple-checkout-orderDetails'),
+                    this.getElm().getElements('.quiqqer-simple-checkout__scrollToPaymentContainer'),
                 ]).animate({
                     opacity: 1
                 });
