@@ -170,12 +170,24 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 return this.$loadGUI();
             }).then(() => {
+                if (this.getElm().getElement('.quiqqer-order-step-processing')) {
+                    // processing step
+                    if (this.getElm().getElement('.quiqqer-simple-checkout-orderDetails')) {
+                        this.getElm().getElement('.quiqqer-simple-checkout-orderDetails').setStyle('display', 'none');
+                    }
+
+                    if (this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer')) {
+                        this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer').setStyle('display', 'none');
+                    }
+                }
+
                 this.$parseTermsAndConditions();
                 this.Loader.hide();
 
                 moofx([
                     this.getElm().getElements('form'),
-                    this.getElm().getElements('.quiqqer-simple-checkout-orderDetails')
+                    this.getElm().getElements('.quiqqer-simple-checkout-orderDetails'),
+                    this.getElm().getElements('.quiqqer-simple-checkout__scrollToPaymentContainer'),
                 ]).animate({
                     opacity: 1
                 });
@@ -532,6 +544,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     if (this.getElm().getElement('form')) {
                         this.getElm().getElement('form').set('data-order-hash', result.orderHash);
                         this.getElm().getElement('form').set('data-products-count', result.productCount);
+                    }
+
+                    if (this.getElm().getElement('.quiqqer-simple-checkout-orderDetails')) {
+                        this.getElm().getElement('.quiqqer-simple-checkout-orderDetails').setStyle('display', 'none');
+                    }
+
+                    if (this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer')) {
+                        this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer').setStyle('display', 'none');
                     }
 
                     this.fireEvent('orderSuccessful', [this]);
