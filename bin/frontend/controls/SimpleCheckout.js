@@ -13,7 +13,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     'Locale',
     'Ajax'
 
-], function(QUI, QUIControl, QUILoader, QUIFormUtils, QUILocale, QUIAjax) {
+], function (QUI, QUIControl, QUILoader, QUIFormUtils, QUILocale, QUIAjax) {
     'use strict';
 
     const lg = 'quiqqer/order-simple-checkout';
@@ -41,7 +41,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             disableProductLinks: 'default'
         },
 
-        initialize: function(options) {
+        initialize: function (options) {
             this.parent(options);
 
             this.$Form = null;
@@ -71,7 +71,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }
         },
 
-        $onImport: function() {
+        $onImport: function () {
             const Elm = this.getElm();
 
             this.Loader = new QUILoader().inject(Elm);
@@ -194,7 +194,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $onInject: function() {
+        $onInject: function () {
             this.$loadProducts().then(() => {
                 return this.$loadCheckout();
             }).catch((err) => {
@@ -220,7 +220,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $loadOrder: function() {
+        $loadOrder: function () {
             if (this.getAttribute('orderHash')) {
                 return new Promise((resolve, reject) => {
                     QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_getOrder', resolve, {
@@ -257,7 +257,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $loadGUI: function() {
+        $loadGUI: function () {
             let SetCurrency = Promise.resolve();
 
             if (typeof window.DEFAULT_USER_CURRENCY !== 'undefined' &&
@@ -351,7 +351,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $loadPayment: function() {
+        $loadPayment: function () {
             return new Promise((resolve, reject) => {
                 QUIAjax.post(
                     'package_quiqqer_order-simple-checkout_ajax_frontend_getPaymentStep',
@@ -399,7 +399,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $loadProducts: function() {
+        $loadProducts: function () {
             const urlParams = new URLSearchParams(window.location.search);
             const product = urlParams.get('product');
 
@@ -434,7 +434,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             return Promise.resolve();
         },
 
-        $loadCheckout: function() {
+        $loadCheckout: function () {
             this.$setAnchor();
 
             return new Promise((resolve) => {
@@ -443,13 +443,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         html: html
                     });
 
-                    const Checkout = Ghost.getElement('.quiqqer-simple-checkout');
+                    const Checkout = Ghost.getElement('[data-name="quiqqer-simple-checkout"]');
 
                     this.getElm().addClass(Checkout.className);
                     this.getElm().set('data-qui', Checkout.get('data-qui'));
+                    this.getElm().set('data-name', 'quiqqer-simple-checkout');
                     this.getElm().set('html', Checkout.get('html'));
                     Ghost.getElements('style').inject(this.getElm());
-
 
                     QUI.parse(this.getElm()).then(() => {
                         this.fireEvent('loaded', [this]);
@@ -465,7 +465,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        setCurrency: function(currency) {
+        setCurrency: function (currency) {
             return new Promise((resolve, reject) => {
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_setCurrency', resolve, {
                     'package': 'quiqqer/order-simple-checkout',
@@ -488,7 +488,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         /**
          * @return {Promise<void>}
          */
-        orderWithCosts: function() {
+        orderWithCosts: function () {
             this.Loader.show();
 
             return this.update().then(() => {
@@ -561,7 +561,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
 
                     // trigger js stuff
-                    Ghost.getElements('script').forEach(function(Script) {
+                    Ghost.getElements('script').forEach(function (Script) {
                         const New = new Element('script');
 
                         if (Script.get('html')) {
@@ -631,7 +631,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $getControl: function(Node) {
+        $getControl: function (Node) {
             return new Promise((resolve) => {
                 if (!Node || !Node.get('data-qui')) {
                     return resolve(null);
@@ -656,7 +656,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $setAnchor: function() {
+        $setAnchor: function () {
             if (!this.getAttribute('loadHashFromUrl')) {
                 return;
             }
@@ -668,9 +668,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             window.location.hash = this.getAttribute('orderHash');
         },
 
-        $parseTermsAndConditions: function() {
+        $parseTermsAndConditions: function () {
             // Terms of Service
-            this.getElm().getElements('a[data-project]').addEvent('click', function(e) {
+            this.getElm().getElements('a[data-project]').addEvent('click', function (e) {
                 let Target = e.target;
 
                 if (Target.nodeName !== 'A') {
@@ -683,7 +683,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 e.stop();
 
-                require(['package/quiqqer/controls/bin/site/Window'], function(Win) {
+                require(['package/quiqqer/controls/bin/site/Window'], function (Win) {
                     new Win({
                         showTitle: true,
                         project: Target.get('data-project'),
@@ -694,7 +694,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $refreshBasket: function() {
+        $refreshBasket: function () {
             //this.Loader.show();
             this.$BasketLoader.style.display = '';
 
@@ -752,7 +752,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $showError: function(message) {
+        $showError: function (message) {
             // @todo michael -> schönere error message
             QUI.getMessageHandler().then((MH) => {
                 MH.addError(message);
@@ -761,7 +761,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             console.error(message);
         },
 
-        update: function() {
+        update: function () {
             this.$BasketLoader.style.display = '';
 
             return new Promise((resolve) => {
@@ -854,7 +854,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
          *
          * @param event
          */
-        toggleAllProducts: function(event) {
+        toggleAllProducts: function (event) {
             event.stop();
 
             const Elm = this.getElm();
@@ -887,7 +887,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
          * @param ListNode
          * @param InnerNode
          */
-        showHiddenArticles: function(ListNode, InnerNode) {
+        showHiddenArticles: function (ListNode, InnerNode) {
             moofx(ListNode).animate({
                 height: InnerNode.offsetHeight,
                 opacity: 1
@@ -903,7 +903,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
          *
          * @param ListNode
          */
-        hideHiddenArticles: function(ListNode) {
+        hideHiddenArticles: function (ListNode) {
             moofx(ListNode).animate({
                 height: 0,
                 opacity: 0
@@ -916,7 +916,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
          *
          * @param event
          */
-        scrollToPayment: function(event) {
+        scrollToPayment: function (event) {
             event.stop();
 
             const Elm = this.getElm();
