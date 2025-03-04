@@ -157,12 +157,10 @@
     border: none;
 }
 
-.quiqqer-simple-checkout-basket__link {
-    font-size: 12px;
-    text-align: right;
+:where(.quiqqer-simple-checkout-basket__link) {
+    margin-top: 0.75rem;
+    display: inline-block;
     float: right;
-    margin-top: 10px;
-    margin-right: 10px;
 }
 
 /**************************/
