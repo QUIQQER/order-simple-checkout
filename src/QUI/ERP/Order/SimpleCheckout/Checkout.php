@@ -27,7 +27,7 @@ use function in_array;
 class Checkout extends QUI\Control
 {
     /**
-     * @param mixed[] $attributes
+     * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -127,15 +127,29 @@ class Checkout extends QUI\Control
             }
         }
 
+        $showDelivery = true;
+        $showShipping = true;
+        $showBillingAddress = true;
+
+        if (!$isShippingInstalled) {
+            $showShipping = false;
+            $showBillingAddress = false;
+        }
+
+        QUI::getEvents()->fireEvent(
+            'onQuiqqerSimpleCheckoutBodyEnd',
+            [$this, &$showDelivery, &$showShipping, &$showBillingAddress]
+        );
+
         $Engine->assign([
             'this' => $this,
             'Order' => $this->getOrder(),
             'Basket' => new Basket($this),
             'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
-            'Delivery' => new CheckoutDelivery($this),
-            'BillingAddress' => $isShippingInstalled ? new CheckoutBillingAddress($this) : false,
-            'Shipping' => $isShippingInstalled ? new CheckoutShipping($this) : false,
+            'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null, // @phpstan-ignore-line
+            'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
+            'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
             'Payment' => new CheckoutPayment($this),
             'termsAndConditions' => $termsAndConditions,
             'BasketSite' => $BasketSite
@@ -151,17 +165,33 @@ class Checkout extends QUI\Control
      */
     public function isValid(): bool
     {
+        $validateAddress = true;
+        $validateShipping = true;
+        $isShippingInstalled = QUI::getPackageManager()->isInstalled('quiqqer/shipping');
+
+        if (!$isShippingInstalled) {
+            $validateShipping = false;
+        }
+
+        QUI::getEvents()->fireEvent(
+            'onQuiqqerSimpleCheckoutValidation',
+            [$this, &$validateAddress, &$validateShipping]
+        );
+
+
         // check address
         try {
             $Order = $this->getOrder();
 
-            if (!$Order) {
-                return false;
-            }
+            if ($validateAddress) { // @phpstan-ignore-line
+                if (!$Order) {
+                    return false;
+                }
 
-            QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
-                $Order->getInvoiceAddress()
-            );
+                QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
+                    $Order->getInvoiceAddress()
+                );
+            }
         } catch (QUI\Exception) {
             return false;
         }
@@ -174,7 +204,7 @@ class Checkout extends QUI\Control
         }
 
         // check shipping
-        if (QUI::getPackageManager()->isInstalled('quiqqer/shipping') && !$Order->getShipping()) {
+        if ($validateShipping && !$Order->getShipping()) {
             return false;
         }
 

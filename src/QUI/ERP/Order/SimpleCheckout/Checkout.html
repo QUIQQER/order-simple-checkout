@@ -61,12 +61,14 @@
                     {/if}
                 </div>
 
+                {if $Delivery}
                 <div class="quiqqer-simple-checkout-data-delivery simpleCheckout-details-section">
                     <h2 class="simpleCheckoutCard-subheader">
                         {locale group="quiqqer/order" var="ordering.step.title.CustomerData"}
                     </h2>
                     {$Delivery->create()}
                 </div>
+                {/if}
 
                 {if $Shipping}
                 <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-details-section">
@@ -77,12 +79,14 @@
                 </div>
                 {/if}
 
+                {if $Payment}
                 <div class="quiqqer-simple-checkout-data-payment simpleCheckout-details-section">
                     <h2 class="simpleCheckoutCard-subheader">
                         {locale group="quiqqer/order" var="ordering.step.title.Payment"}
                     </h2>
                     {$Payment->create()}
                 </div>
+                {/if}
 
                 {if $BillingAddress}
                 <div class="quiqqer-simple-checkout-data-billing simpleCheckout-details-section">
@@ -117,7 +121,7 @@
                 </button>
 
                 {if $this->getAttribute('showBasketLink') && $BasketSite}
-                    <a href="{url Site=$BasketSite}" class="quiqqer-simple-checkout-basket__link">
+                    <a href="{url site=$BasketSite}" class="quiqqer-simple-checkout-basket__link">
                         {locale group="quiqqer/order" var="ordering.btn.backToBasket"}
                     </a>
                 {/if}

@@ -283,29 +283,28 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     return;
                 }
 
-                this.$Delivery.setAttribute('Checkout', this);
+                const steps = [this.$Delivery, this.$Shipping, this.$Payment, this.$Billing];
 
-                if (this.$Shipping) {
-                    this.$Shipping.setAttribute('Checkout', this);
-                }
-
-                this.$Payment.setAttribute('Checkout', this);
-
-                if (this.$Billing) {
-                    this.$Billing.setAttribute('Checkout', this);
-                }
-
-                this.$Delivery.addEvent('change', () => {
-                    this.update().then(() => {
-                        if (this.$Shipping) {
-                            return this.$Shipping.refresh().then(() => {
-                                return this.$Payment.refresh();
-                            });
-                        } else {
-                            return this.$Payment.refresh();
-                        }
-                    });
+                steps.forEach(step => {
+                    if (step) {
+                        step.setAttribute('Checkout', this);
+                    }
                 });
+
+
+                if (this.$Delivery) {
+                    this.$Delivery.addEvent('change', () => {
+                        this.update().then(() => {
+                            if (this.$Shipping) {
+                                return this.$Shipping.refresh().then(() => {
+                                    return this.$Payment.refresh();
+                                });
+                            } else {
+                                return this.$Payment.refresh();
+                            }
+                        });
+                    });
+                }
 
                 if (this.$Shipping) {
                     this.$Shipping.addEvent('change', () => {
@@ -315,9 +314,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
                 }
 
-                this.$Payment.addEvent('change', () => {
-                    this.update();
-                });
+                if (this.$Payment) {
+                    this.$Payment.addEvent('change', () => {
+                        this.update();
+                    });
+                }
 
                 if (this.$Billing) {
                     this.$Billing.addEvent('change', () => {
@@ -344,7 +345,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }
 
                 // load
-                this.$Delivery.fireEvent('change');
+                const firstAvailable = steps.find(step => step);
+                if (firstAvailable) {
+                    firstAvailable.fireEvent('change');
+                }
             }).catch((err) => {
                 console.error(err);
                 this.Loader.hide();
