@@ -34,11 +34,21 @@ class CheckoutPayment extends QUI\Control implements CheckoutStepInterface
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $Delivery = new CheckoutDelivery($this->Checkout);
+        $validate = true;
 
-        try {
-            $Delivery->validate();
-        } catch (QUI\Exception) {
-            return $Engine->fetch(dirname(__FILE__) . '/CheckoutPayment.html');
+        if (
+            class_exists('QUI\ERP\Order\Guest\GuestOrder') &&
+            QUI\ERP\Order\Guest\GuestOrder::isAnonymousOrder()
+        ) {
+            $validate = false;
+        }
+
+        if ($validate) {
+            try {
+                $Delivery->validate();
+            } catch (QUI\Exception) {
+                return $Engine->fetch(__DIR__ . '/CheckoutPayment.html');
+            }
         }
 
         $Payment = new Payment([
