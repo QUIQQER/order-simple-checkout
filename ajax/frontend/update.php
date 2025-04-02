@@ -27,13 +27,13 @@ QUI::getAjax()->registerFunction(
         $Order = $Checkout->getOrder();
 
         $erpAddressData = [
-            'salutation' => $orderData['salutation'],
-            'firstname' => $orderData['firstname'],
-            'lastname' => $orderData['lastname'],
-            'street_no' => $orderData['street_no'],
-            'zip' => $orderData['zip'],
-            'city' => $orderData['city'],
-            'country' => $orderData['country']
+            'salutation' => $orderData['salutation'] ?? '',
+            'firstname' => $orderData['firstname'] ?? '',
+            'lastname' => $orderData['lastname'] ?? '',
+            'street_no' => $orderData['street_no'] ?? '',
+            'zip' => $orderData['zip'] ?? '',
+            'city' => $orderData['city'] ?? '',
+            'country' => $orderData['country'] ?? ''
         ];
 
         if (isset($orderData['company'])) {
