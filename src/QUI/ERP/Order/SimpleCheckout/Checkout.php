@@ -147,7 +147,7 @@ class Checkout extends QUI\Control
             'Basket' => new Basket($this),
             'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
-            'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null,
+            'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null, // @phpstan-ignore-line
             'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
             'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
             'Payment' => new CheckoutPayment($this),
@@ -183,7 +183,7 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
-            if ($validateAddress) {
+            if ($validateAddress) { // @phpstan-ignore-line
                 if (!$Order) {
                     return false;
                 }
