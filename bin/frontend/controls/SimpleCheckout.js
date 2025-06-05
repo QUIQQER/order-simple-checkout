@@ -35,6 +35,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             orderHash: false,
             loadHashFromUrl: false,
             showPayToOrderBtn: true,
+            showEmail: false,
             showOrderSuccessInfo: true,
             showBasketLink: true,
             disableAddress: false,
@@ -442,6 +443,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$setAnchor();
 
             return new Promise((resolve) => {
+                const settings = this.getAttributes();
+                settings.showEmail = this.getAttribute('showEmail');
+
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl', (html) => {
                     const Ghost = new Element('div', {
                         html: html
@@ -464,7 +468,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('orderHash'),
-                    settings: JSON.encode(this.getAttributes())
+                    settings: JSON.encode(settings)
                 });
             });
         },

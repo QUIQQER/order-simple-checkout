@@ -23,7 +23,8 @@
     "quiqqer/order": "^2.7.13",
     "quiqqer/frontend-users": "^2",
     "quiqqer/gallery": "^2.1",
-    "quiqqer/presentation-bricks": "^2"
+    "quiqqer/presentation-bricks": "^2",
+    "quiqqer/order-guestorder": "^2"
   },
   "autoload": {
     "psr-4": {

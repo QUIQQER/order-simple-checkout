@@ -116,6 +116,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
             'isOnlyB2B' => $isOnlyB2B,
             'isOnlyB2C' => $isOnlyB2C,
             'settings' => $settings,
+            'showEmail' => $this->Checkout->getAttribute('showEmail'),
             'businessTypeIsChangeable' => $businessTypeIsChangeable,
         ]);
 
