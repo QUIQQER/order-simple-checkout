@@ -511,12 +511,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     if (this.$Form.elements.country.value === '') {
                         Countries.focus();
                         this.Loader.hide();
+                        this.fireEvent('orderInvalid', [this]);
                         return;
                     }
                 }
 
                 if (!this.$Form.reportValidity()) {
                     this.Loader.hide();
+                    this.fireEvent('orderInvalid', [this]);
                     return;
                 }
 
@@ -531,11 +533,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                         if ('checkValidity' in Terms) {
                             if (Terms.checkValidity() === false) {
+                                this.fireEvent('orderInvalid', [this]);
                                 return;
                             }
                         }
                     }
 
+                    this.fireEvent('orderInvalid', [this]);
                     return;
                 }
 
