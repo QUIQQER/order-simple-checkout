@@ -131,6 +131,10 @@
             <de><![CDATA[Simple Checkout - Einfache Kaufabwicklung]]></de>
             <en><![CDATA[Simple Checkout]]></en>
         </locale>
+        <locale name="component.email">
+            <de><![CDATA[E-Mail]]></de>
+            <en><![CDATA[E-mail]]></en>
+        </locale>
     </groups>
 
     <groups name="quiqqer/order-simple-checkout" datatype="php">

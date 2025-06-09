@@ -105,6 +105,18 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
             $businessTypeIsChangeable = $this->getAttribute('businessTypeIsChangeable');
         }
 
+
+        $showEmail = $this->Checkout->getAttribute('showEmail');
+        $UserSession = QUI::getUserBySession();
+
+        if (
+            $UserSession->getUUID()
+            && !($UserSession instanceof QUI\Users\Nobody)
+            && empty($UserSession->getAttribute('email'))
+        ) {
+            $showEmail = false;
+        }
+
         $Engine->assign([
             'Checkout' => $this->Checkout,
             'addresses' => $User->getAddressList(),
@@ -116,6 +128,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
             'isOnlyB2B' => $isOnlyB2B,
             'isOnlyB2C' => $isOnlyB2C,
             'settings' => $settings,
+            'showEmail' => $showEmail,
             'businessTypeIsChangeable' => $businessTypeIsChangeable,
         ]);
 

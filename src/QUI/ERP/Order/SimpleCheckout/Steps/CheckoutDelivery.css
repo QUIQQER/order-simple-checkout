@@ -8,7 +8,8 @@
 .quiqqer-simple-checkout-delivery label select,
 .quiqqer-simple-checkout-delivery label input[type="text"],
 .quiqqer-simple-checkout-delivery label input[type="tel"],
-.quiqqer-simple-checkout-delivery label input[type="fax"] {
+.quiqqer-simple-checkout-delivery label input[type="fax"],
+.quiqqer-simple-checkout-delivery label input[type="email"] {
     width: 100%;
 }
 
