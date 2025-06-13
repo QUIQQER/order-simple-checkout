@@ -217,6 +217,21 @@
     </label>
 {/if}
 
+{if $showEmail}
+<label class="quiqqer-order-customerData-edit-tel">
+    {assign var=email value=$User->getAttribute('email')}
+    <span>
+        {locale group="quiqqer/order-simple-checkout" var="component.email"} *
+    </span>
+    <input type="email"
+           name="email"
+           autocomplete="email"
+           value="{$email|escape:'html'}"
+           {if !empty($email)}disabled="disabled"{/if}
+    />
+</label>
+{/if}
+
 {if $settings.phone.show}
     <label class="quiqqer-order-customerData-edit-tel">
         {assign var=r value=""}

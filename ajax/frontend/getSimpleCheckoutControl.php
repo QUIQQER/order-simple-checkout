@@ -17,18 +17,11 @@ QUI::getAjax()->registerFunction(
             $settings = [];
         }
 
-        if (!isset($settings['disableAddress'])) {
-            $settings['disableAddress'] = false;
-        }
-
-        if (!isset($settings['disableProductLinks'])) {
-            $settings['disableProductLinks'] = 'default';
-        }
-
         $Checkout = new Checkout([
             'orderHash' => $orderHash,
-            'disableAddress' => $settings['disableAddress'],
-            'disableProductLinks' => $settings['disableProductLinks']
+            'disableAddress' => $settings['disableAddress'] ?? false,
+            'disableProductLinks' => $settings['disableProductLinks'] ?? 'default',
+            'showEmail' => $settings['showEmail'] ?? false
         ]);
 
         $Output = new QUI\Output();

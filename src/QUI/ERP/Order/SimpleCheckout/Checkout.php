@@ -37,6 +37,7 @@ class Checkout extends QUI\Control
             'disableAddress' => false,
             'disableProductLinks' => 'default',
             'showBasketLink' => true,
+            'showEmail' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
