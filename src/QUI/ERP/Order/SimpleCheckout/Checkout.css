@@ -139,6 +139,9 @@
 }
 
 .quiqqer-simple-checkout-basket__pay > :where(.quiqqer-order-step-checkout-notice) {
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
     margin-bottom: 1rem;
     background: var(--_sectionBgColor);
     padding: var(--_sectionPadding);

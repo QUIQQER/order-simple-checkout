@@ -109,21 +109,32 @@
             {template_event name="quiqqer::simple::order::basket::middle" Order=$Order}
 
             <div class="quiqqer-simple-checkout-basket__pay">
+                {if $mandatoryLinksDisplay === 'multiple_checkboxes'}
+                <div class="quiqqer-order-step-checkout-notice">
+                    {foreach $checkboxes as $checkbox}
+                    <label>
+                        <input type="checkbox" name="{$checkbox.name}" required/>
+                        {$checkbox.text}
+                    </label>
+                    {/foreach}
+                </div>
+                {else}
                 <div class="quiqqer-order-step-checkout-notice">
                     <label>
                         <input type="checkbox" name="termsAndConditions" required/>
-                        {$termsAndConditions}
+                        {$acceptText}
                     </label>
                 </div>
+                {/if}
 
                 <button name="pay" class="btn btn-primary btn-lg btn-large">
                     {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
                 </button>
 
                 {if $this->getAttribute('showBasketLink') && $BasketSite}
-                    <a href="{url site=$BasketSite}" class="quiqqer-simple-checkout-basket__link">
-                        {locale group="quiqqer/order" var="ordering.btn.backToBasket"}
-                    </a>
+                <a href="{url site=$BasketSite}" class="quiqqer-simple-checkout-basket__link">
+                    {locale group="quiqqer/order" var="ordering.btn.backToBasket"}
+                </a>
                 {/if}
             </div>
 
