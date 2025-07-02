@@ -493,58 +493,65 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
+        validate: function () {
+            // check country, because input country is not focusable
+            if (typeof this.$Form.elements.country !== 'undefined') {
+                const Countries = QUI.Controls.getById(this.$Form.elements.country.get('data-quiid'));
+
+                if (this.$Form.elements.country.value === '') {
+                    this.$Form.elements.country.value = Countries.getValue();
+                }
+
+                if (this.$Form.elements.country.value === '') {
+                    Countries.focus();
+                    return false;
+                }
+            }
+
+            if (!this.$Form.reportValidity()) {
+                return false;
+            }
+
+            const required = Array.from(this.getElm().querySelectorAll('[required]'));
+            let i, len, requireField;
+
+            for (i = 0, len = required.length; i < len; i++) {
+                requireField = required[i];
+
+                if ('checkValidity' in requireField) {
+                    if (requireField.checkValidity() === false) {
+                        requireField.reportValidity();
+                        return false;
+                    }
+                }
+
+                if (requireField.type === 'radio' || requireField.type === 'checkbox') {
+                    if (requireField.checked === false) {
+                        return false;
+                    }
+                }
+
+                if (requireField.value === '') {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
         /**
          * @return {Promise<void>}
          */
         orderWithCosts: function () {
+            if (this.validate() === false) {
+                this.fireEvent('orderInvalid', [this]);
+                return Promise.reject();
+            }
+
             this.Loader.show();
 
             return this.update().then(() => {
-                // check country, because input country is not focusable
-                if (typeof this.$Form.elements.country !== 'undefined') {
-                    const Countries = QUI.Controls.getById(this.$Form.elements.country.get('data-quiid'));
-
-                    if (this.$Form.elements.country.value === '') {
-                        this.$Form.elements.country.value = Countries.getValue();
-                    }
-
-                    if (this.$Form.elements.country.value === '') {
-                        Countries.focus();
-                        this.Loader.hide();
-                        this.fireEvent('orderInvalid', [this]);
-                        return;
-                    }
-                }
-
-                if (!this.$Form.reportValidity()) {
-                    this.Loader.hide();
-                    this.fireEvent('orderInvalid', [this]);
-                    return;
-                }
-
-                this.Loader.show();
-                const Terms = this.getElm().getElement('[name="termsAndConditions"]');
-
-                if (!Terms.checked) {
-                    this.Loader.hide();
-
-                    if ('reportValidity' in Terms) {
-                        Terms.reportValidity();
-
-                        if ('checkValidity' in Terms) {
-                            if (Terms.checkValidity() === false) {
-                                this.fireEvent('orderInvalid', [this]);
-                                return;
-                            }
-                        }
-                    }
-
-                    this.fireEvent('orderInvalid', [this]);
-                    return;
-                }
-
                 this.fireEvent('orderStart', [this]);
-
 
                 // execute order
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts', (result) => {
