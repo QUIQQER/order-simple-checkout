@@ -90,20 +90,8 @@ class Checkout extends QUI\Control
         }
 
         $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
+        $Checkout->generateCheckboxLinks($Engine);
 
-        // terms and conditions
-        $termsAndConditions = QUI::getLocale()->get(
-            'quiqqer/order',
-            'ordering.step.checkout.checkoutAcceptText',
-            [
-                'terms_and_conditions' => $Checkout->getLinkOf('terms_and_conditions')
-            ]
-        );
-
-        QUI::getEvents()->fireEvent(
-            'quiqqerOrderSimpleCheckoutOutput',
-            [$this, &$termsAndConditions]
-        );
 
         $BasketForHeader = new Basket($this);
         $BasketForHeader->setAttribute('basketForHeader', true);
@@ -152,7 +140,6 @@ class Checkout extends QUI\Control
             'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
             'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
             'Payment' => new CheckoutPayment($this),
-            'termsAndConditions' => $termsAndConditions,
             'BasketSite' => $BasketSite
         ]);
 
