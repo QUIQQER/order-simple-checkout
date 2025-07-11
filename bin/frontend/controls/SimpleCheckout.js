@@ -525,8 +525,23 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }
                 }
 
-                if (requireField.type === 'radio' || requireField.type === 'checkbox') {
-                    if (requireField.checked === false) {
+                if (requireField.type === 'radio') {
+                    const radios = this.getElm().querySelectorAll(`[name="${requireField.name}"]`);
+                    let checked = false;
+
+                    radios.forEach(radio => {
+                        if (radio.checked) checked = true;
+                    });
+
+                    if (!checked) {
+                        return false;
+                    }
+
+                    continue;
+                }
+
+                if (requireField.type === 'checkbox') {
+                    if (!requireField.checked) {
                         return false;
                     }
                 }
