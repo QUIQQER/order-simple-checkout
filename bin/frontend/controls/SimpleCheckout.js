@@ -494,6 +494,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         validate: function () {
+            const scrollToFirstInvalidField = () => {
+                const firstInvalid = this.$Form.querySelector(':invalid');
+
+                setTimeout(() => {
+                    firstInvalid.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    firstInvalid.focus();
+                }, 200);
+            }
+
             // check country, because input country is not focusable
             if (typeof this.$Form.elements.country !== 'undefined') {
                 const Countries = QUI.Controls.getById(this.$Form.elements.country.get('data-quiid'));
@@ -509,6 +522,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }
 
             if (!this.$Form.reportValidity()) {
+                scrollToFirstInvalidField();
                 return false;
             }
 
@@ -521,6 +535,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 if ('checkValidity' in requireField) {
                     if (requireField.checkValidity() === false) {
                         requireField.reportValidity();
+                        scrollToFirstInvalidField();
                         return false;
                     }
                 }
@@ -534,6 +549,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
 
                     if (!checked) {
+                        scrollToFirstInvalidField();
                         return false;
                     }
 
@@ -542,11 +558,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                 if (requireField.type === 'checkbox') {
                     if (!requireField.checked) {
+                        scrollToFirstInvalidField();
                         return false;
                     }
                 }
 
                 if (requireField.value === '') {
+                    scrollToFirstInvalidField();
                     return false;
                 }
             }
