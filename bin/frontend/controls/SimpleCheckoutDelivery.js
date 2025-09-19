@@ -102,7 +102,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 // disable all addresses
                 this.getElm().querySelectorAll('select,input').forEach((Node) => {
                     if (Node.name !== 'addresses') {
-                        Node.disabled = true;
+                        //Node.disabled = true;
                     }
                 });
 
