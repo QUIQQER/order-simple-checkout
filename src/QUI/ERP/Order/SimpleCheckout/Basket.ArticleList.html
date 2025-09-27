@@ -60,7 +60,7 @@
         </section>
     {else}
         <!-- real products -->
-        {assign var=Product value=\QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
+        {assign var=Product value=QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
         {assign var=calc value=$Article->getAttribute('calculated')}
 
         <section class="articleList-entry">
