@@ -34,6 +34,13 @@ class Basket extends QUI\Control
         $Order?->recalculate(); // because of price factors
         $Articles = $Order?->getArticles();
 
+        if (method_exists($Engine, 'getSmarty')) {
+            $Engine->getSmarty()->registerClass(
+                'QUI\ERP\Products\Handler\Products',
+                '\QUI\ERP\Products\Handler\Products'
+            );
+        }
+
         if (!$Articles || !$Articles->count()) {
             $Engine->assign([
                 'basketEmpty' => true
