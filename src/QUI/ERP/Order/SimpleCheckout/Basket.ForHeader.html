@@ -47,12 +47,18 @@
             </section>
         {else}
             <!-- real products -->
-            {assign var=Product value=\QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
+            {assign var=Product value=QUI\ERP\Products\Handler\Products::getProduct($Article->getAttribute('id'))}
             {assign var=calc value=$Article->getAttribute('calculated')}
             <section class="articleList-entry">
                 <div class="articleList-entry__data articleList-entry__data--forHeader">
                     <div class="articleData__title">
-                        <a href="{$Product->getUrl()}">{$Article->getAttribute('title')|escape:'html'}</a>
+                        {if !$disableProductLinks}
+                        <a href="{$Product->getUrl()}">
+                        {/if}
+                            {$Article->getAttribute('title')|escape:'html'}
+                        {if !$disableProductLinks}
+                        </a>
+                        {/if}
                     </div>
 
                     <div class="articleData__artNo text-muted">
