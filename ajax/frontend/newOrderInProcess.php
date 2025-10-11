@@ -56,7 +56,7 @@ QUI::getAjax()->registerFunction(
                 }
 
                 if (isset($product['id'])) {
-                    $productId = $product['id'];
+                    $productId = (int)$product['id'];
                 }
 
                 if (empty($productId)) {
