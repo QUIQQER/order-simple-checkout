@@ -68,7 +68,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
 
             if (!this.getAttribute('orderHash') && window.location.hash) {
-                this.setAttribute('orderHash', window.location.hash.replace('#', ''));
+                const hash = window.location.hash.replace(/^#/, '');
+                const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+                // check if hash is a valid uuid
+                if (uuidRegex.test(hash)) {
+                    this.setAttribute('orderHash', hash);
+                }
             }
         },
 
@@ -714,6 +720,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }
 
             if (!this.getAttribute('orderHash')) {
+                return;
+            }
+
+            if (window.location.hash !== '') {
+                // hash besteht, nicht überschreiben
                 return;
             }
 
