@@ -175,7 +175,7 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
-            if ($validateAddress) { // @phpstan-ignore-line
+            if ($validateAddress) {
                 if (!$Order) {
                     return false;
                 }
