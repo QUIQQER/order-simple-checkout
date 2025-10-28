@@ -4,7 +4,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     'qui/controls/Control',
     'Ajax'
 
-], function(QUI, QUIControl, QUIAjax) {
+], function (QUI, QUIControl, QUIAjax) {
     'use strict';
 
     let loading = false;
@@ -18,7 +18,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             '$onChange'
         ],
 
-        initialize: function(options) {
+        initialize: function (options) {
             this.parent(options);
 
             this.$labels = [];
@@ -31,7 +31,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $onImport: function() {
+        $onImport: function () {
             this.$labels = [];
 
             this.$Loader = new Element('span', {
@@ -44,7 +44,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        refresh: function() {
+        refresh: function () {
             const Addresses = this.getElm().getElement('[name="addresses"]');
 
             if (!Addresses) {
@@ -91,12 +91,38 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $registerEvents: function() {
-            const BusinessType = this.getElm().getElement('[name="businessType"]');
-            const Company = this.getElm().getElement('.quiqqer-order-customerData-edit-company');
-            const VatId = this.getElm().getElement('.quiqqer-order-customerData-edit-vatId');
-            const chUID = this.getElm().getElement('.quiqqer-order-customerData-edit-chUID');
-            const Addresses = this.getElm().getElement('[name="addresses"]');
+        $registerEvents: function () {
+            const BusinessType = this.getElm().querySelector('[name="businessType"]');
+            const Company = this.getElm().querySelector('.quiqqer-order-customerData-edit-company');
+            const VatId = this.getElm().querySelector('.quiqqer-order-customerData-edit-vatId');
+            const chUID = this.getElm().querySelector('.quiqqer-order-customerData-edit-chUID');
+            const Addresses = this.getElm().querySelector('[name="addresses"]');
+            const addressOpener = this.getElm().querySelector('[data-name="address-container-opener"]');
+            const addressContainer = this.getElm().querySelector('[data-name="address-container"]');
+
+            if (addressOpener) {
+                addressOpener.addEventListener('click', () => {
+                    const faIcon = addressOpener.querySelector('.fa');
+console.log(faIcon);
+                    if (addressContainer.style.display === 'none') {
+                        // show
+                        addressContainer.style.display = '';
+
+                        if (faIcon) {
+                            faIcon.classList.remove('fa-chevron-right');
+                            faIcon.classList.add('fa-chevron-down');
+                        }
+                        return;
+                    }
+
+                    addressContainer.style.display = 'none';
+
+                    if (faIcon) {
+                        faIcon.classList.remove('fa-chevron-down');
+                        faIcon.classList.add('fa-chevron-right');
+                    }
+                });
+            }
 
             if (Addresses) {
                 // disable all addresses
@@ -178,7 +204,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $onChange: function() {
+        $onChange: function () {
             if (!loading) {
                 return;
             }
@@ -192,7 +218,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             }, 50);
         },
 
-        $hideB2B: function() {
+        $hideB2B: function () {
             const VatId = this.getElm().getElement('.quiqqer-order-customerData-edit-vatId');
             const chUID = this.getElm().getElement('.quiqqer-order-customerData-edit-chUID');
 
@@ -217,7 +243,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
-        $showB2B: function() {
+        $showB2B: function () {
             const VatId = this.getElm().getElement('.quiqqer-order-customerData-edit-vatId');
             const chUID = this.getElm().getElement('.quiqqer-order-customerData-edit-chUID');
             const labels = this.$labels.concat([VatId, chUID]);

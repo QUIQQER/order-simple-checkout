@@ -98,6 +98,20 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
             $settings = [];
         }
 
+        // address needed?
+        $addressRequired = true;
+
+        if (class_exists('QUI\ERP\Accounting\Invoice\Utils\Invoice')) {
+            $addressRequired = QUI\ERP\Accounting\Invoice\Utils\Invoice::addressRequirement();
+
+            if ($addressRequired === false) {
+                foreach ($settings as $key => $val) {
+                    $settings[$key]['required'] = false;
+                }
+            }
+        }
+
+        // business type
         $settings = QUI\FrontendUsers\Controls\Address\Address::checkSettingsArray($settings);
         $businessTypeIsChangeable = !(QUI\ERP\Utils\Shop::isOnlyB2C() || QUI\ERP\Utils\Shop::isOnlyB2B());
 
@@ -120,6 +134,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         $Engine->assign([
             'Checkout' => $this->Checkout,
             'addresses' => $User->getAddressList(),
+            'addressRequired' => $addressRequired,
             'User' => $User,
             'Address' => $this->getInvoiceAddress(),
             'b2bSelected' => $isUserB2B(),
@@ -188,6 +203,14 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      */
     public function validate(): void
     {
+        if (class_exists('QUI\ERP\Accounting\Invoice\Utils\Invoice')) {
+            $addressRequired = QUI\ERP\Accounting\Invoice\Utils\Invoice::addressRequirement();
+
+            if ($addressRequired === false) {
+                return;
+            }
+        }
+
         $Address = $this->Checkout->getOrder()?->getInvoiceAddress();
 
         if ($Address instanceof QUI\Users\Address) {
