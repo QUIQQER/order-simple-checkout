@@ -13,6 +13,22 @@
     width: 100%;
 }
 
+.quiqqer-simple-checkout-data-delivery h2 {
+    margin-bottom: 0.5rem;
+}
+
+[data-name="address-container-opener"] {
+    background-color: var(--_bg, rgba(0, 0, 0, 0.25));
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    padding: 5px 10px;
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
 
 .quiqqer-simple-checkout-delivery label .qui-select {
     float: initial;
