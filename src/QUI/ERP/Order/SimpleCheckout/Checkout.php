@@ -161,6 +161,10 @@ class Checkout extends QUI\Control
             $validateShipping = false;
         }
 
+        if (class_exists('QUI\ERP\Accounting\Invoice\Utils\Invoice')) {
+            $validateAddress = QUI\ERP\Accounting\Invoice\Utils\Invoice::addressRequirement();
+        }
+
         QUI::getEvents()->fireEvent(
             'onQuiqqerSimpleCheckoutValidation',
             [$this, &$validateAddress, &$validateShipping]
@@ -171,7 +175,7 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
-            if ($validateAddress) { // @phpstan-ignore-line
+            if ($validateAddress) {
                 if (!$Order) {
                     return false;
                 }
@@ -208,6 +212,12 @@ class Checkout extends QUI\Control
         $Order = null;
 
         // check address
+        $addressRequired = true;
+
+        if (class_exists('QUI\ERP\Accounting\Invoice\Utils\Invoice')) {
+            $addressRequired = QUI\ERP\Accounting\Invoice\Utils\Invoice::addressRequirement();
+        }
+
         try {
             $Order = $this->getOrder();
 
@@ -216,10 +226,14 @@ class Checkout extends QUI\Control
                     $Order->getInvoiceAddress()
                 );
             } else {
-                $missing[] = 'address';
+                if ($addressRequired) {
+                    $missing[] = 'address';
+                }
             }
         } catch (QUI\Exception) {
-            $missing[] = 'address';
+            if ($addressRequired) {
+                $missing[] = 'address';
+            }
         }
 
         if (!$Order) {

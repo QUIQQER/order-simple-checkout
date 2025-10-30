@@ -1,3 +1,12 @@
+{if $addressRequired === false}
+<div data-name="address-container-opener">
+    <span class="fa fa-chevron-right"></span>
+    <span>{locale group="quiqqer/order-simple-checkout" var="ordering.step.title.CustomerData.openAddress"}</span>
+</div>
+{/if}
+
+<div data-name="address-container" {if $addressRequired === false}style="display: none"{/if}>
+
 {if count($addresses) > 1}
     <label class="quiqqer-order-customerData-edit-businessType">
     <span>
@@ -283,3 +292,5 @@
         />
     </label>
 {/if}
+
+</div>

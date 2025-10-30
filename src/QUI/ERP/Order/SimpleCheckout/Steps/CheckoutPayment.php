@@ -34,16 +34,24 @@ class CheckoutPayment extends QUI\Control implements CheckoutStepInterface
     {
         $Engine = QUI::getTemplateManager()->getEngine();
         $Delivery = new CheckoutDelivery($this->Checkout);
-        $validate = true;
+        $validateAddress = true;
 
         if (
             class_exists('QUI\ERP\Order\Guest\GuestOrder') &&
             QUI\ERP\Order\Guest\GuestOrder::isAnonymousOrder()
         ) {
-            $validate = false;
+            $validateAddress = false;
         }
 
-        if ($validate) {
+        if (class_exists('QUI\ERP\Accounting\Invoice\Utils\Invoice')) {
+            $addressRequired = QUI\ERP\Accounting\Invoice\Utils\Invoice::addressRequirement();
+
+            if ($addressRequired === false) {
+                $validateAddress = false; // we don't need a address
+            }
+        }
+
+        if ($validateAddress) {
             try {
                 $Delivery->validate();
             } catch (QUI\Exception) {
