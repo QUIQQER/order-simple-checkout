@@ -85,7 +85,7 @@
             <en><![CDATA[Use a different billing address]]></en>
         </locale>
         <locale name="ordering.step.title.CustomerData.addresses">
-            <de><![CDATA[Deine vorhandenen Addressen]]></de>
+            <de><![CDATA[Deine vorhandenen Adressen]]></de>
             <en><![CDATA[Your existing addresses]]></en>
         </locale>
         <locale name="ordering.step.title.CustomerData.openAddress">
@@ -93,6 +93,10 @@
             <en><![CDATA[Enter address details (optional)]]></en>
         </locale>
 
+        <locale name="CheckoutPayment.enter_address_to_show_delivery_options">
+            <de><![CDATA[Bitte geben Sie Ihre Lieferadresse ein, um die verfügbaren Versandmethoden anzuzeigen.]]></de>
+            <en><![CDATA[Enter your delivery address to view available shipping methods.]]></en>
+        </locale>
         <locale name="CheckoutPayment.enter_address_to_show_payment_options">
             <de><![CDATA[Bitte geben Sie Ihre Adresse an, um verfügbare Zahlungsmethoden angezeigt zu bekommen.]]></de>
             <en><![CDATA[Please enter your address to view available payment methods.]]></en>
