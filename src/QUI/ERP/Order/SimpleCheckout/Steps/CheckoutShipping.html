@@ -1,6 +1,6 @@
 {if !isset($Shipping)}
     <div class="order-simple-checkout-shipping--info">
-        Enter your delivery address to view available shipping methods.
+        {locale group="quiqqer/order-simple-checkout" var="CheckoutPayment.enter_address_to_show_delivery_options"}
     </div>
 {else}
     {$Shipping->create()}
