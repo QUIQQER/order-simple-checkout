@@ -88,6 +88,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                     QUI.parse(this.getElm()).then(() => {
                         this.$registerEvents();
+
+                        if (this.getElm().querySelectorAll('input').length === 1) {
+                            this.getElm().querySelector('input').click();
+                        }
+
                         this.fireEvent('refreshEnd', [this]);
                         this.$Loader.style.display = 'none';
                         resolve();
