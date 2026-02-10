@@ -25,6 +25,8 @@ QUI::getAjax()->registerFunction(
 
         $Checkout = new Checkout(['orderHash' => $orderHash]);
         $Order = $Checkout->getOrder();
+        $orderDirty = false;
+        $userDirty = false;
 
         $erpAddressData = [
             'salutation' => $orderData['salutation'] ?? '',
@@ -63,14 +65,53 @@ QUI::getAjax()->registerFunction(
         $ErpAddress = new Address($erpAddressData);
         $address = $ErpAddress->getAttributes();
 
+        $addressDirty = false;
+
         foreach ($address as $k => $v) {
-            $Address->setAttribute($k, $v);
+            if ($Address->getAttribute($k) !== $v) {
+                $Address->setAttribute($k, $v);
+                $addressDirty = true;
+            }
         }
 
-        $Address->save(QUI::getUsers()->getSystemUser());
+        if ($addressDirty) {
+            $Address->save(QUI::getUsers()->getSystemUser());
+            $orderDirty = true;
+        }
+
+        $addressKeys = [
+            'id',
+            'salutation',
+            'firstname',
+            'lastname',
+            'street_no',
+            'zip',
+            'city',
+            'country',
+            'company'
+        ];
+
+        $addressesEqual = static function (?Address $Current, array $Data) use ($addressKeys): bool {
+            if (!$Current) {
+                return false;
+            }
+
+            $compare = array_intersect_key($Data, array_flip($addressKeys));
+
+            foreach ($compare as $key => $value) {
+                if ($Current->getAttribute($key) !== $value) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
 
         if (isset($orderData['billing_address']) && $orderData['billing_address'] === 'different') {
-            $Order?->setDeliveryAddress($ErpAddress);
+            if ($Order && !$addressesEqual($Order->getDeliveryAddress(), $ErpAddress->getAttributes())) {
+                $Order->setDeliveryAddress($ErpAddress);
+                $orderDirty = true;
+            }
 
             // invoice address / billing address
             if (isset($orderData['billing_street']) && isset($orderData['billing_street_number'])) {
@@ -91,18 +132,39 @@ QUI::getAjax()->registerFunction(
                 $billingAddress['company'] = $orderData['billing_company'];
             }
 
-            $Order?->setInvoiceAddress(new Address($billingAddress));
+            if ($Order && !$addressesEqual($Order->getInvoiceAddress(), $billingAddress)) {
+                $Order->setInvoiceAddress(new Address($billingAddress));
+                $orderDirty = true;
+            }
         } else {
-            $Order?->setInvoiceAddress($ErpAddress);
-            $Order?->removeDeliveryAddress();
+            if ($Order && !$addressesEqual($Order->getInvoiceAddress(), $ErpAddress->getAttributes())) {
+                $Order->setInvoiceAddress($ErpAddress);
+                $orderDirty = true;
+            }
+
+            if ($Order && $Order->hasDeliveryAddress()) {
+                $Order->removeDeliveryAddress();
+                $orderDirty = true;
+            }
         }
 
         if (!empty($orderData['shipping']) && QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
-            $Order?->setShipping(
-                Shipping::getInstance()->getShippingEntry($orderData['shipping'])
-            );
+            if ($Order) {
+                $currentShippingId = $Order->getShipping()?->getId();
+                $newShippingId = (int)$orderData['shipping'];
+
+                if ($currentShippingId !== $newShippingId) {
+                    $Order->setShipping(
+                        Shipping::getInstance()->getShippingEntry($orderData['shipping'])
+                    );
+                    $orderDirty = true;
+                }
+            }
         } else {
-            $Order?->removeShipping();
+            if ($Order && $Order->getShipping()) {
+                $Order->removeShipping();
+                $orderDirty = true;
+            }
         }
 
         if (isset($orderData['businessType'])) {
@@ -111,39 +173,75 @@ QUI::getAjax()->registerFunction(
                 $User = QUI::getUsers()->get($Customer->getUUID());
 
                 if ($orderData['businessType'] === 'b2b') {
-                    $User->setAttribute('quiqqer.erp.isNettoUser', QUI\ERP\Utils\User::IS_NETTO_USER);
-                    $User->setCompanyStatus(true);
+                    if ($User->getAttribute('quiqqer.erp.isNettoUser') !== QUI\ERP\Utils\User::IS_NETTO_USER) {
+                        $User->setAttribute('quiqqer.erp.isNettoUser', QUI\ERP\Utils\User::IS_NETTO_USER);
+                        $userDirty = true;
+                    }
+
+                    if ($User->isCompany() === false) {
+                        $User->setCompanyStatus(true);
+                        $userDirty = true;
+                    }
                 } else {
-                    $User->setAttribute('quiqqer.erp.isNettoUser', QUI\ERP\Utils\User::IS_BRUTTO_USER);
-                    $User->setCompanyStatus(false);
+                    if ($User->getAttribute('quiqqer.erp.isNettoUser') !== QUI\ERP\Utils\User::IS_BRUTTO_USER) {
+                        $User->setAttribute('quiqqer.erp.isNettoUser', QUI\ERP\Utils\User::IS_BRUTTO_USER);
+                        $userDirty = true;
+                    }
+
+                    if ($User->isCompany() === true) {
+                        $User->setCompanyStatus(false);
+                        $userDirty = true;
+                    }
                 }
 
                 if (isset($orderData['vatId'])) {
-                    $User->setAttribute('quiqqer.erp.euVatId', $orderData['vatId']);
+                    if ($User->getAttribute('quiqqer.erp.euVatId') !== $orderData['vatId']) {
+                        $User->setAttribute('quiqqer.erp.euVatId', $orderData['vatId']);
+                        $userDirty = true;
+                    }
                 }
 
                 if (isset($orderData['chUID'])) {
-                    $User->setAttribute('quiqqer.erp.chUID', $orderData['chUID']);
+                    if ($User->getAttribute('quiqqer.erp.chUID') !== $orderData['chUID']) {
+                        $User->setAttribute('quiqqer.erp.chUID', $orderData['chUID']);
+                        $userDirty = true;
+                    }
                 }
 
-                $User->save(QUI::getUsers()->getSystemUser());
-                $Order->setCustomer($User);
+                if ($userDirty) {
+                    $User->save(QUI::getUsers()->getSystemUser());
+                }
+
+                if ($Order && $userDirty) {
+                    $Order->setCustomer($User);
+                    $orderDirty = true;
+                }
             } catch (QUI\Exception $Exception) {
                 Log::addError($Exception->getMessage());
             }
         }
 
         if (!empty($orderData['payment'])) {
-            $Order?->setPayment($orderData['payment']);
+            if ($Order) {
+                $currentPaymentId = $Order->getPayment()?->getId();
+                $newPaymentId = (int)$orderData['payment'];
+
+                if ($currentPaymentId !== $newPaymentId) {
+                    $Order->setPayment($orderData['payment']);
+                    $orderDirty = true;
+                }
+            }
         } else {
-            $Order?->clearPayment();
+            if ($Order && $Order->getPayment()) {
+                $Order->clearPayment();
+                $orderDirty = true;
+            }
         }
 
-        if ($Order) {
+        if ($Order && ($orderDirty || $userDirty || $addressDirty)) {
             $Order->setData('sc_needs_recalc', 1);
+            $Order->save();
         }
-
-        $Order?->save();
 
         return $Checkout->isValid();
     },
