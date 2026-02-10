@@ -139,6 +139,10 @@ QUI::getAjax()->registerFunction(
             $Order?->clearPayment();
         }
 
+        if ($Order) {
+            $Order->setData('sc_needs_recalc', 1);
+        }
+
         $Order?->save();
 
         return $Checkout->isValid();

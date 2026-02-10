@@ -83,6 +83,7 @@ QUI::getAjax()->registerFunction(
             }
         }
 
+        $OrderInProcess->setData('sc_needs_recalc', 1);
         $OrderInProcess->save();
 
         return $OrderInProcess->getUUID();
