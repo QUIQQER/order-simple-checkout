@@ -150,7 +150,7 @@ QUI::getAjax()->registerFunction(
 
         if (!empty($orderData['shipping']) && QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
             if ($Order) {
-                $currentShippingId = $Order->getShipping()?->getId();
+                $currentShippingId = $Order->getShipping()?->getId(); // @phpstan-ignore-line
                 $newShippingId = (int)$orderData['shipping'];
 
                 if ($currentShippingId !== $newShippingId) {
