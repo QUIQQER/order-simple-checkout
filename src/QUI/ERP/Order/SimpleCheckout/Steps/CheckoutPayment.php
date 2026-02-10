@@ -3,9 +3,9 @@
 namespace QUI\ERP\Order\SimpleCheckout\Steps;
 
 use QUI;
-use QUI\ERP\Accounting\Payments\Order\Payment;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Order\SimpleCheckout\CheckoutStepInterface;
+use QUI\ERP\Order\SimpleCheckout\Payments\SimpleCheckoutPayment;
 
 use function dirname;
 
@@ -59,7 +59,7 @@ class CheckoutPayment extends QUI\Control implements CheckoutStepInterface
             }
         }
 
-        $Payment = new Payment([
+        $Payment = new SimpleCheckoutPayment([
             'Order' => $this->Checkout->getOrder()
         ]);
 

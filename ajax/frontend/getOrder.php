@@ -33,6 +33,7 @@ QUI::getAjax()->registerFunction(
         if ($Address) {
             $Order->setInvoiceAddress($Address);
             $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
+            $Order->setData('sc_needs_recalc', 1);
             $Order->save(QUI::getUserBySession());
         }
 
