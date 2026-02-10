@@ -54,6 +54,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$BasketLoader = null;
             this.Loader = null;
 
+            this.$initialized = false;
+
             this.$PayToOrderBtn = null;
             this.ScrollToPaymentBtn = null;
             this.showAllProductsBtn = null;
@@ -825,6 +827,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         update: function () {
+            if (!this.$initialized) {
+                this.$initialized = true;
+                return Promise.resolve();
+            }
+
             this.$BasketLoader.style.display = '';
 
             return new Promise((resolve) => {

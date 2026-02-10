@@ -20,6 +20,7 @@ QUI::getAjax()->registerFunction(
                     $ErpAddress = new QUI\ERP\Address($Address->getAttributes(), QUI::getUserBySession());
                     $Order->setDeliveryAddress($ErpAddress);
                     $Order->setInvoiceAddress($ErpAddress);
+                    $Order->setData('sc_needs_recalc', 1);
                     $Order->save();
                 }
             } catch (QUI\Exception) {
