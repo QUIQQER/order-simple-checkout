@@ -80,11 +80,20 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     onLoaded: () => {
                         this.Loader.hide();
                     },
+                    onOrderStart: () => {
+                        this.Loader.show();
+                    },
                     onOrderSuccessful: () => {
                         new Fx.Scroll(CheckoutWrapper).toTop();
+
+                        if (!this.getAttribute('showOrderSuccessInfo')) {
+                            this.Loader.hide();
+                        }
+
                         this.fireEvent('orderSuccessful', [this]);
                     },
                     onShowOrderSuccessInfo: (SimpleCheckoutControl) => {
+                        this.Loader.hide();
                         this.fireEvent('showOrderSuccessInfo', [SimpleCheckoutControl, this]);
                     },
                     onLoadedError: () => {

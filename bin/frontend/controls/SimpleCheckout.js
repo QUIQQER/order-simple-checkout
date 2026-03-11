@@ -55,6 +55,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.Loader = null;
 
             this.$initialized = false;
+            this.$isOrdering = false;
+            this.$orderPromise = null;
 
             this.$PayToOrderBtn = null;
             this.ScrollToPaymentBtn = null;
@@ -584,110 +586,127 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
          * @return {Promise<void>}
          */
         orderWithCosts: function () {
+            if (this.$isOrdering) {
+                return this.$orderPromise || Promise.resolve();
+            }
+
             if (this.validate() === false) {
                 this.fireEvent('orderInvalid', [this]);
                 return Promise.reject();
             }
 
+            this.$isOrdering = true;
+            this.$setPayButtonDisabled(true);
             this.Loader.show();
 
-            return this.update().then(() => {
+            this.$orderPromise = this.update().then(() => {
                 this.fireEvent('orderStart', [this]);
 
-                // execute order
-                QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts', (result) => {
-                    const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
-                    this.setAttribute('orderHash', result.orderHash);
-                    this.$setAnchor();
+                return new Promise((resolve, reject) => {
+                    // execute order
+                    QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts', (result) => {
+                        const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
+                        this.setAttribute('orderHash', result.orderHash);
+                        this.$setAnchor();
 
-                    // for the OrderProcess.js
-                    if (this.getElm().getElement('form')) {
-                        this.getElm().getElement('form').set('data-order-hash', result.orderHash);
-                        this.getElm().getElement('form').set('data-products-count', result.productCount);
-                    }
-
-                    if (this.getElm().getElement('.quiqqer-simple-checkout-orderDetails')) {
-                        this.getElm().getElement('.quiqqer-simple-checkout-orderDetails').setStyle('display', 'none');
-                    }
-
-                    if (this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer')) {
-                        this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer').setStyle('display', 'none');
-                    }
-
-                    this.fireEvent('orderSuccessful', [this]);
-                    const scripts = [];
-                    const Ghost = new Element('div', {
-                        html: result.html
-                    });
-
-                    // trigger js stuff
-                    Ghost.getElements('script').forEach(function (Script) {
-                        const New = new Element('script');
-
-                        if (Script.get('html')) {
-                            New.set('html', Script.get('html'));
+                        // for the OrderProcess.js
+                        if (this.getElm().getElement('form')) {
+                            this.getElm().getElement('form').set('data-order-hash', result.orderHash);
+                            this.getElm().getElement('form').set('data-products-count', result.productCount);
                         }
 
-                        if (Script.get('src')) {
-                            New.set('src', Script.get('src'));
+                        if (this.getElm().getElement('.quiqqer-simple-checkout-orderDetails')) {
+                            this.getElm().getElement('.quiqqer-simple-checkout-orderDetails').setStyle('display', 'none');
                         }
 
-                        scripts.push(New);
-                    });
+                        if (this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer')) {
+                            this.getElm().getElement('.quiqqer-simple-checkout__scrollToPaymentContainer').setStyle('display', 'none');
+                        }
 
-                    if (!this.getAttribute('showOrderSuccessInfo')) {
-                        scripts.forEach((Script) => {
-                            Script.inject(Container);
+                        this.fireEvent('orderSuccessful', [this]);
+                        const scripts = [];
+                        const Ghost = new Element('div', {
+                            html: result.html
                         });
 
-                        return;
-                    }
+                        // trigger js stuff
+                        Ghost.getElements('script').forEach(function (Script) {
+                            const New = new Element('script');
 
-                    moofx(Container).animate({
-                        opacity: 0
-                    }, {
-                        callback: () => {
-                            Container.set('html', result.html);
+                            if (Script.get('html')) {
+                                New.set('html', Script.get('html'));
+                            }
 
+                            if (Script.get('src')) {
+                                New.set('src', Script.get('src'));
+                            }
+
+                            scripts.push(New);
+                        });
+
+                        if (!this.getAttribute('showOrderSuccessInfo')) {
                             scripts.forEach((Script) => {
                                 Script.inject(Container);
                             });
 
-                            QUI.parse(Container).then(() => {
-                                moofx(Container).animate({
-                                    opacity: 1
-                                }, {
-                                    callback: () => {
-                                        this.Loader.hide();
-
-                                        if (typeof Container.scrollIntoView === 'function') {
-                                            Container.scrollIntoView({
-                                                behavior: 'smooth',
-                                                block: 'center',
-                                                inline: 'start'
-                                            });
-                                        }
-
-                                        this.fireEvent('showOrderSuccessInfo', [this]);
-                                    }
-                                });
-                            });
-                        }
-                    });
-                }, {
-                    'package': 'quiqqer/order-simple-checkout',
-                    orderHash: this.getAttribute('orderHash'),
-                    onError: (err) => {
-                        if (typeof err.getMessage === 'function') {
-                            this.$showError(err.getMessage());
                             this.Loader.hide();
+                            resolve();
                             return;
                         }
 
-                        console.error(err);
-                        this.Loader.hide();
-                    }
+                        moofx(Container).animate({
+                            opacity: 0
+                        }, {
+                            callback: () => {
+                                Container.set('html', result.html);
+
+                                scripts.forEach((Script) => {
+                                    Script.inject(Container);
+                                });
+
+                                QUI.parse(Container).then(() => {
+                                    moofx(Container).animate({
+                                        opacity: 1
+                                    }, {
+                                        callback: () => {
+                                            this.Loader.hide();
+
+                                            if (typeof Container.scrollIntoView === 'function') {
+                                                Container.scrollIntoView({
+                                                    behavior: 'smooth',
+                                                    block: 'center',
+                                                    inline: 'start'
+                                                });
+                                            }
+
+                                            this.fireEvent('showOrderSuccessInfo', [this]);
+                                            resolve();
+                                        }
+                                    });
+                                }).catch(reject);
+                            }
+                        });
+                    }, {
+                        'package': 'quiqqer/order-simple-checkout',
+                        orderHash: this.getAttribute('orderHash'),
+                        onError: reject
+                    });
                 });
+            });
+
+            return this.$orderPromise.catch((err) => {
+                if (typeof err.getMessage === 'function') {
+                    this.$showError(err.getMessage());
+                } else {
+                    console.error(err);
+                }
+
+                this.$isOrdering = false;
+                this.$orderPromise = null;
+                this.$setPayButtonDisabled(false);
+                this.Loader.hide();
+
+                throw err;
             });
         },
 
@@ -806,7 +825,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         });
                     }
 
-                    this.Loader.hide();
+                    if (!this.$isOrdering) {
+                        this.Loader.hide();
+                    }
                     this.$BasketLoader.style.display = 'none';
                     resolve();
                 }, {
@@ -824,6 +845,21 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
 
             console.error(message);
+        },
+
+        $setPayButtonDisabled: function (disabled) {
+            if (!this.$PayToOrderBtn) {
+                return;
+            }
+
+            this.$PayToOrderBtn.disabled = disabled;
+
+            if (disabled) {
+                this.$PayToOrderBtn.setAttribute('disabled', 'disabled');
+                return;
+            }
+
+            this.$PayToOrderBtn.removeAttribute('disabled');
         },
 
         update: function () {
@@ -906,13 +942,17 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     onError: (err) => {
                         if (typeof err.getMessage === 'function') {
                             this.$showError(err.getMessage());
-                            this.Loader.hide();
+                            if (!this.$isOrdering) {
+                                this.Loader.hide();
+                            }
                             resolve();
                             return;
                         }
 
                         console.error(err);
-                        this.Loader.hide();
+                        if (!this.$isOrdering) {
+                            this.Loader.hide();
+                        }
                         resolve();
                     }
                 });
