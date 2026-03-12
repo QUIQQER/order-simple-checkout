@@ -51,7 +51,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return Promise.resolve();
             }
 
-            loading = true;
+            loading = false;
             this.$Loader.style.display = '';
             this.fireEvent('refreshBegin', [this]);
 
@@ -78,7 +78,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         this.fireEvent('refreshEnd', [this]);
                         this.$Loader.style.display = 'none';
 
-                        loading = false;
+                        loading = true;
                         this.$onChange();
 
                         resolve();
@@ -103,7 +103,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             if (addressOpener) {
                 addressOpener.addEventListener('click', () => {
                     const faIcon = addressOpener.querySelector('.fa');
-console.log(faIcon);
+
                     if (addressContainer.style.display === 'none') {
                         // show
                         addressContainer.style.display = '';
