@@ -35,7 +35,10 @@ QUI::getAjax()->registerFunction(
             'street_no' => $orderData['street_no'] ?? '',
             'zip' => $orderData['zip'] ?? '',
             'city' => $orderData['city'] ?? '',
-            'country' => $orderData['country'] ?? ''
+            'country' => $orderData['country'] ?? '',
+            'tel' => $orderData['tel'] ?? '',
+            'mobile' => $orderData['mobile'] ?? '',
+            'fax' => $orderData['fax'] ?? ''
         ];
 
         if (isset($orderData['company'])) {
@@ -88,7 +91,10 @@ QUI::getAjax()->registerFunction(
             'zip',
             'city',
             'country',
-            'company'
+            'company',
+            'tel',
+            'mobile',
+            'fax'
         ];
 
         $addressesEqual = static function (?Address $Current, array $Data) use ($addressKeys): bool {
