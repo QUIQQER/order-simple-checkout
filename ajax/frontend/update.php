@@ -71,6 +71,39 @@ QUI::getAjax()->registerFunction(
         $addressDirty = false;
 
         foreach ($address as $k => $v) {
+            if ($k === 'tel' && $Address->getPhone() !== $v) {
+                $list = $Address->getPhoneList();
+
+                foreach ($list as $phoneIndex => $entry) {
+                    if ($entry['type'] === 'tel') {
+                        $Address->editPhone($phoneIndex, $v);
+                        $addressDirty = true;
+                        continue 2;
+                    }
+                }
+
+                // no tel available
+                $Address->addPhone([
+                    'type' => 'tel',
+                    'no' => $v
+                ]);
+
+                $addressDirty = true;
+                continue;
+            }
+
+            if ($k === 'mobile' && $Address->getMobile() !== $v) {
+                $Address->editMobile($v);
+                $addressDirty = true;
+                continue;
+            }
+
+            if ($k === 'fax' && $Address->getFax() !== $v) {
+                $Address->editFax($v);
+                $addressDirty = true;
+                continue;
+            }
+
             if ($Address->getAttribute($k) !== $v) {
                 $Address->setAttribute($k, $v);
                 $addressDirty = true;
