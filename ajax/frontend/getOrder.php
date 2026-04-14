@@ -10,9 +10,11 @@ use QUI\ERP\Order\SimpleCheckout\Checkout;
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getOrder',
     function ($orderHash) {
-        $OrderHandler = QUI\ERP\Order\Handler::getInstance();
         $User = QUI::getUserBySession();
         $Address = $User->getStandardAddress();
+        $Checkout = new Checkout([
+            'orderHash' => $orderHash
+        ]);
 
         $result = [
             'order' => false,
@@ -20,9 +22,9 @@ QUI::getAjax()->registerFunction(
         ];
 
         try {
-            $Order = $OrderHandler->getOrderByHash($orderHash);
+            $Order = $Checkout->getProcessOrder();
+            $orderHash = $Order->getUUID();
         } catch (QUI\Exception) {
-            $Checkout = new Checkout();
             $Order = $Checkout->getOrder();
             $orderHash = $Order->getUUID();
         }
@@ -38,7 +40,7 @@ QUI::getAjax()->registerFunction(
         }
 
         if ($User->getUUID() === $customerId) {
-            $result['order'] = $OrderHandler->getOrderByHash($orderHash)->toArray();
+            $result['order'] = $Order->toArray();
         }
 
         return $result;

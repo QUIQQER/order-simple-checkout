@@ -3,6 +3,7 @@
 namespace QUI\ERP\Order\SimpleCheckout;
 
 use QUI;
+use QUI\ERP\Order\AbstractOrder;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\OrderInterface;
@@ -275,19 +276,34 @@ class Checkout extends QUI\Control
             );
         }
 
-        //$failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+        $failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+        $Payment = $OrderInProcess->getPayment();
 
-        //if ($failedPaymentProcedure === 'execute') {
-        $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
-        $Order->setData('orderedWithCosts', true);
-        $Order->save(QUI::getUsers()->getSystemUser());
-        $this->setAttribute('orderHash', $Order->getUUID());
-        /*
+        if ($failedPaymentProcedure === 'execute') {
+            $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
+            $Order->setData('orderedWithCosts', true);
+
+            if ($Payment) {
+                $Order->setData('orderedWithCostsPayment', $Payment->getId());
+            }
+
+            $Order->save(QUI::getUsers()->getSystemUser());
+
             QUI::getSession()->set(
-                'termsAndConditions-' . $OrderInProcess->getUUID(),
+                'termsAndConditions-' . $Order->getUUID(),
                 1
             );
+
+            $this->setAttribute('orderHash', $Order->getUUID());
         } else {
+            $OrderInProcess->setData('orderedWithCosts', true);
+
+            if ($Payment) {
+                $OrderInProcess->setData('orderedWithCostsPayment', $Payment->getId());
+            }
+
+            $OrderInProcess->save(QUI::getUsers()->getSystemUser());
+
             QUI::getSession()->set(
                 'termsAndConditions-' . $OrderInProcess->getUUID(),
                 1
@@ -295,7 +311,7 @@ class Checkout extends QUI\Control
 
             $this->setAttribute('orderHash', $OrderInProcess->getUUID());
         }
-        */
+
         return $this->getOrderProcessStep();
     }
 
@@ -306,8 +322,7 @@ class Checkout extends QUI\Control
      */
     public function getOrderProcessStep(): array
     {
-        $OrderHandler = QUI\ERP\Order\Handler::getInstance();
-        $Order = $OrderHandler->getOrderByHash($this->getAttribute('orderHash'));
+        $Order = $this->getProcessOrder();
 
         // init order process
         $OrderProcess = new QUI\ERP\Order\OrderProcess([
@@ -327,6 +342,32 @@ class Checkout extends QUI\Control
             'orderHash' => $Order->getUUID(),
             'productCount' => $Order->getArticles()->count(),
         ];
+    }
+
+    /**
+     * Resolve the current process order from the active hash.
+     *
+     * @throws QUI\ERP\Order\Exception
+     * @throws QUI\ERP\Exception
+     * @throws QUI\Database\Exception
+     */
+    public function getProcessOrder(): AbstractOrder
+    {
+        $OrderHandler = QUI\ERP\Order\Handler::getInstance();
+        $orderHash = $this->getAttribute('orderHash');
+
+        if (!$orderHash) {
+            throw new QUI\ERP\Order\Exception(
+                QUI::getLocale()->get('quiqqer/order', 'exception.order.not.found'),
+                QUI\ERP\Order\Handler::ERROR_ORDER_NOT_FOUND
+            );
+        }
+
+        try {
+            return $OrderHandler->getOrderByHash($orderHash);
+        } catch (QUI\Exception) {
+            return $OrderHandler->getOrderInProcessByHash($orderHash);
+        }
     }
 
     // region getter
@@ -395,7 +436,7 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * Get the shipping html for the current order.
+     * Get the shipping HTML for the current order.
      *
      * @return string The shipping information
      * @throws \Exception
@@ -416,7 +457,7 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * Get the shipping html for the current order.
+     * Get the shipping HTML for the current order.
      *
      * @return string The shipping information
      * @throws \Exception
@@ -437,7 +478,7 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * Get the payment html for the current order.
+     * Get the payment HTML for the current order.
      *
      * @return string The shipping information
      * @throws \Exception
