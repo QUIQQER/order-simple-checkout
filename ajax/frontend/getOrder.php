@@ -5,6 +5,7 @@
  */
 
 use QUI\ERP\Address;
+use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 
 QUI::getAjax()->registerFunction(
@@ -27,6 +28,19 @@ QUI::getAjax()->registerFunction(
         } catch (QUI\Exception) {
             $Order = $Checkout->getOrder();
             $orderHash = $Order->getUUID();
+        }
+
+        if ($Order instanceof OrderInProcess) {
+            $Payment = $Order->getPayment();
+
+            if (
+                $Payment
+                && $Payment->isSuccessful($Order->getUUID())
+                && !$Order->getOrderId()
+            ) {
+                $Order = $Order->createOrder(QUI::getUsers()->getSystemUser());
+                $orderHash = $Order->getUUID();
+            }
         }
 
         $Customer = $Order->getCustomer();

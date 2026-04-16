@@ -12,6 +12,7 @@ use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
+use QUI\ERP\Order\Utils\OrderProcessSteps;
 use QUI\Exception;
 
 use function class_exists;
@@ -297,6 +298,7 @@ class Checkout extends QUI\Control
             $this->setAttribute('orderHash', $Order->getUUID());
         } else {
             $OrderInProcess->setData('orderedWithCosts', true);
+            $OrderInProcess->setData('failedPaymentProcedure', $failedPaymentProcedure);
 
             if ($Payment) {
                 $OrderInProcess->setData('orderedWithCostsPayment', $Payment->getId());
@@ -309,7 +311,12 @@ class Checkout extends QUI\Control
                 1
             );
 
-            $this->setAttribute('orderHash', $OrderInProcess->getUUID());
+            if ($Payment && $Payment->isSuccessful($OrderInProcess->getUUID())) {
+                $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
+                $this->setAttribute('orderHash', $Order->getUUID());
+            } else {
+                $this->setAttribute('orderHash', $OrderInProcess->getUUID());
+            }
         }
 
         return $this->getOrderProcessStep();
@@ -324,11 +331,26 @@ class Checkout extends QUI\Control
     {
         $Order = $this->getProcessOrder();
 
+        $processingStep = new QUI\ERP\Order\Controls\OrderProcess\Processing([
+            'Order' => $Order,
+            'priority' => 40
+        ]);
+
         // init order process
         $OrderProcess = new QUI\ERP\Order\OrderProcess([
             'Order' => $Order,
             'orderHash' => $Order->getUUID(),
-            'step' => 'Processing'
+            'step' => 'Processing',
+            'events' => [
+                'onQuiqqerOrderProcessStepsEnd' => function (
+                    QUI\ERP\Order\OrderProcess $instance,
+                    AbstractOrder $Order,
+                    OrderProcessSteps $Steps
+                ) use ($processingStep) {
+                    $Steps->clear();
+                    $Steps->append($processingStep);
+                }
+            ]
         ]);
 
         $result = $OrderProcess->create();
