@@ -347,8 +347,10 @@ class Checkout extends QUI\Control
                     AbstractOrder $Order,
                     OrderProcessSteps $Steps
                 ) use ($processingStep) {
-                    $Steps->clear();
-                    $Steps->append($processingStep);
+                    if ($Order->getPayment() && !$Order->getPayment()->isSuccessful($Order->getUUID())) {
+                        $Steps->clear();
+                        $Steps->append($processingStep);
+                    }
                 }
             ]
         ]);

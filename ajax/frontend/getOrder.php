@@ -50,7 +50,10 @@ QUI::getAjax()->registerFunction(
             $Order->setInvoiceAddress($Address);
             $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
             $Order->setData('sc_needs_recalc', 1);
-            $Order->save(QUI::getUserBySession());
+
+            if (method_exists($Order, 'save')) {
+                $Order->save(QUI::getUserBySession());
+            }
         }
 
         if ($User->getUUID() === $customerId) {
