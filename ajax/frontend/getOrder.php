@@ -24,10 +24,12 @@ QUI::getAjax()->registerFunction(
 
         try {
             $Order = $Checkout->getProcessOrder();
-            $orderHash = $Order->getUUID();
         } catch (QUI\Exception) {
             $Order = $Checkout->getOrder();
-            $orderHash = $Order->getUUID();
+        }
+
+        if ($Order->getCustomer()->getUUID() !== $User->getUUID()) {
+            throw new QUI\Exception(['quiqqer/order', 'exception.no.permission.for.this.order']);
         }
 
         if ($Order instanceof OrderInProcess) {
@@ -39,7 +41,6 @@ QUI::getAjax()->registerFunction(
                 && !$Order->getOrderId()
             ) {
                 $Order = $Order->createOrder(QUI::getUsers()->getSystemUser());
-                $orderHash = $Order->getUUID();
             }
         }
 

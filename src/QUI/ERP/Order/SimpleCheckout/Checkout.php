@@ -280,6 +280,8 @@ class Checkout extends QUI\Control
         $failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
         $Payment = $OrderInProcess->getPayment();
 
+        // In "execute" mode the order is created before the gateway step, even if payment may fail later.
+        // In "returning" mode the user stays on OrderInProcess until payment succeeds or another payment is chosen.
         if ($failedPaymentProcedure === 'execute') {
             $Order = $OrderInProcess->createOrder(QUI::getUsers()->getSystemUser());
             $Order->setData('orderedWithCosts', true);
@@ -342,6 +344,8 @@ class Checkout extends QUI\Control
             'orderHash' => $Order->getUUID(),
             'step' => 'Processing',
             'events' => [
+                // Simple checkout jumps directly into the payment gateway flow, so while payment is still not
+                // successful we keep only the Processing step and hide the normal checkout timeline steps.
                 'onQuiqqerOrderProcessStepsEnd' => function (
                     QUI\ERP\Order\OrderProcess $instance,
                     AbstractOrder $Order,
