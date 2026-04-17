@@ -5,14 +5,17 @@
  */
 
 use QUI\ERP\Address;
+use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getOrder',
     function ($orderHash) {
-        $OrderHandler = QUI\ERP\Order\Handler::getInstance();
         $User = QUI::getUserBySession();
         $Address = $User->getStandardAddress();
+        $Checkout = new Checkout([
+            'orderHash' => $orderHash
+        ]);
 
         $result = [
             'order' => false,
@@ -20,11 +23,25 @@ QUI::getAjax()->registerFunction(
         ];
 
         try {
-            $Order = $OrderHandler->getOrderByHash($orderHash);
+            $Order = $Checkout->getProcessOrder();
         } catch (QUI\Exception) {
-            $Checkout = new Checkout();
             $Order = $Checkout->getOrder();
-            $orderHash = $Order->getUUID();
+        }
+
+        if ($Order->getCustomer()->getUUID() !== $User->getUUID()) {
+            throw new QUI\Exception(['quiqqer/order', 'exception.no.permission.for.this.order']);
+        }
+
+        if ($Order instanceof OrderInProcess) {
+            $Payment = $Order->getPayment();
+
+            if (
+                $Payment
+                && $Payment->isSuccessful($Order->getUUID())
+                && !$Order->getOrderId()
+            ) {
+                $Order = $Order->createOrder(QUI::getUsers()->getSystemUser());
+            }
         }
 
         $Customer = $Order->getCustomer();
@@ -34,11 +51,14 @@ QUI::getAjax()->registerFunction(
             $Order->setInvoiceAddress($Address);
             $Order->setDeliveryAddress(new Address($Address->getAttributes(), $User));
             $Order->setData('sc_needs_recalc', 1);
-            $Order->save(QUI::getUserBySession());
+
+            if (method_exists($Order, 'save')) {
+                $Order->save(QUI::getUserBySession());
+            }
         }
 
         if ($User->getUUID() === $customerId) {
-            $result['order'] = $OrderHandler->getOrderByHash($orderHash)->toArray();
+            $result['order'] = $Order->toArray();
         }
 
         return $result;

@@ -20,7 +20,7 @@
   },
   "require": {
     "php": "^8",
-    "quiqqer/order": "^2.10",
+    "quiqqer/order": "^2.10.13",
     "quiqqer/frontend-users": "^2",
     "quiqqer/gallery": "^2.1",
     "quiqqer/presentation-bricks": "^2",
