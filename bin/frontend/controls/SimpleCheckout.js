@@ -373,6 +373,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     (result) => {
                         const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
 
+                        this.setAttribute('orderHash', result.orderHash);
+
                         // for the OrderProcess.js
                         if (this.$Form) {
                             this.$Form.set('data-order-hash', result.orderHash);
