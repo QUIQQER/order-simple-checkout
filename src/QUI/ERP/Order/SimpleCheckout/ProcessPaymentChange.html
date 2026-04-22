@@ -1,0 +1,23 @@
+<div
+    class="quiqqer-simple-checkout-process-payment-change"
+    data-current-payment="{$currentPaymentId}"
+>
+    <button
+        type="button"
+        class="btn quiqqer-simple-checkout-process-payment-change-toggle"
+        aria-expanded="false"
+    >
+        <span class="fa fa-angle-down" aria-hidden="true"></span>
+        <span class="quiqqer-simple-checkout-process-payment-change-toggle-text">
+            {locale group="quiqqer/order-simple-checkout" var="processPaymentChange.button"}
+        </span>
+        <span class="fa fa-angle-down" aria-hidden="true"></span>
+    </button>
+
+    <div
+        class="quiqqer-simple-checkout-process-payment-change-payments"
+        aria-hidden="true"
+    >
+        {$payments}
+    </div>
+</div>

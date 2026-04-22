@@ -14,6 +14,7 @@
 
     --_bg: var(--bg, #fff);
     --_imgWidth: var(--imgWidth, 80px);
+    flex-grow: 1;
 }
 
 @media screen and (max-width: 767px) {
@@ -43,6 +44,7 @@
 .quiqqer-simple-checkout-container {
     gap: var(--_gap);
     display: flex;
+    flex-grow: 1;
     flex-wrap: wrap;
 }
 
@@ -166,6 +168,12 @@
     float: right;
 }
 
+[data-name="order"] {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
 /**************************/
 /* Scroll to payments btn */
 /**************************/
@@ -176,6 +184,93 @@
 
 .quiqqer-simple-checkout__scrollToPaymentBtn {
     display: block;
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-process-payment-change {
+    margin: auto auto 0;
+    max-width: 48rem;
+}
+
+.quiqqer-simple-checkout-process-payment-change-toggle {
+    align-items: center;
+    background: transparent;
+    border: 1px solid transparent;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    min-height: 3.5rem;
+    width: 100%;
+}
+
+.quiqqer-simple-checkout-process-payment-change-toggle .fa {
+    color: transparent;
+    font-size: 1rem;
+}
+
+.quiqqer-simple-checkout-process-payment-change.is-opening .quiqqer-simple-checkout-process-payment-change-toggle,
+.quiqqer-simple-checkout-process-payment-change.is-open .quiqqer-simple-checkout-process-payment-change-toggle {
+    background: rgba(120, 120, 120, 0.16);
+    border-color: rgba(120, 120, 120, 0.28);
+}
+
+.quiqqer-simple-checkout-process-payment-change-payments {
+    display: none;
+    height: 0;
+    margin-top: 1rem;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-8px);
+    transition: height 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.quiqqer-simple-checkout-process-payment-change.is-opening .quiqqer-simple-checkout-process-payment-change-payments,
+.quiqqer-simple-checkout-process-payment-change.is-open .quiqqer-simple-checkout-process-payment-change-payments,
+.quiqqer-simple-checkout-process-payment-change.is-closing .quiqqer-simple-checkout-process-payment-change-payments {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.quiqqer-simple-checkout-process-payment-change.is-open .quiqqer-simple-checkout-process-payment-change-payments {
+    overflow: visible;
+}
+
+.qui-window-popup [data-name="order"] form {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    margin: 0;
+    min-height: 100%;
+}
+
+.qui-window-popup [data-name="order"] > .quiqqer-simple-checkout,
+.qui-window-popup [data-name="order"] > .qui-control.quiqqer-simple-checkout {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.qui-window-popup [data-name="order"] > .quiqqer-simple-checkout form,
+.qui-window-popup [data-name="order"] > .qui-control.quiqqer-simple-checkout form {
+    flex: 1 1 auto;
+}
+
+.qui-window-popup .quiqqer-order-ordering {
+    flex-grow: 1;
+}
+
+.qui-window-popup .quiqqer-simple-checkout--processing .quiqqer-simple-checkout-container {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.qui-window-popup .quiqqer-simple-checkout--processing .quiqqer-simple-checkout-process-payment-change {
+    margin-top: 2rem;
+    padding-top: 2rem;
     width: 100%;
 }
 
@@ -300,4 +395,3 @@
     max-height: 120px;
     height: initial;
 }
-
