@@ -30,7 +30,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             'toggleAllProducts',
             'scrollToPayment',
             '$toggleProcessPaymentChange',
-            '$onProcessPaymentChange'
+            '$onProcessPaymentChange',
+            '$initEmbeddedOrderProcess',
+            '$maybeFireShowOrderSuccessInfo'
         ],
 
         options: {
@@ -60,6 +62,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$isOrdering = false;
             this.$orderPromise = null;
             this.$processPaymentChangeTimers = [];
+            this.$showOrderSuccessInfoPending = false;
+            this.$EmbeddedOrderProcess = null;
 
             this.$PayToOrderBtn = null;
             this.ScrollToPaymentBtn = null;
@@ -69,6 +73,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 onImport: this.$onImport,
                 onInject: this.$onInject
             });
+
+            // this.addEvent('showOrderSuccessInfo', () => {
+            //     console.debug('SimpleCheckout: showOrderSuccessInfo fired', {
+            //         orderHash: this.getAttribute('orderHash')
+            //     });
+            // });
 
             QUI.addEvent('onQuiqqerCurrencyChange', (Instance, curr) => {
                 this.setCurrency(curr.code);
@@ -597,6 +607,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                         this.fireEvent('orderSuccessful', [this]);
                         const scripts = this.$extractScripts(result.html);
+                        this.$showOrderSuccessInfoPending = !!this.getAttribute('showOrderSuccessInfo');
 
                         if (!this.getAttribute('showOrderSuccessInfo')) {
                             scripts.forEach((Script) => {
@@ -621,6 +632,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                 QUI.parse(Container).then(() => {
                                     return this.$initProcessPaymentChange();
                                 }).then(() => {
+                                    return this.$initEmbeddedOrderProcess();
+                                }).then(() => {
                                     moofx(Container).animate({
                                         opacity: 1
                                     }, {
@@ -635,7 +648,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                                 });
                                             }
 
-                                            this.fireEvent('showOrderSuccessInfo', [this]);
+                                            if (result.step !== 'Processing' && this.$showOrderSuccessInfoPending) {
+                                                this.$showOrderSuccessInfoPending = false;
+                                                this.fireEvent('showOrderSuccessInfo', [this]);
+                                            }
                                             resolve();
                                         }
                                     });
@@ -724,6 +740,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         QUI.parse(Container).then(() => {
                             return this.$initProcessPaymentChange();
                         }).then(() => {
+                            return this.$initEmbeddedOrderProcess();
+                        }).then(() => {
                             moofx(Container).animate({
                                 opacity: 1
                             }, {
@@ -743,6 +761,49 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }
                 });
             });
+        },
+
+        $initEmbeddedOrderProcess: function () {
+            const OrderProcessNode = this.getElm().getElement(
+                '[data-qui="package/quiqqer/order/bin/frontend/controls/OrderProcess"]'
+            );
+
+            if (!OrderProcessNode) {
+                this.$EmbeddedOrderProcess = null;
+                return Promise.resolve();
+            }
+
+            return this.$getControl(OrderProcessNode).then((OrderProcess) => {
+                if (!OrderProcess || this.$EmbeddedOrderProcess === OrderProcess) {
+                    return;
+                }
+
+                this.$EmbeddedOrderProcess = OrderProcess;
+                OrderProcess.addEvent('change', this.$maybeFireShowOrderSuccessInfo);
+                OrderProcess.addEvent('stepLoaded', this.$maybeFireShowOrderSuccessInfo);
+                this.$maybeFireShowOrderSuccessInfo(OrderProcess);
+            });
+        },
+
+        $maybeFireShowOrderSuccessInfo: function (OrderProcess) {
+            if (!this.$showOrderSuccessInfoPending) {
+                return;
+            }
+
+            const Process = OrderProcess || this.$EmbeddedOrderProcess;
+
+            if (!Process) {
+                return;
+            }
+
+            const current = Process.getAttribute('current');
+
+            if (!current || String(current).toLowerCase() === 'processing') {
+                return;
+            }
+
+            this.$showOrderSuccessInfoPending = false;
+            this.fireEvent('showOrderSuccessInfo', [this]);
         },
 
         $initProcessPaymentChange: function () {
