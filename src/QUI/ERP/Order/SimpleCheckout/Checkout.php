@@ -360,6 +360,21 @@ class Checkout extends QUI\Control
         ]);
 
         $result = $OrderProcess->create();
+
+        if (
+            $Order instanceof OrderInProcess
+            && $Order->getPayment()
+            && !$Order->getPayment()->isSuccessful($Order->getUUID())
+        ) {
+            $Engine = QUI::getTemplateManager()->getEngine();
+            $Engine->assign([
+                'currentPaymentId' => $Order->getPayment()->getId(),
+                'payments' => $this->getPayments()
+            ]);
+
+            $result .= $Engine->fetch(dirname(__FILE__) . '/ProcessPaymentChange.html');
+        }
+
         $current = $OrderProcess->getCurrentStep()->getName();
 
         return [

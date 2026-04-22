@@ -29,9 +29,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         $onImport: function() {
             this.$registerEvents();
 
+            const LoaderTarget = this.getElm().getParent('.simpleCheckout-details-section') || this.getElm();
+
             this.$Loader = new Element('span', {
                 'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
-            }).inject(this.getElm().getParent('.simpleCheckout-details-section'));
+            }).inject(LoaderTarget);
 
             this.$Loader.style.display = 'none';
         },

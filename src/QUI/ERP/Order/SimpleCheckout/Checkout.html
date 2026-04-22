@@ -109,6 +109,7 @@
             {template_event name="quiqqer::simple::order::basket::middle" Order=$Order}
 
             <div class="quiqqer-simple-checkout-basket__pay">
+                {if $hasMandatoryLinks}
                 {if $mandatoryLinksDisplay === 'multiple_checkboxes'}
                 <div class="quiqqer-order-step-checkout-notice">
                     {foreach $checkboxes as $checkbox}
@@ -125,6 +126,7 @@
                         {$acceptText}
                     </label>
                 </div>
+                {/if}
                 {/if}
 
                 <button name="pay" class="btn btn-primary btn-lg btn-large">
