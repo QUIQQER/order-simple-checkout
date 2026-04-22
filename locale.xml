@@ -101,6 +101,10 @@
             <de><![CDATA[Bitte geben Sie Ihre Adresse an, um verfügbare Zahlungsmethoden angezeigt zu bekommen.]]></de>
             <en><![CDATA[Please enter your address to view available payment methods.]]></en>
         </locale>
+        <locale name="processPaymentChange.button">
+            <de><![CDATA[Zahlungsweise ändern]]></de>
+            <en><![CDATA[Change payment method]]></en>
+        </locale>
 
         <locale name="ordering.btn.showAllProductsText.open">
             <de><![CDATA[Alle Produkte anzeigen ([max]) <i class="fa-solid fa-chevron-down"></i>]]></de>
