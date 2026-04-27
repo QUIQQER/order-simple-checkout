@@ -33,7 +33,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             '$toggleProcessPaymentChange',
             '$onProcessPaymentChange',
             '$initEmbeddedOrderProcess',
-            '$maybeFireShowOrderSuccessInfo'
+            '$maybeFireShowOrderSuccessInfo',
+            '$removeProcessPaymentChange'
         ],
 
         options: {
@@ -685,6 +686,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                             }
 
                                             if (result.step !== 'Processing' && this.$showOrderSuccessInfoPending) {
+                                                this.$removeProcessPaymentChange();
                                                 this.$showOrderSuccessInfoPending = false;
                                                 this.fireEvent('showOrderSuccessInfo', [this]);
                                             }
@@ -838,8 +840,17 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return;
             }
 
+            this.$removeProcessPaymentChange();
             this.$showOrderSuccessInfoPending = false;
             this.fireEvent('showOrderSuccessInfo', [this]);
+        },
+
+        $removeProcessPaymentChange: function () {
+            const Wrapper = this.getElm().querySelector('.quiqqer-simple-checkout-process-payment-change');
+
+            if (Wrapper && Wrapper.parentNode) {
+                Wrapper.parentNode.removeChild(Wrapper);
+            }
         },
 
         $initProcessPaymentChange: function () {
