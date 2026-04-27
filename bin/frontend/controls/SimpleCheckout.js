@@ -27,6 +27,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             'update',
             '$onInject',
             '$onImport',
+            '$startInitialLoad',
             'toggleAllProducts',
             'scrollToPayment',
             '$toggleProcessPaymentChange',
@@ -150,12 +151,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.Loader.show();
 
-            this.$BasketLoader = new Element('span', {
-                'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
-            }).inject(
-                this.getElm().getElement('.quiqqer-simple-checkout-basket')
-            );
+            this.$waitForElement('.quiqqer-simple-checkout-basket').then((BasketNode) => {
+                this.$BasketLoader = new Element('span', {
+                    'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
+                }).inject(BasketNode);
 
+                this.$startInitialLoad();
+            }).catch((err) => {
+                console.error(err);
+                this.Loader.hide();
+            });
+        },
+
+        $startInitialLoad: function () {
             const urlParams = new URLSearchParams(window.location.search);
             const product = urlParams.get('product');
             let loaded;
@@ -215,6 +223,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 ]).animate({
                     opacity: 1
                 });
+            }).catch((err) => {
+                console.error(err);
+                this.Loader.hide();
             });
         },
 
@@ -462,6 +473,31 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     orderHash: this.getAttribute('orderHash'),
                     settings: JSON.encode(settings)
                 });
+            });
+        },
+
+        $waitForElement: function (selector, timeout) {
+            const waitTimeout = typeof timeout === 'number' ? timeout : 3000;
+
+            return new Promise((resolve, reject) => {
+                const start = Date.now();
+                const check = () => {
+                    const Node = this.getElm().getElement(selector);
+
+                    if (Node) {
+                        resolve(Node);
+                        return;
+                    }
+
+                    if (Date.now() - start >= waitTimeout) {
+                        reject(new Error('Element not found: ' + selector));
+                        return;
+                    }
+
+                    window.requestAnimationFrame(check);
+                };
+
+                check();
             });
         },
 
