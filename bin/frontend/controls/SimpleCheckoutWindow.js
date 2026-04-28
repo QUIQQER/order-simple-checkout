@@ -81,7 +81,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         this.Loader.hide();
                     },
                     onOrderStart: () => {
-                        this.Loader.show();
+                        // nicht machen -> sonst ewig loader
+                        // this.Loader.show();
                     },
                     onOrderSuccessful: () => {
                         new Fx.Scroll(CheckoutWrapper).toTop();

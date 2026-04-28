@@ -27,12 +27,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             'update',
             '$onInject',
             '$onImport',
+            '$startInitialLoad',
             'toggleAllProducts',
             'scrollToPayment',
             '$toggleProcessPaymentChange',
             '$onProcessPaymentChange',
             '$initEmbeddedOrderProcess',
-            '$maybeFireShowOrderSuccessInfo'
+            '$maybeFireShowOrderSuccessInfo',
+            '$removeProcessPaymentChange'
         ],
 
         options: {
@@ -150,12 +152,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.Loader.show();
 
-            this.$BasketLoader = new Element('span', {
-                'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
-            }).inject(
-                this.getElm().getElement('.quiqqer-simple-checkout-basket')
-            );
+            this.$waitForElement('.quiqqer-simple-checkout-basket').then((BasketNode) => {
+                this.$BasketLoader = new Element('span', {
+                    'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
+                }).inject(BasketNode);
 
+                this.$startInitialLoad();
+            }).catch((err) => {
+                console.error(err);
+                this.Loader.hide();
+            });
+        },
+
+        $startInitialLoad: function () {
             const urlParams = new URLSearchParams(window.location.search);
             const product = urlParams.get('product');
             let loaded;
@@ -215,6 +224,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 ]).animate({
                     opacity: 1
                 });
+            }).catch((err) => {
+                console.error(err);
+                this.Loader.hide();
             });
         },
 
@@ -465,6 +477,31 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
+        $waitForElement: function (selector, timeout) {
+            const waitTimeout = typeof timeout === 'number' ? timeout : 3000;
+
+            return new Promise((resolve, reject) => {
+                const start = Date.now();
+                const check = () => {
+                    const Node = this.getElm().getElement(selector);
+
+                    if (Node) {
+                        resolve(Node);
+                        return;
+                    }
+
+                    if (Date.now() - start >= waitTimeout) {
+                        reject(new Error('Element not found: ' + selector));
+                        return;
+                    }
+
+                    window.requestAnimationFrame(check);
+                };
+
+                check();
+            });
+        },
+
         setCurrency: function (currency) {
             return new Promise((resolve, reject) => {
                 QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_setCurrency', resolve, {
@@ -649,6 +686,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                             }
 
                                             if (result.step !== 'Processing' && this.$showOrderSuccessInfoPending) {
+                                                this.$removeProcessPaymentChange();
                                                 this.$showOrderSuccessInfoPending = false;
                                                 this.fireEvent('showOrderSuccessInfo', [this]);
                                             }
@@ -802,8 +840,17 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return;
             }
 
+            this.$removeProcessPaymentChange();
             this.$showOrderSuccessInfoPending = false;
             this.fireEvent('showOrderSuccessInfo', [this]);
+        },
+
+        $removeProcessPaymentChange: function () {
+            const Wrapper = this.getElm().querySelector('.quiqqer-simple-checkout-process-payment-change');
+
+            if (Wrapper && Wrapper.parentNode) {
+                Wrapper.parentNode.removeChild(Wrapper);
+            }
         },
 
         $initProcessPaymentChange: function () {
