@@ -277,7 +277,7 @@ QUI::getAjax()->registerFunction(
             }
         }
 
-        if ($Order && ($orderDirty || $userDirty || $addressDirty)) {
+        if ($Order && ($orderDirty || $userDirty)) {
             $Order->setData('sc_needs_recalc', 1);
             $Order->save();
         }
