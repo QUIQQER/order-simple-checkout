@@ -113,7 +113,7 @@ class Checkout extends QUI\Control
                 'limit' => 1
             ]);
 
-            if (!empty($basketSites)) {
+            if (is_array($basketSites) && isset($basketSites[0])) {
                 $BasketSite = $basketSites[0];
             }
         }
@@ -452,12 +452,15 @@ class Checkout extends QUI\Control
                 $OrderInstance = null;
 
                 foreach ($result as $entry) {
-                    if ($entry && in_array(OrderInterface::class, class_implements($entry))) {
+                    if ($entry && in_array(OrderInterface::class, class_implements($entry) ?: [], true)) {
                         $OrderInstance = $entry;
                     }
                 }
 
-                if ($OrderInstance && in_array(OrderInterface::class, class_implements($OrderInstance))) {
+                if (
+                    $OrderInstance
+                    && in_array(OrderInterface::class, class_implements($OrderInstance) ?: [], true)
+                ) {
                     return $OrderInstance;
                 }
             }

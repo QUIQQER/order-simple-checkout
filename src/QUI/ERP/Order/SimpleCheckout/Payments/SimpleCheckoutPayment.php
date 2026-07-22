@@ -51,6 +51,11 @@ class SimpleCheckoutPayment extends BasePayment
         ]);
 
         $baseFile = (new \ReflectionClass(BasePayment::class))->getFileName();
+
+        if ($baseFile === false) {
+            throw new QUI\Exception('Payment template path is not available.');
+        }
+
         return $Engine->fetch(dirname($baseFile) . '/Payment.html');
     }
 }
