@@ -7,7 +7,7 @@ use QUI\ERP\Order\AbstractOrder;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\OrderInterface;
-use QUI\ERP\Order\Settings;
+use QUI\ERP\Order\Settings as OrderSettings;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
@@ -53,8 +53,8 @@ class Checkout extends QUI\Control
         // default
         if ($this->getAttribute('disableProductLinks') === 'default') {
             try {
-                $defaultValue = (bool)QUI::getPackage('quiqqer/order-simple-checkout')
-                    ->getConfig()->getValue('orderSimpleCheckout', 'disableProductLinks');
+                $defaultValue = (bool)Settings::getConfig()
+                    ->getValue('orderSimpleCheckout', 'disableProductLinks');
 
                 $this->setAttribute('disableProductLinks', $defaultValue);
             } catch (QUI\Exception) {
@@ -284,7 +284,7 @@ class Checkout extends QUI\Control
             );
         }
 
-        $failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+        $failedPaymentProcedure = OrderSettings::getInstance()->get('order', 'failedPaymentProcedure');
         $Payment = $OrderInProcess->getPayment();
 
         // In "execute" mode the order is created before the gateway step, even if payment may fail later.
