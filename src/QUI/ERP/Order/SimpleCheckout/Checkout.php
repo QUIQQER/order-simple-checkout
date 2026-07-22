@@ -120,6 +120,29 @@ class Checkout extends QUI\Control
             }
         }
 
+        [$showDelivery, $showShipping, $showBillingAddress] = $this->getStepVisibility($isShippingInstalled);
+
+        $Engine->assign([
+            'this' => $this,
+            'Order' => $this->getOrder(),
+            'Basket' => new Basket($this),
+            'BasketForHeader' => $BasketForHeader,
+            'User' => $this->getUser(),
+            'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null,
+            'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
+            'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
+            'Payment' => new CheckoutPayment($this),
+            'BasketSite' => $BasketSite
+        ]);
+
+        return $Engine->fetch($template);
+    }
+
+    /**
+     * @return array{bool, bool, bool}
+     */
+    private function getStepVisibility(bool $isShippingInstalled): array
+    {
         $showDelivery = true;
         $showShipping = true;
         $showBillingAddress = true;
@@ -134,20 +157,7 @@ class Checkout extends QUI\Control
             [$this, &$showDelivery, &$showShipping, &$showBillingAddress]
         );
 
-        $Engine->assign([
-            'this' => $this,
-            'Order' => $this->getOrder(),
-            'Basket' => new Basket($this),
-            'BasketForHeader' => $BasketForHeader,
-            'User' => $this->getUser(),
-            'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null, // @phpstan-ignore-line
-            'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
-            'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
-            'Payment' => new CheckoutPayment($this),
-            'BasketSite' => $BasketSite
-        ]);
-
-        return $Engine->fetch($template);
+        return [$showDelivery, $showShipping, $showBillingAddress];
     }
 
     /**
