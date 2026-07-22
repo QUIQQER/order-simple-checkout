@@ -13,6 +13,10 @@ use function json_encode;
 
 class Events
 {
+    /**
+     * @param Edit $Site
+     * @return void
+     */
     public static function siteCreateChildEnd(Edit $Site): void
     {
         if ($Site->getAttribute('type') !== 'quiqqer/order-simple-checkout:types/productLandingPage') {
@@ -96,6 +100,18 @@ class Events
     }
 
     /**
+     * @param Edit $Site
+     * @return list<array{
+     *     attributes: array{
+     *         type: string,
+     *         title: string,
+     *         description: string,
+     *         content: string,
+     *         areas: string
+     *     },
+     *     settings: array<string, mixed>,
+     *     assignedBrickArea: string
+     * }>
      * @throws Exception
      */
     public static function getDemoBricksData(Edit $Site): array

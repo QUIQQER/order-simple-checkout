@@ -29,7 +29,7 @@ use function in_array;
 class Checkout extends QUI\Control
 {
     /**
-     * @param array $attributes
+     * @param array<string, mixed> $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -206,7 +206,7 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function gatherMissingOrderDetails(): array
     {
@@ -260,7 +260,14 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * @return mixed[]
+     * @return array{
+     *     html: string,
+     *     step: string,
+     *     url: string,
+     *     hash: string,
+     *     orderHash: string,
+     *     productCount: int
+     * }
      *
      * @throws QUI\ERP\Order\Exception
      * @throws QUI\Permissions\Exception
@@ -325,7 +332,14 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * @return mixed[]
+     * @return array{
+     *     html: string,
+     *     step: string,
+     *     url: string,
+     *     hash: string,
+     *     orderHash: string,
+     *     productCount: int
+     * }
      * @throws QUI\ERP\Order\Basket\Exception
      * @throws \Exception
      */

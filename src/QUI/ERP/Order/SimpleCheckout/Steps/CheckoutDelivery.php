@@ -26,7 +26,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      * Constructor method for the SimpleCheckoutDelivery class.
      *
      * @param Checkout $Checkout
-     * @param mixed[] $attributes
+     * @param array<string, mixed> $attributes
      * @return void
      */
     public function __construct(Checkout $Checkout, array $attributes = [])
