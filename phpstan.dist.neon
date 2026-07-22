@@ -12,6 +12,8 @@ parameters:
         - types
     bootstrapFiles:
         - tests/phpstan-bootstrap.php
+    scanFiles:
+        - tests/phpstan-stubs/Shipping.stub
     treatPhpDocTypesAsCertain: false
     tipsOfTheDay: false
     customRulesetUsed: true

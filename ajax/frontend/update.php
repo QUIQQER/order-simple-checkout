@@ -191,9 +191,12 @@ QUI::getAjax()->registerFunction(
             }
         }
 
-        if (!empty($orderData['shipping']) && QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
+        if (
+            !empty($orderData['shipping'])
+            && QUI::getPackageManager()->isInstalled('quiqqer/shipping')
+        ) {
             if ($Order) {
-                $currentShippingId = $Order->getShipping()?->getId(); // @phpstan-ignore-line
+                $currentShippingId = $Order->getShipping()?->getId();
                 $newShippingId = (int)$orderData['shipping'];
 
                 if ($currentShippingId !== $newShippingId) {

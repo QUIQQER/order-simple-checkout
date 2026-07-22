@@ -106,15 +106,17 @@ class Checkout extends QUI\Control
         if ($this->getAttribute('showBasketLink')) {
             $Project = QUI::getRewrite()->getProject();
 
-            $basketSites = $Project->getSites([
-                'where' => [
-                    'type' => 'quiqqer/order:types/shoppingCart'
-                ],
-                'limit' => 1
-            ]);
+            if ($Project) {
+                $basketSites = $Project->getSites([
+                    'where' => [
+                        'type' => 'quiqqer/order:types/shoppingCart'
+                    ],
+                    'limit' => 1
+                ]);
 
-            if (is_array($basketSites) && isset($basketSites[0])) {
-                $BasketSite = $basketSites[0];
+                if (is_array($basketSites) && isset($basketSites[0])) {
+                    $BasketSite = $basketSites[0];
+                }
             }
         }
 

@@ -34,6 +34,9 @@
     "quiqqer/gallery": "^2.2.2",
     "quiqqer/presentation-bricks": "^2.3"
   },
+  "suggest": {
+    "quiqqer/shipping": "Enables shipping selection during checkout."
+  },
   "autoload": {
     "psr-4": {
       "QUI\\ERP\\Order\\SimpleCheckout\\": "src/QUI/ERP/Order/SimpleCheckout"

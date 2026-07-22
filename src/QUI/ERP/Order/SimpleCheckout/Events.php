@@ -30,6 +30,11 @@ class Events
         $BrickManager = QUI\Bricks\Manager::init();
         $Project = $Site->getProject();
 
+        if ($BrickManager === null) {
+            QUI\System\Log::addError('Brick manager is not available.');
+            return;
+        }
+
         foreach (self::getDemoBricksData($Site) as $data) {
             $brickDataToSave = [
                 'attributes' => $data['attributes']
@@ -151,7 +156,8 @@ class Events
             }
         }
 
-        $placeholderImage = $PlaceholdersImage->getUrl();
+        $placeholderImage = $PlaceholdersImage?->getUrl()
+            ?? URL_OPT_DIR . 'quiqqer/order-simple-checkout/bin/images/demo/placeholder-image-vertical-grey.png';
 
         return [
             [
