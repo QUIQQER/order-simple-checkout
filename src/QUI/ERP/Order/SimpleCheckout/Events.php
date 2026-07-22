@@ -2,7 +2,6 @@
 
 namespace QUI\ERP\Order\SimpleCheckout;
 
-use phpseclib3\File\ASN1\Maps\NameConstraints;
 use QUI;
 use QUI\Exception;
 use QUI\Projects\Site\Edit;
