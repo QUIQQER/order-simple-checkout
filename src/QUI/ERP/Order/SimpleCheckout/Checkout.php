@@ -177,11 +177,11 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
-            if ($validateAddress) {
-                if (!$Order) {
-                    return false;
-                }
+            if (!$Order) {
+                return false;
+            }
 
+            if ($validateAddress) {
                 QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
                     $Order->getInvoiceAddress()
                 );

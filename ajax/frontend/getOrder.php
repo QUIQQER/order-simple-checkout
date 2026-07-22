@@ -28,6 +28,13 @@ QUI::getAjax()->registerFunction(
             $Order = $Checkout->getOrder();
         }
 
+        if ($Order === null) {
+            throw new QUI\ERP\Order\Exception(
+                QUI::getLocale()->get('quiqqer/order', 'exception.order.not.found'),
+                QUI\ERP\Order\Handler::ERROR_ORDER_NOT_FOUND
+            );
+        }
+
         if ($Order->getCustomer()->getUUID() !== $User->getUUID()) {
             throw new QUI\Exception(['quiqqer/order', 'exception.no.permission.for.this.order']);
         }

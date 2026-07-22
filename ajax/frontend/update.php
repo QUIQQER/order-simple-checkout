@@ -206,7 +206,7 @@ QUI::getAjax()->registerFunction(
             }
         }
 
-        if (isset($orderData['businessType'])) {
+        if (isset($orderData['businessType']) && $Order) {
             try {
                 $Customer = $Order->getCustomer();
                 $User = QUI::getUsers()->get($Customer->getUUID());
@@ -251,7 +251,7 @@ QUI::getAjax()->registerFunction(
                     $User->save(QUI::getUsers()->getSystemUser());
                 }
 
-                if ($Order && $userDirty) {
+                if ($userDirty) {
                     $Order->setCustomer($User);
                     $orderDirty = true;
                 }
