@@ -3,32 +3,48 @@
   "type": "quiqqer-module",
   "description": "A simple checkout",
   "license": [
-    "GPL-3.0+",
+    "GPL-3.0-or-later",
     "PCSG QEL-1.0"
   ],
+  "homepage": "https://www.quiqqer.com",
   "authors": [
     {
-      "name": "Henning Leutz",
-      "email": "support@pcsg.de",
-      "homepage": "https://www.pcsg.de",
-      "role": "Developer"
+      "name": "PCSG - Computer & Internet Service OHG",
+      "email": "info@quiqqer.com",
+      "homepage": "https://www.quiqqer.com",
+      "role": "Maintainer"
     }
   ],
   "support": {
-    "email": "support@pcsg.de",
-    "url": "https://www.pcsg.de"
+    "email": "info@quiqqer.com",
+    "issues": "https://dev.quiqqer.com/quiqqer/order-simple-checkout/-/issues",
+    "source": "https://dev.quiqqer.com/quiqqer/order-simple-checkout"
   },
   "require": {
-    "php": "^8",
-    "quiqqer/order": "^2.10.13",
-    "quiqqer/frontend-users": "^2",
-    "quiqqer/gallery": "^2.1",
-    "quiqqer/presentation-bricks": "^2",
-    "quiqqer/order-guestorder": "^2"
+    "php": "^8.2",
+    "quiqqer/core": "^2.25.1",
+    "quiqqer/erp": "^3.15 || ^4.0.3",
+    "quiqqer/order": "^2.10.17",
+    "quiqqer/order-guestorder": "^2.5.3",
+    "quiqqer/payments": "^3.1.4 || ^4",
+    "quiqqer/products": "^2.7.3",
+    "quiqqer/currency": "^2.3.2",
+    "quiqqer/frontend-users": "^2.13.4",
+    "quiqqer/bricks": "^2.28.2",
+    "quiqqer/gallery": "^2.2.2",
+    "quiqqer/presentation-bricks": "^2.3"
+  },
+  "suggest": {
+    "quiqqer/shipping": "Enables shipping selection during checkout."
   },
   "autoload": {
     "psr-4": {
       "QUI\\ERP\\Order\\SimpleCheckout\\": "src/QUI/ERP/Order/SimpleCheckout"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "QUI\\ERP\\Order\\SimpleCheckout\\Tests\\": "tests/"
     }
   },
   "scripts": {

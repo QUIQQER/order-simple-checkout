@@ -2,7 +2,6 @@
 
 namespace QUI\ERP\Order\SimpleCheckout;
 
-use phpseclib3\File\ASN1\Maps\NameConstraints;
 use QUI;
 use QUI\Exception;
 use QUI\Projects\Site\Edit;
@@ -14,6 +13,10 @@ use function json_encode;
 
 class Events
 {
+    /**
+     * @param Edit $Site
+     * @return void
+     */
     public static function siteCreateChildEnd(Edit $Site): void
     {
         if ($Site->getAttribute('type') !== 'quiqqer/order-simple-checkout:types/productLandingPage') {
@@ -26,6 +29,11 @@ class Events
 
         $BrickManager = QUI\Bricks\Manager::init();
         $Project = $Site->getProject();
+
+        if ($BrickManager === null) {
+            QUI\System\Log::addError('Brick manager is not available.');
+            return;
+        }
 
         foreach (self::getDemoBricksData($Site) as $data) {
             $brickDataToSave = [
@@ -97,6 +105,18 @@ class Events
     }
 
     /**
+     * @param Edit $Site
+     * @return list<array{
+     *     attributes: array{
+     *         type: string,
+     *         title: string,
+     *         description: string,
+     *         content: string,
+     *         areas: string
+     *     },
+     *     settings: array<string, mixed>,
+     *     assignedBrickArea: string
+     * }>
      * @throws Exception
      */
     public static function getDemoBricksData(Edit $Site): array
@@ -136,7 +156,8 @@ class Events
             }
         }
 
-        $placeholderImage = $PlaceholdersImage->getUrl();
+        $placeholderImage = $PlaceholdersImage?->getUrl()
+            ?? URL_OPT_DIR . 'quiqqer/order-simple-checkout/bin/images/demo/placeholder-image-vertical-grey.png';
 
         return [
             [

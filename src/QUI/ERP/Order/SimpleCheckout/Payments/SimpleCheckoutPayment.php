@@ -21,6 +21,11 @@ class SimpleCheckoutPayment extends BasePayment
         $User = QUI::getUserBySession();
 
         $Order = $this->getOrder();
+
+        if ($Order === null) {
+            throw new QUI\Exception('No order is available for the payment step.');
+        }
+
         $needsRecalc = $Order->getDataEntry('sc_needs_recalc');
 
         if ($needsRecalc === null || (int)$needsRecalc === 1) {
@@ -51,6 +56,11 @@ class SimpleCheckoutPayment extends BasePayment
         ]);
 
         $baseFile = (new \ReflectionClass(BasePayment::class))->getFileName();
+
+        if ($baseFile === false) {
+            throw new QUI\Exception('Payment template path is not available.');
+        }
+
         return $Engine->fetch(dirname($baseFile) . '/Payment.html');
     }
 }

@@ -23,7 +23,7 @@ class CheckoutBillingAddress extends QUI\Control implements CheckoutStepInterfac
      * Constructor method for the SimpleCheckoutDelivery class.
      *
      * @param Checkout $Checkout
-     * @param mixed[] $attributes
+     * @param array<string, mixed> $attributes
      * @return void
      */
     public function __construct(Checkout $Checkout, array $attributes = [])
