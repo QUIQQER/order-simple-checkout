@@ -1,0 +1,41 @@
+<?php
+
+namespace QUI\ERP\Shipping\Api {
+    interface ShippingInterface
+    {
+    }
+}
+
+namespace QUI\ERP\Shipping\Types {
+    class ShippingEntry implements \QUI\ERP\Shipping\Api\ShippingInterface
+    {
+        public function getId(): int|string
+        {
+        }
+    }
+}
+
+namespace QUI\ERP\Shipping {
+    class Shipping
+    {
+        public static function getInstance(): self
+        {
+        }
+
+        public function getShippingEntry(int|string $shippingId): Types\ShippingEntry
+        {
+        }
+    }
+}
+
+namespace QUI\ERP\Shipping\Order {
+    class Shipping
+    {
+        /**
+         * @param array<string, mixed> $attributes
+         */
+        public function __construct(array $attributes = [])
+        {
+        }
+    }
+}

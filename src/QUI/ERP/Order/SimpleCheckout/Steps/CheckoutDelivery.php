@@ -26,7 +26,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
      * Constructor method for the SimpleCheckoutDelivery class.
      *
      * @param Checkout $Checkout
-     * @param mixed[] $attributes
+     * @param array<string, mixed> $attributes
      * @return void
      */
     public function __construct(Checkout $Checkout, array $attributes = [])
@@ -165,7 +165,7 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         $Address = $Order?->getInvoiceAddress();
         $attributes = $Address?->getAttributes();
 
-        $attributes = array_filter($attributes, function ($value) {
+        $attributes = array_filter($attributes ?? [], function ($value) {
             if (!$value || is_array($value)) {
                 return false;
             }

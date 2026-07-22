@@ -63,6 +63,10 @@ QUI::getAjax()->registerFunction(
             $Address = $User->getStandardAddress();
         }
 
+        if ($Address === null) {
+            throw new QUI\Exception('The required user address is unavailable.');
+        }
+
         $erpAddressData['uuid'] = $Address->getUUID();
         $erpAddressData['id'] = $Address->getId();
         $ErpAddress = new Address($erpAddressData);
@@ -187,9 +191,12 @@ QUI::getAjax()->registerFunction(
             }
         }
 
-        if (!empty($orderData['shipping']) && QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
+        if (
+            !empty($orderData['shipping'])
+            && QUI::getPackageManager()->isInstalled('quiqqer/shipping')
+        ) {
             if ($Order) {
-                $currentShippingId = $Order->getShipping()?->getId(); // @phpstan-ignore-line
+                $currentShippingId = $Order->getShipping()?->getId();
                 $newShippingId = (int)$orderData['shipping'];
 
                 if ($currentShippingId !== $newShippingId) {
@@ -206,7 +213,7 @@ QUI::getAjax()->registerFunction(
             }
         }
 
-        if (isset($orderData['businessType'])) {
+        if (isset($orderData['businessType']) && $Order) {
             try {
                 $Customer = $Order->getCustomer();
                 $User = QUI::getUsers()->get($Customer->getUUID());
@@ -251,7 +258,7 @@ QUI::getAjax()->registerFunction(
                     $User->save(QUI::getUsers()->getSystemUser());
                 }
 
-                if ($Order && $userDirty) {
+                if ($userDirty) {
                     $Order->setCustomer($User);
                     $orderDirty = true;
                 }

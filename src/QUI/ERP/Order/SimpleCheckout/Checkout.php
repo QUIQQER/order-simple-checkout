@@ -7,7 +7,7 @@ use QUI\ERP\Order\AbstractOrder;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\OrderInterface;
-use QUI\ERP\Order\Settings;
+use QUI\ERP\Order\Settings as OrderSettings;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
@@ -29,7 +29,7 @@ use function in_array;
 class Checkout extends QUI\Control
 {
     /**
-     * @param array $attributes
+     * @param array<string, mixed> $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -53,8 +53,8 @@ class Checkout extends QUI\Control
         // default
         if ($this->getAttribute('disableProductLinks') === 'default') {
             try {
-                $defaultValue = (bool)QUI::getPackage('quiqqer/order-simple-checkout')
-                    ->getConfig()->getValue('orderSimpleCheckout', 'disableProductLinks');
+                $defaultValue = (bool)Settings::getConfig()
+                    ->getValue('orderSimpleCheckout', 'disableProductLinks');
 
                 $this->setAttribute('disableProductLinks', $defaultValue);
             } catch (QUI\Exception) {
@@ -106,18 +106,43 @@ class Checkout extends QUI\Control
         if ($this->getAttribute('showBasketLink')) {
             $Project = QUI::getRewrite()->getProject();
 
-            $basketSites = $Project->getSites([
-                'where' => [
-                    'type' => 'quiqqer/order:types/shoppingCart'
-                ],
-                'limit' => 1
-            ]);
+            if ($Project) {
+                $basketSites = $Project->getSites([
+                    'where' => [
+                        'type' => 'quiqqer/order:types/shoppingCart'
+                    ],
+                    'limit' => 1
+                ]);
 
-            if (!empty($basketSites)) {
-                $BasketSite = $basketSites[0];
+                if (is_array($basketSites) && isset($basketSites[0])) {
+                    $BasketSite = $basketSites[0];
+                }
             }
         }
 
+        [$showDelivery, $showShipping, $showBillingAddress] = $this->getStepVisibility($isShippingInstalled);
+
+        $Engine->assign([
+            'this' => $this,
+            'Order' => $this->getOrder(),
+            'Basket' => new Basket($this),
+            'BasketForHeader' => $BasketForHeader,
+            'User' => $this->getUser(),
+            'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null,
+            'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
+            'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
+            'Payment' => new CheckoutPayment($this),
+            'BasketSite' => $BasketSite
+        ]);
+
+        return $Engine->fetch($template);
+    }
+
+    /**
+     * @return array{bool, bool, bool}
+     */
+    private function getStepVisibility(bool $isShippingInstalled): array
+    {
         $showDelivery = true;
         $showShipping = true;
         $showBillingAddress = true;
@@ -132,20 +157,7 @@ class Checkout extends QUI\Control
             [$this, &$showDelivery, &$showShipping, &$showBillingAddress]
         );
 
-        $Engine->assign([
-            'this' => $this,
-            'Order' => $this->getOrder(),
-            'Basket' => new Basket($this),
-            'BasketForHeader' => $BasketForHeader,
-            'User' => $this->getUser(),
-            'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null, // @phpstan-ignore-line
-            'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
-            'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
-            'Payment' => new CheckoutPayment($this),
-            'BasketSite' => $BasketSite
-        ]);
-
-        return $Engine->fetch($template);
+        return [$showDelivery, $showShipping, $showBillingAddress];
     }
 
     /**
@@ -177,11 +189,11 @@ class Checkout extends QUI\Control
         try {
             $Order = $this->getOrder();
 
-            if ($validateAddress) {
-                if (!$Order) {
-                    return false;
-                }
+            if (!$Order) {
+                return false;
+            }
 
+            if ($validateAddress) {
                 QUI\ERP\Order\Controls\OrderProcess\CustomerData::validateAddress(
                     $Order->getInvoiceAddress()
                 );
@@ -206,7 +218,7 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function gatherMissingOrderDetails(): array
     {
@@ -260,7 +272,14 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * @return mixed[]
+     * @return array{
+     *     html: string,
+     *     step: string,
+     *     url: string,
+     *     hash: string,
+     *     orderHash: string,
+     *     productCount: int
+     * }
      *
      * @throws QUI\ERP\Order\Exception
      * @throws QUI\Permissions\Exception
@@ -277,7 +296,7 @@ class Checkout extends QUI\Control
             );
         }
 
-        $failedPaymentProcedure = Settings::getInstance()->get('order', 'failedPaymentProcedure');
+        $failedPaymentProcedure = OrderSettings::getInstance()->get('order', 'failedPaymentProcedure');
         $Payment = $OrderInProcess->getPayment();
 
         // In "execute" mode the order is created before the gateway step, even if payment may fail later.
@@ -325,7 +344,14 @@ class Checkout extends QUI\Control
     }
 
     /**
-     * @return mixed[]
+     * @return array{
+     *     html: string,
+     *     step: string,
+     *     url: string,
+     *     hash: string,
+     *     orderHash: string,
+     *     productCount: int
+     * }
      * @throws QUI\ERP\Order\Basket\Exception
      * @throws \Exception
      */
@@ -438,12 +464,15 @@ class Checkout extends QUI\Control
                 $OrderInstance = null;
 
                 foreach ($result as $entry) {
-                    if ($entry && in_array(OrderInterface::class, class_implements($entry))) {
+                    if ($entry && in_array(OrderInterface::class, class_implements($entry) ?: [], true)) {
                         $OrderInstance = $entry;
                     }
                 }
 
-                if ($OrderInstance && in_array(OrderInterface::class, class_implements($OrderInstance))) {
+                if (
+                    $OrderInstance
+                    && in_array(OrderInterface::class, class_implements($OrderInstance) ?: [], true)
+                ) {
                     return $OrderInstance;
                 }
             }

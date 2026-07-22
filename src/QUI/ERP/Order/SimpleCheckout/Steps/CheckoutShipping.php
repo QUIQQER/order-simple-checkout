@@ -14,7 +14,7 @@ class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
 
     /**
      * @param Checkout $Checkout
-     * @param mixed[] $attributes
+     * @param array<string, mixed> $attributes
      */
     public function __construct(Checkout $Checkout, array $attributes = [])
     {

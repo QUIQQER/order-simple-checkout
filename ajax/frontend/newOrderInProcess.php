@@ -38,7 +38,10 @@ QUI::getAjax()->registerFunction(
             } else {
                 $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout();
                 $OrderInProcess = $Checkout->getOrder();
-                $OrderInProcess->clear();
+
+                if ($OrderInProcess) {
+                    $OrderInProcess->clear();
+                }
             }
         } catch (Exception) {
         }
