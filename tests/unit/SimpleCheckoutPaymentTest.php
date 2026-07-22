@@ -10,6 +10,16 @@ use QUI\ERP\Order\SimpleCheckout\Payments\SimpleCheckoutPayment;
 
 final class SimpleCheckoutPaymentTest extends TestCase
 {
+    public function testPaymentBodyRequiresOrder(): void
+    {
+        $Payment = new SimpleCheckoutPayment();
+
+        $this->expectException(\QUI\Exception::class);
+        $this->expectExceptionMessage('No order is available for the payment step.');
+
+        $Payment->getBody();
+    }
+
     public function testPaymentBodyRecalculatesOrderOnlyWhenRequired(): void
     {
         $Order = $this->createMock(OrderInProcess::class);
