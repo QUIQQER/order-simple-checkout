@@ -63,6 +63,10 @@ QUI::getAjax()->registerFunction(
             $Address = $User->getStandardAddress();
         }
 
+        if ($Address === null) {
+            throw new QUI\Exception('The required user address is unavailable.');
+        }
+
         $erpAddressData['uuid'] = $Address->getUUID();
         $erpAddressData['id'] = $Address->getId();
         $ErpAddress = new Address($erpAddressData);
