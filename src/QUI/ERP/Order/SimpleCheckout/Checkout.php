@@ -98,7 +98,7 @@ class Checkout extends QUI\Control
         $BasketForHeader = new Basket($this);
         $BasketForHeader->setAttribute('basketForHeader', true);
 
-        $isShippingInstalled = QUI::getPackageManager()->isInstalled('quiqqer/shipping');
+        $isShippingAvailable = $this->isShippingAvailable();
 
         // Basket
         $BasketSite = null;
@@ -120,7 +120,7 @@ class Checkout extends QUI\Control
             }
         }
 
-        [$showDelivery, $showShipping, $showBillingAddress] = $this->getStepVisibility($isShippingInstalled);
+        [$showDelivery, $showShipping, $showBillingAddress] = $this->getStepVisibility($isShippingAvailable);
 
         $Engine->assign([
             'this' => $this,
@@ -141,13 +141,13 @@ class Checkout extends QUI\Control
     /**
      * @return array{bool, bool, bool}
      */
-    private function getStepVisibility(bool $isShippingInstalled): array
+    private function getStepVisibility(bool $isShippingAvailable): array
     {
         $showDelivery = true;
         $showShipping = true;
         $showBillingAddress = true;
 
-        if (!$isShippingInstalled) {
+        if (!$isShippingAvailable) {
             $showShipping = false;
             $showBillingAddress = false;
         }
@@ -169,9 +169,8 @@ class Checkout extends QUI\Control
     {
         $validateAddress = true;
         $validateShipping = true;
-        $isShippingInstalled = QUI::getPackageManager()->isInstalled('quiqqer/shipping');
 
-        if (!$isShippingInstalled) {
+        if (!$this->isShippingAvailable()) {
             $validateShipping = false;
         }
 
@@ -224,6 +223,7 @@ class Checkout extends QUI\Control
     {
         $missing = [];
         $Order = null;
+        $isShippingAvailable = $this->isShippingAvailable();
 
         // check address
         $addressRequired = true;
@@ -253,7 +253,7 @@ class Checkout extends QUI\Control
         if (!$Order) {
             $missing[] = 'payment';
 
-            if (QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
+            if ($isShippingAvailable) {
                 $missing[] = 'shipping';
             }
         } else {
@@ -263,12 +263,18 @@ class Checkout extends QUI\Control
                 $missing[] = 'payment';
             }
 
-            if (QUI::getPackageManager()->isInstalled('quiqqer/shipping') && !$Order->getShipping()) {
+            if ($isShippingAvailable && !$Order->getShipping()) {
                 $missing[] = 'shipping';
             }
         }
 
         return $missing;
+    }
+
+    private function isShippingAvailable(): bool
+    {
+        return QUI::getPackageManager()->isInstalled('quiqqer/shipping')
+            && class_exists('QUI\ERP\Shipping\Order\Shipping');
     }
 
     /**

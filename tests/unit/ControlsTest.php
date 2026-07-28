@@ -153,14 +153,17 @@ final class ControlsTest extends TestCase
         self::assertStringContainsString('order-simple-checkout-payment--info', $html);
     }
 
-    public function testShippingBodyIsEmptyWithoutShippingPackage(): void
+    public function testShippingBodyMatchesShippingAvailability(): void
     {
         $Checkout = $this->createStub(Checkout::class);
         $Checkout->method('getOrder')->willReturn(null);
 
         $html = (new CheckoutShipping($Checkout))->getBody();
 
-        if (\QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
+        if (
+            \QUI::getPackageManager()->isInstalled('quiqqer/shipping')
+            && class_exists('QUI\ERP\Shipping\Order\Shipping')
+        ) {
             self::assertStringContainsString('order-simple-checkout-shipping--info', $html);
 
             return;
