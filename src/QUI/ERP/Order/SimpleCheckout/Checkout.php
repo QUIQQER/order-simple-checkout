@@ -5,6 +5,7 @@ namespace QUI\ERP\Order\SimpleCheckout;
 use QUI;
 use QUI\ERP\Order\AbstractOrder;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
+use QUI\ERP\Order\Controls\OrderProcess\Finish;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\OrderInterface;
 use QUI\ERP\Order\Settings as OrderSettings;
@@ -376,16 +377,29 @@ class Checkout extends QUI\Control
             'orderHash' => $Order->getUUID(),
             'step' => 'Processing',
             'events' => [
-                // Simple checkout jumps directly into the payment gateway flow, so while payment is still not
-                // successful we keep only the Processing step and hide the normal checkout timeline steps.
+                // Simple checkout jumps directly into the payment gateway flow. Processing still requires
+                // the Finish step to initialize and render the selected payment provider.
                 'onQuiqqerOrderProcessStepsEnd' => function (
                     QUI\ERP\Order\OrderProcess $instance,
                     AbstractOrder $Order,
                     OrderProcessSteps $Steps
                 ) use ($processingStep) {
                     if ($Order->getPayment() && !$Order->getPayment()->isSuccessful($Order->getUUID())) {
+                        $Finish = null;
+
+                        foreach ($Steps as $Step) {
+                            if ($Step instanceof Finish) {
+                                $Finish = $Step;
+                                break;
+                            }
+                        }
+
                         $Steps->clear();
                         $Steps->append($processingStep);
+
+                        if ($Finish !== null) {
+                            $Steps->append($Finish);
+                        }
                     }
                 }
             ]
