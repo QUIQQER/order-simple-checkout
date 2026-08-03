@@ -48,6 +48,16 @@
     flex-wrap: wrap;
 }
 
+.quiqqer-simple-checkout--processing .quiqqer-simple-checkout-container {
+    flex-direction: column;
+}
+
+.quiqqer-simple-checkout--processing .quiqqer-simple-checkout-container > .quiqqer-order-ordering {
+    flex: 1 1 auto;
+    max-width: none;
+    width: 100%;
+}
+
 .quiqqer-simple-checkout-details,
 .quiqqer-simple-checkout-basket {
     flex: 1;

@@ -6,6 +6,7 @@ use QUI;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
 use QUI\ERP\Order\SimpleCheckout\CheckoutStepInterface;
 
+use function class_exists;
 use function dirname;
 
 class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
@@ -31,7 +32,10 @@ class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
 
     public function getBody(): string
     {
-        if (!QUI::getPackageManager()->isInstalled('quiqqer/shipping')) {
+        if (
+            !QUI::getPackageManager()->isInstalled('quiqqer/shipping')
+            || !class_exists('QUI\ERP\Shipping\Order\Shipping')
+        ) {
             return '';
         }
 

@@ -625,6 +625,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     // execute order
                     QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_orderWithCosts', (result) => {
                         const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
+
+                        if (result.step === 'Processing') {
+                            this.getElm().addClass('quiqqer-simple-checkout--processing');
+                        } else {
+                            this.getElm().removeClass('quiqqer-simple-checkout--processing');
+                        }
+
                         this.setAttribute('orderHash', result.orderHash);
                         this.$setAnchor();
 
