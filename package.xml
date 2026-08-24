@@ -8,6 +8,22 @@
             <locale group="quiqqer/order-simple-checkout" var="package.title"/>
         </description>
 
+        <capabilities schemaVersion="1">
+            <capability id="commerce.single-page-checkout">
+                <title>Single-page checkout</title>
+                <description>
+                    Combines address, optional shipping and payment selection in a compact checkout flow.
+                </description>
+            </capability>
+
+            <capability id="commerce.product-landing-pages">
+                <title>Product landing pages</title>
+                <description>
+                    Creates product-focused landing pages with a configurable product, call to action and starter content.
+                </description>
+            </capability>
+        </capabilities>
+
         <image src="URL_OPT_DIR/quiqqer/order-simple-checkout/bin/images/Logo.png"/>
 
         <preview></preview>
