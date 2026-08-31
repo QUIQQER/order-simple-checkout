@@ -368,7 +368,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 if (this.getAttribute('showPayToOrderBtn')) {
                     this.$PayToOrderBtn.addEvent('click', (e) => {
                         e.stop();
-                        this.orderWithCosts();
+                        this.orderWithCosts().catch(() => {
+                            // Error handling is performed by orderWithCosts().
+                        });
                     });
                 } else {
                     this.$PayToOrderBtn.destroy();
@@ -602,7 +604,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         /**
-         * @return {Promise<void>}
+         * @return {Promise<void|boolean>}
          */
         orderWithCosts: function () {
             if (this.$isOrdering) {
@@ -611,7 +613,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             if (this.validate() === false) {
                 this.fireEvent('orderInvalid', [this]);
-                return Promise.reject();
+                return Promise.resolve(false);
             }
 
             this.$isOrdering = true;
