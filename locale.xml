@@ -5,130 +5,283 @@
         <locale name="package.title">
             <de><![CDATA[QUIQQER - Einfacher Bestellcheckout]]></de>
             <en><![CDATA[QUIQQER - Simple order checkout]]></en>
+            <es><![CDATA[QUIQQER - Compra simplificada]]></es>
+            <pt><![CDATA[QUIQQER - Finalização de compra simplificada]]></pt>
+            <fr><![CDATA[QUIQQER - Commande simplifiée]]></fr>
+            <it><![CDATA[QUIQQER - Procedura d'acquisto semplificata]]></it>
+            <pl><![CDATA[QUIQQER - Uproszczona finalizacja zamówienia]]></pl>
         </locale>
         <locale name="package.description">
             <de><![CDATA[ ]]></de>
             <en><![CDATA[ ]]></en>
+            <es><![CDATA[ ]]></es>
+            <pt><![CDATA[ ]]></pt>
+            <fr><![CDATA[ ]]></fr>
+            <it><![CDATA[ ]]></it>
+            <pl><![CDATA[ ]]></pl>
         </locale>
         <locale name="title.contact">
             <de><![CDATA[Konto / Kontakt]]></de>
             <en><![CDATA[Account / Contact]]></en>
+            <es><![CDATA[Cuenta / Contacto]]></es>
+            <pt><![CDATA[Conta / Contacto]]></pt>
+            <fr><![CDATA[Compte / Contact]]></fr>
+            <it><![CDATA[Account / Contatti]]></it>
+            <pl><![CDATA[Konto / Kontakt]]></pl>
         </locale>
         <locale name="area.productLandingPage.top.title">
-            <de><![CDATA[Produkt Landingpage: Zone vor dem Produkt]]></de>
+            <de><![CDATA[Produkt-Landingpage: Zone vor dem Produkt]]></de>
             <en><![CDATA[Product landing page: area before the product]]></en>
+            <es><![CDATA[Página de destino del producto: zona antes del producto]]></es>
+            <pt><![CDATA[Página de destino do produto: área antes do produto]]></pt>
+            <fr><![CDATA[Page de destination du produit : zone avant le produit]]></fr>
+            <it><![CDATA[Pagina di destinazione del prodotto: area prima del prodotto]]></it>
+            <pl><![CDATA[Strona docelowa produktu: obszar przed produktem]]></pl>
         </locale>
         <locale name="area.productLandingPage.top.description">
-            <de>
-                <![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
+            <de><![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt-Landingpages.]]></de>
             <en><![CDATA[Special brick area for the quick and easy creation of product landing pages.]]></en>
+            <es><![CDATA[Zona de bloques específica para crear páginas de destino de productos de forma rápida y sencilla.]]></es>
+            <pt><![CDATA[Área de blocos dedicada à criação rápida e simples de páginas de destino de produtos.]]></pt>
+            <fr><![CDATA[Zone de blocs dédiée à la création rapide et simple de pages de destination de produits.]]></fr>
+            <it><![CDATA[Area di blocchi dedicata alla creazione rapida e semplice di pagine di destinazione dei prodotti.]]></it>
+            <pl><![CDATA[Specjalny obszar bloków do szybkiego i łatwego tworzenia stron docelowych produktów.]]></pl>
         </locale>
         <locale name="area.productLandingPage.bottom.title">
-            <de><![CDATA[Produkt Landingpage: Zone nach dem Produkt]]></de>
+            <de><![CDATA[Produkt-Landingpage: Zone nach dem Produkt]]></de>
             <en><![CDATA[Product landing page: area after the product]]></en>
+            <es><![CDATA[Página de destino del producto: zona después del producto]]></es>
+            <pt><![CDATA[Página de destino do produto: área depois do produto]]></pt>
+            <fr><![CDATA[Page de destination du produit : zone après le produit]]></fr>
+            <it><![CDATA[Pagina di destinazione del prodotto: area dopo il prodotto]]></it>
+            <pl><![CDATA[Strona docelowa produktu: obszar za produktem]]></pl>
         </locale>
         <locale name="area.productLandingPage.bottom.description">
-            <de>
-                <![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt Landingpage.]]></de>
+            <de><![CDATA[Spezielle Bausteinzone für die schnelle und einfache Erstellung von Produkt-Landingpages.]]></de>
             <en><![CDATA[Special brick area for the quick and easy creation of product landing pages.]]></en>
+            <es><![CDATA[Zona de bloques específica para crear páginas de destino de productos de forma rápida y sencilla.]]></es>
+            <pt><![CDATA[Área de blocos dedicada à criação rápida e simples de páginas de destino de produtos.]]></pt>
+            <fr><![CDATA[Zone de blocs dédiée à la création rapide et simple de pages de destination de produits.]]></fr>
+            <it><![CDATA[Area di blocchi dedicata alla creazione rapida e semplice di pagine di destinazione dei prodotti.]]></it>
+            <pl><![CDATA[Specjalny obszar bloków do szybkiego i łatwego tworzenia stron docelowych produktów.]]></pl>
         </locale>
         <locale name="or">
             <de><![CDATA[ODER]]></de>
             <en><![CDATA[OR]]></en>
+            <es><![CDATA[O]]></es>
+            <pt><![CDATA[OU]]></pt>
+            <fr><![CDATA[OU]]></fr>
+            <it><![CDATA[OPPURE]]></it>
+            <pl><![CDATA[LUB]]></pl>
         </locale>
         <locale name="basket.empty">
             <de><![CDATA[Dein Warenkorb enthält leider keine Artikel]]></de>
             <en><![CDATA[Your shopping cart does not contain any items]]></en>
+            <es><![CDATA[Tu carrito no contiene ningún artículo]]></es>
+            <pt><![CDATA[O teu carrinho não contém artigos]]></pt>
+            <fr><![CDATA[Votre panier ne contient aucun article]]></fr>
+            <it><![CDATA[Il tuo carrello non contiene articoli]]></it>
+            <pl><![CDATA[Twój koszyk jest pusty]]></pl>
         </locale>
         <locale name="simpleCheckout.basket.btn.moreDetails">
             <de><![CDATA[Produktdetails]]></de>
             <en><![CDATA[Product details]]></en>
+            <es><![CDATA[Detalles del producto]]></es>
+            <pt><![CDATA[Detalhes do produto]]></pt>
+            <fr><![CDATA[Détails du produit]]></fr>
+            <it><![CDATA[Dettagli del prodotto]]></it>
+            <pl><![CDATA[Szczegóły produktu]]></pl>
         </locale>
         <locale name="simpleCheckout.subheader.expressCheckout">
             <de><![CDATA[Express checkout]]></de>
             <en><![CDATA[Express checkout]]></en>
+            <es><![CDATA[Pago exprés]]></es>
+            <pt><![CDATA[Pagamento expresso]]></pt>
+            <fr><![CDATA[Paiement express]]></fr>
+            <it><![CDATA[Pagamento rapido]]></it>
+            <pl><![CDATA[Szybka płatność]]></pl>
         </locale>
         <locale name="simpleCheckout.expressCheckout.text" html="true">
             <de><![CDATA[<p>Mit "Express Checkout" schneller und bequemer bezahlen.</p>]]></de>
             <en><![CDATA[<p>Pay faster and more conveniently with "Express Checkout".</p>]]></en>
+            <es><![CDATA[<p>Paga de forma más rápida y cómoda con «Pago exprés».</p>]]></es>
+            <pt><![CDATA[<p>Paga de forma mais rápida e cómoda com «Pagamento expresso».</p>]]></pt>
+            <fr><![CDATA[<p>Payez plus rapidement et plus facilement avec « Paiement express ».</p>]]></fr>
+            <it><![CDATA[<p>Paga in modo più rapido e comodo con «Pagamento rapido».</p>]]></it>
+            <pl><![CDATA[<p>Płać szybciej i wygodniej dzięki opcji „Szybka płatność”.</p>]]></pl>
         </locale>
         <locale name="simpleCheckout.subheader.basket">
             <de><![CDATA[Warenkorb]]></de>
             <en><![CDATA[Your order]]></en>
+            <es><![CDATA[Tu pedido]]></es>
+            <pt><![CDATA[A tua encomenda]]></pt>
+            <fr><![CDATA[Votre commande]]></fr>
+            <it><![CDATA[Il tuo ordine]]></it>
+            <pl><![CDATA[Twoje zamówienie]]></pl>
         </locale>
         <locale name="logged.in.guest">
             <de><![CDATA[Eingeloggt als: Gast]]></de>
             <en><![CDATA[Logged in as: Guest]]></en>
+            <es><![CDATA[Sesión iniciada como: invitado]]></es>
+            <pt><![CDATA[Sessão iniciada como: convidado]]></pt>
+            <fr><![CDATA[Connecté en tant que : invité]]></fr>
+            <it><![CDATA[Accesso come: ospite]]></it>
+            <pl><![CDATA[Zalogowano jako: gość]]></pl>
         </locale>
         <locale name="logged.in.user">
             <de><![CDATA[Eingeloggt als:]]></de>
             <en><![CDATA[Logged in as:]]></en>
+            <es><![CDATA[Sesión iniciada como:]]></es>
+            <pt><![CDATA[Sessão iniciada como:]]></pt>
+            <fr><![CDATA[Connecté en tant que :]]></fr>
+            <it><![CDATA[Accesso come:]]></it>
+            <pl><![CDATA[Zalogowano jako:]]></pl>
         </locale>
         <locale name="log.in">
             <de><![CDATA[Du hast einen Account?]]></de>
-            <en><![CDATA[You have an account?]]></en>
+            <en><![CDATA[Do you have an account?]]></en>
+            <es><![CDATA[¿Ya tienes una cuenta?]]></es>
+            <pt><![CDATA[Já tens uma conta?]]></pt>
+            <fr><![CDATA[Vous avez déjà un compte ?]]></fr>
+            <it><![CDATA[Hai già un account?]]></it>
+            <pl><![CDATA[Masz już konto?]]></pl>
         </locale>
         <locale name="log.in.link">
             <de><![CDATA[Jetzt einloggen]]></de>
             <en><![CDATA[Log in]]></en>
+            <es><![CDATA[Iniciar sesión]]></es>
+            <pt><![CDATA[Iniciar sessão]]></pt>
+            <fr><![CDATA[Se connecter]]></fr>
+            <it><![CDATA[Accedi]]></it>
+            <pl><![CDATA[Zaloguj się]]></pl>
         </locale>
         <locale name="ordering.step.title.Billing">
             <de><![CDATA[Rechnungsadresse]]></de>
-            <en><![CDATA[Billing]]></en>
+            <en><![CDATA[Billing address]]></en>
+            <es><![CDATA[Dirección de facturación]]></es>
+            <pt><![CDATA[Morada de faturação]]></pt>
+            <fr><![CDATA[Adresse de facturation]]></fr>
+            <it><![CDATA[Indirizzo di fatturazione]]></it>
+            <pl><![CDATA[Adres rozliczeniowy]]></pl>
         </locale>
         <locale name="ordering.step.title.Billing.same">
             <de><![CDATA[Gleiche Adresse wie die Lieferadresse]]></de>
             <en><![CDATA[Same as shipping address]]></en>
+            <es><![CDATA[La misma que la dirección de envío]]></es>
+            <pt><![CDATA[Igual à morada de entrega]]></pt>
+            <fr><![CDATA[Identique à l'adresse de livraison]]></fr>
+            <it><![CDATA[Uguale all'indirizzo di spedizione]]></it>
+            <pl><![CDATA[Taki sam jak adres dostawy]]></pl>
         </locale>
         <locale name="ordering.step.title.Billing.different">
             <de><![CDATA[Eine andere Rechnungsadresse verwenden]]></de>
             <en><![CDATA[Use a different billing address]]></en>
+            <es><![CDATA[Usar otra dirección de facturación]]></es>
+            <pt><![CDATA[Usar uma morada de faturação diferente]]></pt>
+            <fr><![CDATA[Utiliser une autre adresse de facturation]]></fr>
+            <it><![CDATA[Usa un indirizzo di fatturazione diverso]]></it>
+            <pl><![CDATA[Użyj innego adresu rozliczeniowego]]></pl>
         </locale>
         <locale name="ordering.step.title.CustomerData.addresses">
             <de><![CDATA[Deine vorhandenen Adressen]]></de>
             <en><![CDATA[Your existing addresses]]></en>
+            <es><![CDATA[Tus direcciones guardadas]]></es>
+            <pt><![CDATA[As tuas moradas guardadas]]></pt>
+            <fr><![CDATA[Vos adresses enregistrées]]></fr>
+            <it><![CDATA[I tuoi indirizzi salvati]]></it>
+            <pl><![CDATA[Twoje zapisane adresy]]></pl>
         </locale>
         <locale name="ordering.step.title.CustomerData.openAddress">
             <de><![CDATA[Adresse hinzufügen oder bearbeiten (optional)]]></de>
-            <en><![CDATA[Enter address details (optional)]]></en>
+            <en><![CDATA[Add or edit an address (optional)]]></en>
+            <es><![CDATA[Añadir o editar una dirección (opcional)]]></es>
+            <pt><![CDATA[Adicionar ou editar uma morada (opcional)]]></pt>
+            <fr><![CDATA[Ajouter ou modifier une adresse (facultatif)]]></fr>
+            <it><![CDATA[Aggiungi o modifica un indirizzo (facoltativo)]]></it>
+            <pl><![CDATA[Dodaj lub edytuj adres (opcjonalnie)]]></pl>
         </locale>
 
         <locale name="CheckoutPayment.enter_address_to_show_delivery_options">
             <de><![CDATA[Bitte geben Sie Ihre Lieferadresse ein, um die verfügbaren Versandmethoden anzuzeigen.]]></de>
             <en><![CDATA[Enter your delivery address to view available shipping methods.]]></en>
+            <es><![CDATA[Introduce tu dirección de envío para ver los métodos de envío disponibles.]]></es>
+            <pt><![CDATA[Introduz a tua morada de entrega para veres os métodos de envio disponíveis.]]></pt>
+            <fr><![CDATA[Saisissez votre adresse de livraison pour afficher les modes de livraison disponibles.]]></fr>
+            <it><![CDATA[Inserisci il tuo indirizzo di spedizione per visualizzare i metodi di spedizione disponibili.]]></it>
+            <pl><![CDATA[Podaj adres dostawy, aby zobaczyć dostępne sposoby dostawy.]]></pl>
         </locale>
         <locale name="CheckoutPayment.enter_address_to_show_payment_options">
             <de><![CDATA[Bitte geben Sie Ihre Adresse an, um verfügbare Zahlungsarten angezeigt zu bekommen.]]></de>
-            <en><![CDATA[Please enter your address to view available payment types.]]></en>
+            <en><![CDATA[Please enter your address to view available payment methods.]]></en>
+            <es><![CDATA[Introduce tu dirección para ver los métodos de pago disponibles.]]></es>
+            <pt><![CDATA[Introduz a tua morada para veres os métodos de pagamento disponíveis.]]></pt>
+            <fr><![CDATA[Saisissez votre adresse pour afficher les moyens de paiement disponibles.]]></fr>
+            <it><![CDATA[Inserisci il tuo indirizzo per visualizzare i metodi di pagamento disponibili.]]></it>
+            <pl><![CDATA[Podaj swój adres, aby zobaczyć dostępne metody płatności.]]></pl>
         </locale>
         <locale name="processPaymentChange.button">
             <de><![CDATA[Zahlungsart ändern]]></de>
-            <en><![CDATA[Change payment type]]></en>
+            <en><![CDATA[Change payment method]]></en>
+            <es><![CDATA[Cambiar método de pago]]></es>
+            <pt><![CDATA[Alterar método de pagamento]]></pt>
+            <fr><![CDATA[Changer de moyen de paiement]]></fr>
+            <it><![CDATA[Cambia metodo di pagamento]]></it>
+            <pl><![CDATA[Zmień metodę płatności]]></pl>
         </locale>
 
         <locale name="ordering.btn.showAllProductsText.open">
             <de><![CDATA[Alle Produkte anzeigen ([max]) <i class="fa-solid fa-chevron-down"></i>]]></de>
             <en><![CDATA[Show all products ([max]) <i class="fa-solid fa-chevron-down"></i>]]></en>
+            <es><![CDATA[Mostrar todos los productos ([max]) <i class="fa-solid fa-chevron-down"></i>]]></es>
+            <pt><![CDATA[Mostrar todos os produtos ([max]) <i class="fa-solid fa-chevron-down"></i>]]></pt>
+            <fr><![CDATA[Afficher tous les produits ([max]) <i class="fa-solid fa-chevron-down"></i>]]></fr>
+            <it><![CDATA[Mostra tutti i prodotti ([max]) <i class="fa-solid fa-chevron-down"></i>]]></it>
+            <pl><![CDATA[Pokaż wszystkie produkty ([max]) <i class="fa-solid fa-chevron-down"></i>]]></pl>
         </locale>
         <locale name="ordering.btn.showOrderDetails">
             <de><![CDATA[Bestelldetails]]></de>
             <en><![CDATA[Order details]]></en>
+            <es><![CDATA[Detalles del pedido]]></es>
+            <pt><![CDATA[Detalhes da encomenda]]></pt>
+            <fr><![CDATA[Détails de la commande]]></fr>
+            <it><![CDATA[Dettagli dell'ordine]]></it>
+            <pl><![CDATA[Szczegóły zamówienia]]></pl>
         </locale>
         <locale name="ordering.btn.showAllProductsText.close">
             <de><![CDATA[Weniger anzeigen <i class="fa-solid fa-chevron-up"></i>]]></de>
             <en><![CDATA[Show less <i class="fa-solid fa-chevron-up"></i>]]></en>
+            <es><![CDATA[Mostrar menos <i class="fa-solid fa-chevron-up"></i>]]></es>
+            <pt><![CDATA[Mostrar menos <i class="fa-solid fa-chevron-up"></i>]]></pt>
+            <fr><![CDATA[Afficher moins <i class="fa-solid fa-chevron-up"></i>]]></fr>
+            <it><![CDATA[Mostra meno <i class="fa-solid fa-chevron-up"></i>]]></it>
+            <pl><![CDATA[Pokaż mniej <i class="fa-solid fa-chevron-up"></i>]]></pl>
         </locale>
         <locale name="ordering.btn.continueWithPurchase">
             <de><![CDATA[Mit Einkauf fortfahren <i class="fa-solid fa-chevron-down"></i>]]></de>
             <en><![CDATA[Continue with purchase <i class="fa-solid fa-chevron-down"></i>]]></en>
+            <es><![CDATA[Continuar con la compra <i class="fa-solid fa-chevron-down"></i>]]></es>
+            <pt><![CDATA[Continuar a compra <i class="fa-solid fa-chevron-down"></i>]]></pt>
+            <fr><![CDATA[Poursuivre l'achat <i class="fa-solid fa-chevron-down"></i>]]></fr>
+            <it><![CDATA[Prosegui con l'acquisto <i class="fa-solid fa-chevron-down"></i>]]></it>
+            <pl><![CDATA[Kontynuuj zakup <i class="fa-solid fa-chevron-down"></i>]]></pl>
         </locale>
         <locale name="exception.order.has.no.items">
             <de><![CDATA[Bitte füge Deiner Bestellung / Deinem Warenkorb Artikel hinzu.]]></de>
             <en><![CDATA[Please add items to your order / shopping cart.]]></en>
+            <es><![CDATA[Añade artículos a tu pedido o carrito.]]></es>
+            <pt><![CDATA[Adiciona artigos à tua encomenda ou ao teu carrinho.]]></pt>
+            <fr><![CDATA[Ajoutez des articles à votre commande ou à votre panier.]]></fr>
+            <it><![CDATA[Aggiungi articoli al tuo ordine o al tuo carrello.]]></it>
+            <pl><![CDATA[Dodaj artykuły do zamówienia lub koszyka.]]></pl>
         </locale>
         <locale name="orderSimpleCheckout.settings.disableProductLinks">
             <de><![CDATA[Keine Produktlinks]]></de>
             <en><![CDATA[No product links]]></en>
+            <es><![CDATA[Desactivar enlaces a productos]]></es>
+            <pt><![CDATA[Desativar ligações para produtos]]></pt>
+            <fr><![CDATA[Désactiver les liens vers les produits]]></fr>
+            <it><![CDATA[Disattiva i link ai prodotti]]></it>
+            <pl><![CDATA[Wyłącz linki do produktów]]></pl>
         </locale>
         <locale name="orderSimpleCheckout.settings.disableProductLinks.description">
             <de><![CDATA[
@@ -137,14 +290,29 @@
             <en><![CDATA[
             If activated, no links are displayed or used for the products in the simple checkout.
             ]]></en>
+            <es><![CDATA[Si esta opción está activada, no se muestran ni se utilizan enlaces a los productos durante la compra simplificada (Simple Checkout).]]></es>
+            <pt><![CDATA[Se esta opção estiver ativada, não são apresentadas nem utilizadas ligações para os produtos na finalização de compra simplificada (Simple Checkout).]]></pt>
+            <fr><![CDATA[Si cette option est activée, aucun lien vers les produits n'est affiché ni utilisé lors de la commande simplifiée (Simple Checkout).]]></fr>
+            <it><![CDATA[Se questa opzione è attiva, i link ai prodotti non vengono mostrati né utilizzati nella procedura d'acquisto semplificata (Simple Checkout).]]></it>
+            <pl><![CDATA[Po włączeniu tej opcji linki do produktów nie są wyświetlane ani używane podczas uproszczonej finalizacji zamówienia (Simple Checkout).]]></pl>
         </locale>
         <locale name="orderSimpleCheckout.settings.title">
             <de><![CDATA[Simple Checkout - Einfache Kaufabwicklung]]></de>
             <en><![CDATA[Simple Checkout]]></en>
+            <es><![CDATA[Simple Checkout - Compra simplificada]]></es>
+            <pt><![CDATA[Simple Checkout - Finalização de compra simplificada]]></pt>
+            <fr><![CDATA[Simple Checkout - Commande simplifiée]]></fr>
+            <it><![CDATA[Simple Checkout - Procedura d'acquisto semplificata]]></it>
+            <pl><![CDATA[Simple Checkout - Uproszczona finalizacja zamówienia]]></pl>
         </locale>
         <locale name="component.email">
             <de><![CDATA[E-Mail]]></de>
             <en><![CDATA[E-mail]]></en>
+            <es><![CDATA[Correo electrónico]]></es>
+            <pt><![CDATA[E-mail]]></pt>
+            <fr><![CDATA[E-mail]]></fr>
+            <it><![CDATA[E-mail]]></it>
+            <pl><![CDATA[E-mail]]></pl>
         </locale>
     </groups>
 
@@ -152,6 +320,11 @@
         <locale name="admin.types.simpleCheckout">
             <de><![CDATA[Einfacher Bestellprozess]]></de>
             <en><![CDATA[Simple ordering process]]></en>
+            <es><![CDATA[Proceso de compra simplificado]]></es>
+            <pt><![CDATA[Processo de compra simplificado]]></pt>
+            <fr><![CDATA[Processus de commande simplifié]]></fr>
+            <it><![CDATA[Procedura d'acquisto semplificata]]></it>
+            <pl><![CDATA[Uproszczony proces składania zamówienia]]></pl>
         </locale>
         <locale name="admin.types.simpleCheckout.description">
             <de><![CDATA[
@@ -164,11 +337,21 @@
             by providing a structured and intuitive checkout process that meets the needs of customers
             who are looking for a quick and straightforward ordering process.
             ]]></en>
+            <es><![CDATA[El proceso de compra simplificado ofrece una alternativa fácil de usar al proceso estándar. Su estructura clara e intuitiva permite a los clientes realizar pedidos de forma rápida y sencilla.]]></es>
+            <pt><![CDATA[O processo de compra simplificado é uma alternativa fácil de usar ao processo padrão. A sua estrutura clara e intuitiva permite aos clientes efetuar encomendas de forma rápida e simples.]]></pt>
+            <fr><![CDATA[Le processus de commande simplifié offre une alternative conviviale au processus standard. Son déroulement clair et intuitif permet aux clients de passer commande rapidement et facilement.]]></fr>
+            <it><![CDATA[La procedura d'acquisto semplificata offre un'alternativa facile da usare alla procedura standard. La sua struttura chiara e intuitiva permette ai clienti di effettuare ordini in modo rapido e semplice.]]></it>
+            <pl><![CDATA[Uproszczony proces składania zamówienia to łatwa w obsłudze alternatywa dla standardowej procedury. Przejrzysta i intuicyjna finalizacja zakupu pozwala klientom szybko i wygodnie złożyć zamówienie.]]></pl>
         </locale>
 
         <locale name="admin.types.productLandingPage">
-            <de><![CDATA[Produkt Landing Page]]></de>
+            <de><![CDATA[Produkt-Landingpage]]></de>
             <en><![CDATA[Product Landing Page]]></en>
+            <es><![CDATA[Página de destino del producto]]></es>
+            <pt><![CDATA[Página de destino do produto]]></pt>
+            <fr><![CDATA[Page de destination du produit]]></fr>
+            <it><![CDATA[Pagina di destinazione del prodotto]]></it>
+            <pl><![CDATA[Strona docelowa produktu]]></pl>
         </locale>
         <locale name="admin.types.productLandingPage.description">
             <de><![CDATA[
@@ -183,31 +366,66 @@
             ]]></de>
             <en><![CDATA[
             The product landing page is a specially designed page that makes it possible to
-            to focus on a single product and surround it with relevant content and modules.
-            The flexible design of the page allows you to place different modules above or below the product,
+            focus on a single product and surround it with relevant content and bricks.
+            The flexible design of the page allows you to place different bricks above or below the product,
             to create an appealing and convincing presentation.
 
             This page is ideal for promoting new releases, bestsellers or special offers,
             as it makes it possible to present the product in a clear and focused way
             and draw visitors' attention to the essentials.
             ]]></en>
+            <es><![CDATA[La página de destino del producto está diseñada para destacar un único producto y acompañarlo de contenido y bloques relevantes. Su diseño flexible permite colocar distintos bloques encima o debajo del producto para crear una presentación atractiva y convincente.
+
+Esta página es ideal para promocionar novedades, productos más vendidos u ofertas especiales, ya que presenta el producto de forma clara y centra la atención de los visitantes en lo esencial.]]></es>
+            <pt><![CDATA[A página de destino do produto foi concebida para destacar um único produto e complementá-lo com conteúdos e blocos relevantes. A disposição flexível permite colocar diferentes blocos acima ou abaixo do produto, criando uma apresentação apelativa e convincente.
+
+Esta página é ideal para promover novidades, produtos mais vendidos ou ofertas especiais, pois apresenta o produto de forma clara e concentra a atenção dos visitantes no essencial.]]></pt>
+            <fr><![CDATA[La page de destination du produit est conçue pour mettre en valeur un seul produit, accompagné de contenus et de blocs pertinents. Sa mise en page flexible permet de placer différents blocs au-dessus ou en dessous du produit pour créer une présentation attrayante et convaincante.
+
+Cette page est idéale pour promouvoir des nouveautés, des meilleures ventes ou des offres spéciales, car elle présente le produit de manière claire et attire l'attention des visiteurs sur l'essentiel.]]></fr>
+            <it><![CDATA[La pagina di destinazione del prodotto è pensata per mettere in risalto un singolo prodotto, affiancandolo a contenuti e blocchi pertinenti. La struttura flessibile permette di posizionare diversi blocchi sopra o sotto il prodotto per creare una presentazione accattivante e convincente.
+
+Questa pagina è ideale per promuovere novità, prodotti più venduti o offerte speciali, perché presenta il prodotto in modo chiaro e concentra l'attenzione dei visitatori sugli aspetti essenziali.]]></it>
+            <pl><![CDATA[Strona docelowa produktu służy do wyeksponowania jednego produktu i uzupełnienia jego prezentacji odpowiednimi treściami i blokami. Elastyczny układ pozwala umieszczać różne bloki nad produktem lub pod nim, tworząc atrakcyjną i przekonującą prezentację.
+
+Taka strona idealnie nadaje się do promowania nowości, bestsellerów lub ofert specjalnych, ponieważ przedstawia produkt w przejrzysty sposób i skupia uwagę odwiedzających na tym, co najważniejsze.]]></pl>
         </locale>
 
         <locale name="order.simple.checkout.settings.title">
-            <de><![CDATA[Produkt Landing Page]]></de>
+            <de><![CDATA[Produkt-Landingpage]]></de>
             <en><![CDATA[Product Landing Page]]></en>
+            <es><![CDATA[Página de destino del producto]]></es>
+            <pt><![CDATA[Página de destino do produto]]></pt>
+            <fr><![CDATA[Page de destination du produit]]></fr>
+            <it><![CDATA[Pagina di destinazione del prodotto]]></it>
+            <pl><![CDATA[Strona docelowa produktu]]></pl>
         </locale>
         <locale name="order.simple.checkout.settings.productId">
-            <de><![CDATA[Produkt Id:]]></de>
-            <en><![CDATA[Product Id:]]></en>
+            <de><![CDATA[Produkt-ID:]]></de>
+            <en><![CDATA[Product ID:]]></en>
+            <es><![CDATA[ID del producto:]]></es>
+            <pt><![CDATA[ID do produto:]]></pt>
+            <fr><![CDATA[ID du produit :]]></fr>
+            <it><![CDATA[ID del prodotto:]]></it>
+            <pl><![CDATA[Identyfikator produktu:]]></pl>
         </locale>
         <locale name="order.simple.checkout.settings.productId.description">
             <de><![CDATA[Wähle hier das Produkt aus, das auf der Seite angezeigt werden soll.]]></de>
             <en><![CDATA[Select the product to be displayed on the page here.]]></en>
+            <es><![CDATA[Selecciona el producto que se mostrará en la página.]]></es>
+            <pt><![CDATA[Seleciona o produto a apresentar na página.]]></pt>
+            <fr><![CDATA[Sélectionnez le produit à afficher sur la page.]]></fr>
+            <it><![CDATA[Seleziona il prodotto da mostrare nella pagina.]]></it>
+            <pl><![CDATA[Wybierz produkt, który ma być wyświetlany na stronie.]]></pl>
         </locale>
         <locale name="order.simple.checkout.settings.ctaUrl">
-            <de><![CDATA[Aktion-URL (CTA)]]></de>
-            <en><![CDATA[Action url (CTA)]]></en>
+            <de><![CDATA[Aktions-URL (CTA)]]></de>
+            <en><![CDATA[Action URL (CTA)]]></en>
+            <es><![CDATA[URL de la llamada a la acción (CTA)]]></es>
+            <pt><![CDATA[URL da chamada para ação (CTA)]]></pt>
+            <fr><![CDATA[URL de l'appel à l'action (CTA)]]></fr>
+            <it><![CDATA[URL dell'invito all'azione (CTA)]]></it>
+            <pl><![CDATA[Adres URL wezwania do działania (CTA)]]></pl>
         </locale>
         <locale name="order.simple.checkout.settings.ctaUrl.description" html="true">
             <de><![CDATA[
@@ -219,11 +437,16 @@
             ]]></de>
             <en><![CDATA[
             The defined URL is applied to all buttons (call-to-action) that contain the data attribute
-            <code>data-qui-productLandingPage-cta=“1”</code>. This URL can either be an internal page,
+            <code>data-qui-productLandingPage-cta="1"</code>. This URL can either be an internal page,
             a page with a product ID or an external link.<br /><br />
 
             You can also add a product directly to your shopping cart by using the URL: /SIMPLE_CHECKOUT/?product=productId
             ]]></en>
+            <es><![CDATA[La URL indicada se aplica a todos los botones de llamada a la acción que contienen el atributo de datos <code>data-qui-productLandingPage-cta="1"</code>. Puede ser una página interna, una página con un ID de producto o un enlace externo.<br /><br /> También puedes añadir un producto directamente al carrito con la URL /SIMPLE_CHECKOUT/?product=productId.]]></es>
+            <pt><![CDATA[O URL definido aplica-se a todos os botões de chamada para ação que contêm o atributo de dados <code>data-qui-productLandingPage-cta="1"</code>. Pode ser uma página interna, uma página com um ID de produto ou uma ligação externa.<br /><br /> Também podes adicionar um produto diretamente ao carrinho através do URL /SIMPLE_CHECKOUT/?product=productId.]]></pt>
+            <fr><![CDATA[L'URL définie s'applique à tous les boutons d'appel à l'action qui contiennent l'attribut de données <code>data-qui-productLandingPage-cta="1"</code>. Elle peut correspondre à une page interne, à une page avec un ID de produit ou à un lien externe.<br /><br /> Vous pouvez également ajouter un produit directement au panier avec l'URL /SIMPLE_CHECKOUT/?product=productId.]]></fr>
+            <it><![CDATA[L'URL impostato si applica a tutti i pulsanti di invito all'azione che contengono l'attributo di dati <code>data-qui-productLandingPage-cta="1"</code>. Può corrispondere a una pagina interna, a una pagina con un ID prodotto o a un link esterno.<br /><br /> Puoi anche aggiungere un prodotto direttamente al carrello usando l'URL /SIMPLE_CHECKOUT/?product=productId.]]></it>
+            <pl><![CDATA[Podany adres URL jest stosowany do wszystkich przycisków wezwania do działania zawierających atrybut danych <code>data-qui-productLandingPage-cta="1"</code>. Może prowadzić do strony wewnętrznej, strony z identyfikatorem produktu lub strony zewnętrznej.<br /><br /> Możesz też dodać produkt bezpośrednio do koszyka, używając adresu URL /SIMPLE_CHECKOUT/?product=productId.]]></pl>
         </locale>
     </groups>
 
@@ -232,10 +455,20 @@
         <locale name="SimpleCheckoutWindow.btn.continue">
             <de><![CDATA[Weiter]]></de>
             <en><![CDATA[Continue]]></en>
+            <es><![CDATA[Continuar]]></es>
+            <pt><![CDATA[Continuar]]></pt>
+            <fr><![CDATA[Continuer]]></fr>
+            <it><![CDATA[Continua]]></it>
+            <pl><![CDATA[Dalej]]></pl>
         </locale>
         <locale name="SimpleCheckoutWindow.btn.cancel">
             <de><![CDATA[Abbrechen]]></de>
             <en><![CDATA[Cancel]]></en>
+            <es><![CDATA[Cancelar]]></es>
+            <pt><![CDATA[Cancelar]]></pt>
+            <fr><![CDATA[Annuler]]></fr>
+            <it><![CDATA[Annulla]]></it>
+            <pl><![CDATA[Anuluj]]></pl>
         </locale>
     </groups>
 
