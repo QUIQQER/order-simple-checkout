@@ -26,8 +26,6 @@ use function in_array;
  * Class Checkout
  *
  * Represents the simple checkout control
- *
- * @phpstan-import-type CompletionSettings from SuccessSettings
  */
 class Checkout extends QUI\Control
 {
@@ -97,12 +95,8 @@ class Checkout extends QUI\Control
             }
         }
 
-        $Order = $this->getOrder();
-
-        if ($Order !== null) {
-            $successSettings = SuccessSettings::configure($Order, $this->getAttributes());
-            $this->setJavaScriptControlOption('successsettings', json_encode($successSettings, JSON_THROW_ON_ERROR));
-        }
+        $successSettings = SuccessSettings::normalize($this->getAttributes());
+        $this->setJavaScriptControlOption('successsettings', json_encode($successSettings, JSON_THROW_ON_ERROR));
 
         $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
         $Checkout->generateCheckboxLinks($Engine);
@@ -297,8 +291,7 @@ class Checkout extends QUI\Control
      *     url: string,
      *     hash: string,
      *     orderHash: string,
-     *     productCount: int,
-     *     successSettings: CompletionSettings
+     *     productCount: int
      * }
      *
      * @throws QUI\ERP\Order\Exception
@@ -315,8 +308,6 @@ class Checkout extends QUI\Control
                 QUI\ERP\Order\Handler::ERROR_ORDER_NOT_FOUND
             );
         }
-
-        SuccessSettings::configure($OrderInProcess, $this->getAttributes());
 
         $failedPaymentProcedure = OrderSettings::getInstance()->get('order', 'failedPaymentProcedure');
         $Payment = $OrderInProcess->getPayment();
@@ -372,8 +363,7 @@ class Checkout extends QUI\Control
      *     url: string,
      *     hash: string,
      *     orderHash: string,
-     *     productCount: int,
-     *     successSettings: CompletionSettings
+     *     productCount: int
      * }
      * @throws QUI\ERP\Order\Basket\Exception
      * @throws \Exception
@@ -446,7 +436,6 @@ class Checkout extends QUI\Control
             'hash' => $OrderProcess->getStepHash(),
             'orderHash' => $Order->getUUID(),
             'productCount' => $Order->getArticles()->count(),
-            'successSettings' => SuccessSettings::read($Order),
         ];
     }
 

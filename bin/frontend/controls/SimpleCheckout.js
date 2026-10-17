@@ -108,7 +108,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $onImport: function () {
             const Elm = this.getElm();
-            this.$applySuccessSettings(Elm.getAttribute('data-qui-options-successsettings'));
+            if (!this.$successSettings) {
+                this.$applySuccessSettings(Elm.getAttribute('data-qui-options-successsettings'));
+            }
 
             this.Loader = new QUILoader().inject(Elm);
             this.$setAnchor();
@@ -269,13 +271,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         $loadOrder: function () {
             if (this.getAttribute('orderHash')) {
                 return new Promise((resolve, reject) => {
-                    QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_getOrder', (result) => {
-                        this.$applySuccessSettings(result.successSettings);
-                        resolve(result);
-                    }, {
+                    QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_getOrder', resolve, {
                         'package': 'quiqqer/order-simple-checkout',
                         orderHash: this.getAttribute('orderHash'),
-                        successSettings: JSON.stringify(this.$getRequestedSuccessSettings()),
                         onError: reject
                     });
                 });
@@ -466,8 +464,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 const settings = {
                     disableAddress: this.getAttribute('disableAddress'),
                     disableProductLinks: this.getAttribute('disableProductLinks'),
-                    showEmail: this.getAttribute('showEmail'),
-                    ...this.$getRequestedSuccessSettings()
+                    showEmail: this.getAttribute('showEmail')
                 };
 
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl', (html) => {
@@ -476,9 +473,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
 
                     const Checkout = Ghost.getElement('[data-name="quiqqer-simple-checkout"]');
-                    const successSettings = Checkout.getAttribute('data-qui-options-successsettings');
-                    this.$applySuccessSettings(successSettings);
-                    this.getElm().setAttribute('data-qui-options-successsettings', successSettings);
 
                     this.getElm().addClass(Checkout.className);
                     this.getElm().set('data-qui', Checkout.get('data-qui'));
@@ -495,7 +489,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('orderHash'),
-                    settings: JSON.encode(settings)
+                    settings: JSON.stringify(settings)
                 });
             });
         },
@@ -656,7 +650,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         }
 
                         this.setAttribute('orderHash', result.orderHash);
-                        this.$applySuccessSettings(result.successSettings);
                         this.$successViewReady = false;
                         this.$setAnchor();
 
@@ -776,7 +769,6 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         $renderOrderProcessStep: function (result) {
             const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
             const scripts = this.$extractScripts(result.html);
-            this.$applySuccessSettings(result.successSettings);
             this.$successViewReady = false;
             this.$showOrderSuccessInfoPending = !!this.getAttribute('showOrderSuccessInfo');
 
@@ -888,9 +880,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.fireEvent('showOrderSuccessInfo', [this]);
         },
 
-        $getRequestedSuccessSettings: function () {
+        $getSuccessSettings: function () {
+            const content = this.getAttribute('successContent');
+
             return {
-                successContent: this.getAttribute('successContent'),
+                successContent: typeof content === 'string' ? content : this.$successSettings?.successContent ?? false,
+                successContentSource: typeof content === 'string' ? 'frontend' : 'php',
                 successUrl: this.getAttribute('successUrl'),
                 successRedirectDelay: this.getAttribute('successRedirectDelay')
             };
@@ -912,17 +907,19 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$successSettings = settings;
 
             for (const name of ['successUrl', 'successRedirectDelay']) {
-                this.setAttribute(name, settings[name] ?? false);
+                if (this.getAttribute(name) === false) {
+                    this.setAttribute(name, settings[name] ?? false);
+                }
             }
         },
 
         $showSuccessActions: function () {
-            if (this.$successActionsShown || !this.$successSettings) {
+            if (this.$successActionsShown) {
                 return;
             }
 
             this.$successActionsShown = true;
-            const settings = this.$successSettings;
+            const settings = this.$getSuccessSettings();
             const Elm = this.getElm();
 
             if (typeof settings.successContent === 'string' && settings.successContent !== '') {
@@ -955,6 +952,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             if (
                 typeof settings.successUrl !== 'string' ||
+                /[\x00-\x20\x7f\\]/.test(settings.successUrl) ||
+                settings.successUrl.startsWith('//') ||
+                !/^(?:\/(?!\/)|https?:\/\/)/i.test(settings.successUrl) ||
                 !Number.isInteger(settings.successRedirectDelay) ||
                 settings.successRedirectDelay < 0 ||
                 settings.successRedirectDelay > 86400
@@ -1254,7 +1254,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('orderHash'),
-                    settings: JSON.encode(this.getAttributes())
+                    settings: JSON.stringify({
+                        disableAddress: this.getAttribute('disableAddress'),
+                        disableProductLinks: this.getAttribute('disableProductLinks')
+                    })
                 });
             });
         },

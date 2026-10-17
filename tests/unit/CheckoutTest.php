@@ -36,13 +36,18 @@ final class CheckoutTest extends TestCase
         $Articles = $this->createStub(ArticleList::class);
         $Articles->method('count')->willReturn(1);
 
-        $Order = $this->createStub(OrderInProcess::class);
+        $Order = $this->createMock(OrderInProcess::class);
         $Order->method('getArticles')->willReturn($Articles);
+        $Order->expects(self::never())->method('setData');
+        $Order->expects(self::never())->method('save');
 
         $Checkout = $this->getMockBuilder(Checkout::class)
             ->setConstructorArgs([[
                 'template' => dirname(__DIR__) . '/fixtures/checkout.html',
-                'showBasketLink' => false
+                'showBasketLink' => false,
+                'successContent' => '<a href="/konto">Konto</a>',
+                'successUrl' => '/konto',
+                'successRedirectDelay' => 5
             ]])
             ->onlyMethods(['getOrder', 'getUser'])
             ->getMock();
@@ -50,6 +55,11 @@ final class CheckoutTest extends TestCase
         $Checkout->method('getUser')->willReturn($this->createStub(\QUI\ERP\User::class));
 
         self::assertStringContainsString('checkout-test-fixture', $Checkout->getBody());
+        self::assertSame([
+            'successContent' => '<a href="/konto">Konto</a>',
+            'successUrl' => '/konto',
+            'successRedirectDelay' => 5
+        ], json_decode($Checkout->getAttribute('data-qui-options-successsettings'), true, 512, JSON_THROW_ON_ERROR));
     }
 
     public function testMissingOrderReportsPaymentAndRequiredAddress(): void

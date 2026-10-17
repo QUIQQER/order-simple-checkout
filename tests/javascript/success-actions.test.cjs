@@ -67,8 +67,7 @@ function finish(instance) {
 const settings = {
     successContent: '<a class="button" href="/konto">Mein Konto</a>',
     successUrl: '/konto',
-    successRedirectDelay: 5,
-    successContentSource: 'php'
+    successRedirectDelay: 5
 };
 
 test('defaults do not add content or redirect', () => {
@@ -131,10 +130,12 @@ test('redirect works independently of content and permits zero seconds', () => {
     assert.equal([...state.scheduled.values()][0].delay, 0);
 });
 
-test('unconfirmed client HTML is never inserted', () => {
-    const state = checkout({successContent: '<img onerror="alert(1)">'});
+test('client HTML is safely rendered directly from the control attributes', () => {
+    const content = '<img onerror="alert(1)">';
+    const state = checkout({successContent: content});
     finish(state.instance);
-    assert.equal(state.children.length, 0);
+    assert.equal(state.children[0].textContent, content);
+    assert.equal(state.children[0].innerHTML, '');
 });
 
 test('disabled success information never starts completion actions', () => {
@@ -166,6 +167,10 @@ test('a removed checkout cannot redirect the browser', () => {
 test('script URLs and invalid delays never start redirects', () => {
     for (const invalid of [
         {successUrl: 'javascript:alert(1)'},
+        {successUrl: '//example.com'},
+        {successUrl: '/\\example.com'},
+        {successUrl: '/\n/example.com'},
+        {successUrl: 'account'},
         {successRedirectDelay: -1},
         {successRedirectDelay: '5'},
         {successRedirectDelay: 86401}
@@ -177,7 +182,7 @@ test('script URLs and invalid delays never start redirects', () => {
     }
 });
 
-test('order loading sends configuration and adopts the server settings on return', async () => {
+test('order requests do not send completion attributes or replace the control configuration', async () => {
     let request;
     const state = checkout({orderHash: 'order-hash', ...settings}, {
         post: (name, callback, params) => {
@@ -186,16 +191,13 @@ test('order loading sends configuration and adopts the server settings on return
         }
     });
     await state.instance.$loadOrder();
-    assert.deepEqual(JSON.parse(request.successSettings), {
-        successContent: settings.successContent,
-        successUrl: settings.successUrl,
-        successRedirectDelay: settings.successRedirectDelay
-    });
+    assert.equal('successSettings' in request, false);
+    assert.equal('successContent' in request, false);
     finish(state.instance);
-    assert.equal(state.children[0].innerHTML, 'Configured in PHP');
+    assert.equal(state.children[0].textContent, settings.successContent);
 });
 
-test('server-rendered JSON settings support a reload without client options', () => {
+test('PHP control attributes provide HTML and redirect settings to the current instance', () => {
     const state = checkout();
     state.instance.$applySuccessSettings(JSON.stringify(settings));
     finish(state.instance);
@@ -205,14 +207,13 @@ test('server-rendered JSON settings support a reload without client options', ()
 
 test('frontend content is passed to the native sanitizer without writing innerHTML', () => {
     const calls = [];
-    const state = checkout({}, {}, () => ({
+    const content = '<a href="/konto">Konto</a><img src=x onerror="alert(1)"><script>alert(2)</script>';
+    const state = checkout({successContent: content}, {}, () => ({
         dataset: {},
         setHTML: html => calls.push(html),
         set innerHTML(value) { throw new Error('Untrusted HTML must never use innerHTML'); },
         set textContent(value) { throw new Error('Native sanitization is available'); }
     }));
-    const content = '<a href="/konto">Konto</a><img src=x onerror="alert(1)"><script>alert(2)</script>';
-    state.instance.$applySuccessSettings({...settings, successContent: content, successContentSource: 'frontend'});
     finish(state.instance);
     assert.deepEqual(calls, [content]);
     assert.equal(state.children.length, 1);
@@ -220,12 +221,11 @@ test('frontend content is passed to the native sanitizer without writing innerHT
 
 test('browsers without setHTML use textContent for frontend markup', () => {
     const content = '<img src=x onerror="alert(1)"><script>alert(2)</script>';
-    const state = checkout({}, {}, () => ({
+    const state = checkout({successContent: content}, {}, () => ({
         dataset: {},
         textContent: '',
         set innerHTML(value) { throw new Error('Unsafe fallback'); }
     }));
-    state.instance.$applySuccessSettings({...settings, successContent: content, successContentSource: 'frontend'});
     finish(state.instance);
     assert.equal(state.children[0].textContent, content);
 });
@@ -236,27 +236,25 @@ test('native default sanitization also allows CSS classes and accessibility labe
     class NativeSanitizer {
         allowAttribute(name) { attributes.push(name); }
     }
-    const state = checkout({}, {}, () => ({
+    const state = checkout({successContent: settings.successContent}, {}, () => ({
         dataset: {},
         setHTML: (html, options) => { suppliedSanitizer = options.sanitizer; }
     }), NativeSanitizer);
-    state.instance.$applySuccessSettings({...settings, successContentSource: 'frontend'});
     finish(state.instance);
     assert.ok(suppliedSanitizer instanceof NativeSanitizer);
     assert.deepEqual(attributes, ['class', 'aria-label', 'aria-hidden']);
 });
 
-test('a missing or unknown source marker always uses safe rendering', () => {
-    for (const source of [undefined, null, '', true, 'unknown']) {
-        const state = checkout();
-        state.instance.$applySuccessSettings({...settings, successContentSource: source});
+test('JavaScript attributes cannot mark their content as trusted PHP HTML', () => {
+    for (const source of [undefined, null, '', true, 'unknown', 'php']) {
+        const state = checkout({...settings, successContentSource: source});
         finish(state.instance);
         assert.equal(state.children[0].textContent, settings.successContent);
         assert.equal(state.children[0].innerHTML, '');
     }
 });
 
-test('returning from payment keeps frontend content subject to sanitization', async () => {
+test('new control instances never restore completion configuration from order responses', async () => {
     const state = checkout({orderHash: 'order-hash'}, {
         post: (name, callback) => callback({
             order: {},
@@ -265,7 +263,33 @@ test('returning from payment keeps frontend content subject to sanitization', as
     });
     await state.instance.$loadOrder();
     finish(state.instance);
+    assert.equal(state.children.length, 0);
+    assert.equal(state.scheduled.size, 0);
+});
+
+test('PHP defaults do not overwrite JavaScript attributes during checkout import', () => {
+    const state = checkout(settings);
+    state.instance.$applySuccessSettings({successContent: false, successUrl: false, successRedirectDelay: false});
+    finish(state.instance);
     assert.equal(state.children[0].textContent, settings.successContent);
-    assert.equal(state.children[0].innerHTML, '');
-    assert.equal(state.instance.$getRequestedSuccessSettings().successContent, false);
+    assert.equal([...state.scheduled.values()][0].delay, 5000);
+});
+
+test('checkout and basket refresh requests never transmit completion attributes', () => {
+    const requests = [];
+    const state = checkout({...settings, orderHash: 'order-hash'}, {
+        get: (name, callback, params) => requests.push(params)
+    });
+    state.instance.$setAnchor = () => {};
+    state.instance.$BasketLoader = {style: {}};
+    state.instance.$loadCheckout();
+    state.instance.$refreshBasket();
+    assert.equal(requests.length, 2);
+
+    for (const request of requests) {
+        const params = JSON.parse(request.settings);
+        assert.equal('successContent' in params, false);
+        assert.equal('successUrl' in params, false);
+        assert.equal('successRedirectDelay' in params, false);
+    }
 });

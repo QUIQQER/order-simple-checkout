@@ -5,7 +5,6 @@
  */
 
 use QUI\ERP\Order\SimpleCheckout\Checkout;
-use QUI\ERP\Order\SimpleCheckout\SuccessSettings;
 
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl',
@@ -18,21 +17,12 @@ QUI::getAjax()->registerFunction(
             $settings = [];
         }
 
-        $successSettings = SuccessSettings::frontendSettings($settings);
         $Checkout = new Checkout([
             'orderHash' => $orderHash,
             'disableAddress' => $settings['disableAddress'] ?? false,
             'disableProductLinks' => $settings['disableProductLinks'] ?? 'default',
-            'showEmail' => $settings['showEmail'] ?? false,
-            'successUrl' => $successSettings['successUrl'],
-            'successRedirectDelay' => $successSettings['successRedirectDelay']
+            'showEmail' => $settings['showEmail'] ?? false
         ]);
-
-        $Order = $Checkout->getOrder();
-
-        if ($Order !== null) {
-            SuccessSettings::configureFrontend($Order, $successSettings);
-        }
 
         $Output = new QUI\Output();
         $result = $Checkout->create();

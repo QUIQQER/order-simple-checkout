@@ -10,7 +10,6 @@ use QUI\ERP\Order\Factory;
 use QUI\ERP\Order\Handler;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
-use QUI\ERP\Order\SimpleCheckout\SuccessSettings;
 use Throwable;
 
 final class CheckoutProcessTest extends TestCase
@@ -61,31 +60,11 @@ final class CheckoutProcessTest extends TestCase
         self::assertArrayHasKey('url', $step);
         self::assertArrayHasKey('hash', $step);
         self::assertSame(0, $step['productCount']);
+        self::assertArrayNotHasKey('successSettings', $step);
     }
 
     private function getConnection(): Connection
     {
         return \QUI::getDataBaseConnection();
-    }
-
-    public function testCompletionSettingsSurviveReloadAndAreReturnedWithThePaymentStep(): void
-    {
-        $SystemUser = \QUI::getUsers()->getSystemUser();
-        $Order = Factory::getInstance()->createOrderInProcess($SystemUser);
-        $this->orderHash = $Order->getUUID();
-        $settings = SuccessSettings::normalize([
-            'successContent' => '<a href="/konto">Mein Konto</a>',
-            'successUrl' => '/konto',
-            'successRedirectDelay' => 10
-        ]);
-        $Order->setData(SuccessSettings::DATA_KEY, $settings);
-        $Order->save($SystemUser);
-        $Reloaded = new OrderInProcess($this->orderHash);
-
-        self::assertSame($settings, SuccessSettings::read($Reloaded));
-        self::assertSame($settings, SuccessSettings::configure($Reloaded, SuccessSettings::DEFAULTS));
-
-        $Checkout = new Checkout(['orderHash' => $this->orderHash]);
-        self::assertSame($settings, $Checkout->getOrderProcessStep()['successSettings']);
     }
 }
