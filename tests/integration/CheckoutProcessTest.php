@@ -60,6 +60,7 @@ final class CheckoutProcessTest extends TestCase
         self::assertArrayHasKey('url', $step);
         self::assertArrayHasKey('hash', $step);
         self::assertSame(0, $step['productCount']);
+        self::assertArrayNotHasKey('successSettings', $step);
     }
 
     private function getConnection(): Connection

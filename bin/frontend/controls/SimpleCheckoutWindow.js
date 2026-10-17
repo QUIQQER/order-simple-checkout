@@ -27,7 +27,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         options: {
             'class': 'SimpleCheckoutWindow',
             closeButton: true,
-            showOrderSuccessInfo: true
+            showOrderSuccessInfo: true,
+            addToBasket: false,
+            successContent: false,
+            successUrl: false,
+            successRedirectDelay: false
         },
 
         initialize: function(options) {
@@ -46,7 +50,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$PayToOrderBtn = null;
 
             this.addEvents({
-                onOpen: this.$onOpen
+                onOpen: this.$onOpen,
+                onClose: () => {
+                    this.$Checkout?.$clearSuccessRedirect();
+                }
             });
         },
 
@@ -74,8 +81,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.$Checkout = new SimpleCheckout({
                 products: this.getAttribute('products'),
+                addToBasket: this.getAttribute('addToBasket'),
                 showPayToOrderBtn: true,
                 showOrderSuccessInfo: this.getAttribute('showOrderSuccessInfo'),
+                successContent: this.getAttribute('successContent'),
+                successUrl: this.getAttribute('successUrl'),
+                successRedirectDelay: this.getAttribute('successRedirectDelay'),
                 events: {
                     onLoaded: () => {
                         this.Loader.hide();

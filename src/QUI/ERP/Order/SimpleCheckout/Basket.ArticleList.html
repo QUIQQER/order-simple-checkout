@@ -40,7 +40,7 @@
                     <div class="quantity">
                         {if $Article->getAttribute('displayPrice')}
                         {$Article->getAttribute('quantity')} {$Article->getQuantityUnit()} x
-                        {$Currency->format($calc.basisPrice)}
+                        {$Currency->format($calc.price)}
                         {/if}
                     </div>
                     <div class="articleData__sum">
@@ -97,7 +97,7 @@
                 <div class="articleData__price">
                     <div class="quantity">
                         {$Article->getAttribute('quantity')} {$Article->getQuantityUnit()} x
-                        {$Currency->format($calc.basisPrice)}
+                        {$Currency->format($calc.price)}
                     </div>
                     <div class="articleData__sum">
                         <span class="articleData__sumValue fw-bolder">{$Currency->format($calc.sum)}</span>
