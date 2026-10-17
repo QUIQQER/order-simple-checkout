@@ -6,19 +6,29 @@ use QUI;
 use QUI\ERP\Order\AbstractOrder;
 use QUI\ERP\Order\OrderInProcess;
 
-/** Safe, order-specific configuration for the checkout's optional completion actions. */
+/**
+ * Order-specific configuration for the checkout's optional completion actions.
+ *
+ * @phpstan-type CompletionSettings array{
+ *     successContent: string|false,
+ *     successUrl: string|false,
+ *     successRedirectDelay: int|false,
+ *     successContentSource: 'php'|'frontend'
+ * }
+ */
 final class SuccessSettings
 {
     public const DATA_KEY = 'simpleCheckoutSuccess';
     public const DEFAULTS = [
         'successContent' => false,
         'successUrl' => false,
-        'successRedirectDelay' => false
+        'successRedirectDelay' => false,
+        'successContentSource' => 'frontend'
     ];
 
     /**
      * @param array<string, mixed> $settings
-     * @return array{successContent: string|false, successUrl: string|false, successRedirectDelay: int|false}
+     * @return CompletionSettings
      */
     public static function normalize(array $settings): array
     {
@@ -60,51 +70,80 @@ final class SuccessSettings
         return [
             'successContent' => is_string($content) && trim($content) !== '' ? $content : false,
             'successUrl' => $url,
-            'successRedirectDelay' => $delay
+            'successRedirectDelay' => $delay,
+            'successContentSource' => ($settings['successContentSource'] ?? null) === 'php' ? 'php' : 'frontend'
         ];
     }
 
-    /** @return array{successContent: string|false, successUrl: string|false, successRedirectDelay: int|false} */
+    /** @return CompletionSettings */
     public static function read(AbstractOrder $Order): array
     {
         $settings = $Order->getDataEntry(self::DATA_KEY);
 
-        return is_array($settings) ? self::normalize($settings) : self::DEFAULTS;
+        if (!is_array($settings)) {
+            return self::DEFAULTS;
+        }
+
+        // Settings saved before frontend HTML support could only contain trusted PHP content.
+        $settings['successContentSource'] ??= 'php';
+
+        return self::normalize($settings);
     }
 
     /**
-     * HTML is configured exclusively by trusted PHP code, never through frontend requests.
+     * Frontend content always requires sanitization, regardless of any submitted source marker.
      *
      * @param array<string, mixed> $settings
-     * @return array{successUrl: string|false, successRedirectDelay: int|false}
+     * @return CompletionSettings
      */
     public static function frontendSettings(array $settings): array
     {
-        $normalized = self::normalize([
+        return self::normalize([
+            'successContent' => $settings['successContent'] ?? false,
             'successUrl' => $settings['successUrl'] ?? false,
             'successRedirectDelay' => $settings['successRedirectDelay'] ?? false
         ]);
-
-        return [
-            'successUrl' => $normalized['successUrl'],
-            'successRedirectDelay' => $normalized['successRedirectDelay']
-        ];
     }
 
     /**
-     * Configure from trusted PHP. Request handlers must use frontendSettings() first.
+     * Configure trusted PHP content. Request handlers must use configureFrontend() instead.
      * Defaults on a returning page never overwrite the settings saved before payment.
      *
      * @param array<string, mixed> $settings
-     * @return array{successContent: string|false, successUrl: string|false, successRedirectDelay: int|false}
+     * @return CompletionSettings
      */
     public static function configure(AbstractOrder $Order, array $settings): array
+    {
+        $settings['successContentSource'] = 'php';
+
+        return self::save($Order, $settings);
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     * @return CompletionSettings
+     */
+    public static function configureFrontend(AbstractOrder $Order, array $settings): array
+    {
+        return self::save($Order, self::frontendSettings($settings));
+    }
+
+    /**
+     * @param array<string, mixed> $settings
+     * @return CompletionSettings
+     */
+    private static function save(AbstractOrder $Order, array $settings): array
     {
         $normalized = self::normalize($settings);
         $stored = self::read($Order);
 
-        foreach ($normalized as $name => $value) {
-            if ($value === false) {
+        if ($normalized['successContent'] === false) {
+            $normalized['successContent'] = $stored['successContent'];
+            $normalized['successContentSource'] = $stored['successContentSource'];
+        }
+
+        foreach (['successUrl', 'successRedirectDelay'] as $name) {
+            if ($normalized[$name] === false) {
                 $normalized[$name] = $stored[$name];
             }
         }

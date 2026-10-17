@@ -30,23 +30,30 @@ final class SuccessSettingsTest extends TestCase
         self::assertSame($settings, SuccessSettings::normalize($settings));
     }
 
-    public function testFrontendRequestsCannotConfigureHtml(): void
+    public function testFrontendRequestsCannotMarkHtmlAsTrusted(): void
     {
+        $content = '<img src=x onerror="alert(1)"><script>alert(2)</script>';
         $settings = SuccessSettings::frontendSettings([
-            'successContent' => '<img src=x onerror="alert(1)"><script>alert(2)</script>',
+            'successContent' => $content,
+            'successContentSource' => 'php',
             'successUrl' => '/konto',
             'successRedirectDelay' => 5
         ]);
 
         self::assertSame([
+            'successContent' => $content,
             'successUrl' => '/konto',
-            'successRedirectDelay' => 5
+            'successRedirectDelay' => 5,
+            'successContentSource' => 'frontend'
         ], $settings);
     }
 
     public function testFrontendRedirectChangesPreservePhpContent(): void
     {
-        $stored = ['successContent' => '<a href="/konto">Konto</a>'] + SuccessSettings::DEFAULTS;
+        $stored = SuccessSettings::normalize([
+            'successContent' => '<a href="/konto">Konto</a>',
+            'successContentSource' => 'php'
+        ]);
         $expected = array_replace($stored, [
             'successUrl' => '/konto',
             'successRedirectDelay' => 5
@@ -60,13 +67,13 @@ final class SuccessSettingsTest extends TestCase
         );
         $Order->expects(self::once())->method('setData')->with(SuccessSettings::DATA_KEY, $expected);
         $Order->expects(self::once())->method('save');
-        $settings = SuccessSettings::frontendSettings([
-            'successContent' => '<script>alert(1)</script>',
+        $settings = [
             'successUrl' => '/konto',
-            'successRedirectDelay' => 5
-        ]);
+            'successRedirectDelay' => 5,
+            'successContentSource' => 'frontend'
+        ];
 
-        self::assertSame($expected, SuccessSettings::configure($Order, $settings));
+        self::assertSame($expected, SuccessSettings::configureFrontend($Order, $settings));
     }
 
     #[DataProvider('redirectTargets')]
@@ -119,7 +126,10 @@ final class SuccessSettingsTest extends TestCase
 
     public function testSettingsAreSavedBeforePayment(): void
     {
-        $settings = SuccessSettings::normalize(['successContent' => '<a href="/konto">Konto</a>']);
+        $settings = SuccessSettings::normalize([
+            'successContent' => '<a href="/konto">Konto</a>',
+            'successContentSource' => 'php'
+        ]);
         $Customer = $this->createStub(QUI\ERP\User::class);
         $Customer->method('getUUID')->willReturn(QUI::getUserBySession()->getUUID());
         $Order = $this->createMock(OrderInProcess::class);
@@ -184,5 +194,47 @@ final class SuccessSettingsTest extends TestCase
         $Order->expects(self::never())->method('save');
 
         self::assertSame($settings, SuccessSettings::configure($Order, ['successContent' => 'Changed']));
+    }
+
+    public function testFrontendContentIsSavedWithoutTrustingItsSourceMarker(): void
+    {
+        $content = '<p>Danke!</p><img src=x onerror="alert(1)">';
+        $expected = SuccessSettings::normalize(['successContent' => $content]);
+        $Customer = $this->createStub(QUI\ERP\User::class);
+        $Customer->method('getUUID')->willReturn(QUI::getUserBySession()->getUUID());
+        $Order = $this->createMock(OrderInProcess::class);
+        $Order->method('getCustomer')->willReturn($Customer);
+        $Order->expects(self::once())->method('setData')->with(SuccessSettings::DATA_KEY, $expected);
+        $Order->expects(self::once())->method('save');
+
+        self::assertSame($expected, SuccessSettings::configureFrontend($Order, [
+            'successContent' => $content,
+            'successContentSource' => 'php'
+        ]));
+    }
+
+    public function testPhpDefaultsNeverPromoteSavedFrontendContentToTrustedHtml(): void
+    {
+        $settings = SuccessSettings::normalize(['successContent' => '<img src=x onerror="alert(1)">']);
+        $Order = $this->createMock(OrderInProcess::class);
+        $Order->method('getDataEntry')->willReturnCallback(
+            static fn (string $key): mixed => $key === SuccessSettings::DATA_KEY ? $settings : null
+        );
+        $Order->expects(self::never())->method('save');
+
+        self::assertSame($settings, SuccessSettings::configure($Order, SuccessSettings::DEFAULTS));
+    }
+
+    public function testLegacyPhpSettingsKeepTheirOriginalRenderingMode(): void
+    {
+        $settings = [
+            'successContent' => '<a href="/konto">Konto</a>',
+            'successUrl' => false,
+            'successRedirectDelay' => false
+        ];
+        $Order = $this->createStub(Order::class);
+        $Order->method('getDataEntry')->with(SuccessSettings::DATA_KEY)->willReturn($settings);
+
+        self::assertSame($settings + ['successContentSource' => 'php'], SuccessSettings::read($Order));
     }
 }

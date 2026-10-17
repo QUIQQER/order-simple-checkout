@@ -28,6 +28,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             'class': 'SimpleCheckoutWindow',
             closeButton: true,
             showOrderSuccessInfo: true,
+            successContent: false,
             successUrl: false,
             successRedirectDelay: false
         },
@@ -81,6 +82,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 products: this.getAttribute('products'),
                 showPayToOrderBtn: true,
                 showOrderSuccessInfo: this.getAttribute('showOrderSuccessInfo'),
+                successContent: this.getAttribute('successContent'),
                 successUrl: this.getAttribute('successUrl'),
                 successRedirectDelay: this.getAttribute('successRedirectDelay'),
                 events: {

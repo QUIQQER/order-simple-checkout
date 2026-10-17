@@ -28,6 +28,12 @@ QUI::getAjax()->registerFunction(
             'successRedirectDelay' => $successSettings['successRedirectDelay']
         ]);
 
+        $Order = $Checkout->getOrder();
+
+        if ($Order !== null) {
+            SuccessSettings::configureFrontend($Order, $successSettings);
+        }
+
         $Output = new QUI\Output();
         $result = $Checkout->create();
         $css = QUI\Control\Manager::getCSS();

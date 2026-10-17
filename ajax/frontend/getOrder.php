@@ -41,8 +41,7 @@ QUI::getAjax()->registerFunction(
         }
 
         $settings = is_string($successSettings) ? json_decode($successSettings, true) : [];
-        $settings = SuccessSettings::frontendSettings(is_array($settings) ? $settings : []);
-        $result['successSettings'] = SuccessSettings::configure($Order, $settings);
+        $result['successSettings'] = SuccessSettings::configureFrontend($Order, is_array($settings) ? $settings : []);
 
         if ($Order instanceof OrderInProcess) {
             $Payment = $Order->getPayment();

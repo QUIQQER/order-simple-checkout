@@ -3,7 +3,12 @@ const {readFileSync} = require('node:fs');
 const {test} = require('node:test');
 const vm = require('node:vm');
 
-function checkout(options = {}, ajax = {}) {
+function checkout(
+    options = {},
+    ajax = {},
+    createContent = () => ({dataset: {}, innerHTML: '', textContent: ''}),
+    SanitizerClass
+) {
     const children = [];
     const scheduled = new Map();
     const navigations = [];
@@ -17,6 +22,7 @@ function checkout(options = {}, ajax = {}) {
     const context = {
         URL,
         window: {
+            Sanitizer: SanitizerClass,
             location: {href: 'https://shop.example/checkout', hash: '', assign: url => navigations.push(url)},
             setTimeout: (callback, delay) => {
                 scheduled.set(++timerId, {callback, delay});
@@ -24,7 +30,7 @@ function checkout(options = {}, ajax = {}) {
             },
             clearTimeout: id => scheduled.delete(id)
         },
-        document: {createElement: () => ({dataset: {}, innerHTML: ''})},
+        document: {createElement: createContent},
         Class: function (value) { return value; },
         define: (name, dependencies, factory) => {
             definition = factory({addEvent() {}}, {}, {}, {}, {}, ajax);
@@ -61,7 +67,8 @@ function finish(instance) {
 const settings = {
     successContent: '<a class="button" href="/konto">Mein Konto</a>',
     successUrl: '/konto',
-    successRedirectDelay: 5
+    successRedirectDelay: 5,
+    successContentSource: 'php'
 };
 
 test('defaults do not add content or redirect', () => {
@@ -180,6 +187,7 @@ test('order loading sends configuration and adopts the server settings on return
     });
     await state.instance.$loadOrder();
     assert.deepEqual(JSON.parse(request.successSettings), {
+        successContent: settings.successContent,
         successUrl: settings.successUrl,
         successRedirectDelay: settings.successRedirectDelay
     });
@@ -193,4 +201,71 @@ test('server-rendered JSON settings support a reload without client options', ()
     finish(state.instance);
     assert.equal(state.children[0].innerHTML, settings.successContent);
     assert.equal([...state.scheduled.values()][0].delay, 5000);
+});
+
+test('frontend content is passed to the native sanitizer without writing innerHTML', () => {
+    const calls = [];
+    const state = checkout({}, {}, () => ({
+        dataset: {},
+        setHTML: html => calls.push(html),
+        set innerHTML(value) { throw new Error('Untrusted HTML must never use innerHTML'); },
+        set textContent(value) { throw new Error('Native sanitization is available'); }
+    }));
+    const content = '<a href="/konto">Konto</a><img src=x onerror="alert(1)"><script>alert(2)</script>';
+    state.instance.$applySuccessSettings({...settings, successContent: content, successContentSource: 'frontend'});
+    finish(state.instance);
+    assert.deepEqual(calls, [content]);
+    assert.equal(state.children.length, 1);
+});
+
+test('browsers without setHTML use textContent for frontend markup', () => {
+    const content = '<img src=x onerror="alert(1)"><script>alert(2)</script>';
+    const state = checkout({}, {}, () => ({
+        dataset: {},
+        textContent: '',
+        set innerHTML(value) { throw new Error('Unsafe fallback'); }
+    }));
+    state.instance.$applySuccessSettings({...settings, successContent: content, successContentSource: 'frontend'});
+    finish(state.instance);
+    assert.equal(state.children[0].textContent, content);
+});
+
+test('native default sanitization also allows CSS classes and accessibility labels', () => {
+    const attributes = [];
+    let suppliedSanitizer;
+    class NativeSanitizer {
+        allowAttribute(name) { attributes.push(name); }
+    }
+    const state = checkout({}, {}, () => ({
+        dataset: {},
+        setHTML: (html, options) => { suppliedSanitizer = options.sanitizer; }
+    }), NativeSanitizer);
+    state.instance.$applySuccessSettings({...settings, successContentSource: 'frontend'});
+    finish(state.instance);
+    assert.ok(suppliedSanitizer instanceof NativeSanitizer);
+    assert.deepEqual(attributes, ['class', 'aria-label', 'aria-hidden']);
+});
+
+test('a missing or unknown source marker always uses safe rendering', () => {
+    for (const source of [undefined, null, '', true, 'unknown']) {
+        const state = checkout();
+        state.instance.$applySuccessSettings({...settings, successContentSource: source});
+        finish(state.instance);
+        assert.equal(state.children[0].textContent, settings.successContent);
+        assert.equal(state.children[0].innerHTML, '');
+    }
+});
+
+test('returning from payment keeps frontend content subject to sanitization', async () => {
+    const state = checkout({orderHash: 'order-hash'}, {
+        post: (name, callback) => callback({
+            order: {},
+            successSettings: {...settings, successContentSource: 'frontend'}
+        })
+    });
+    await state.instance.$loadOrder();
+    finish(state.instance);
+    assert.equal(state.children[0].textContent, settings.successContent);
+    assert.equal(state.children[0].innerHTML, '');
+    assert.equal(state.instance.$getRequestedSuccessSettings().successContent, false);
 });

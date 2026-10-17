@@ -47,6 +47,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             showBasketLink: true,
             disableAddress: false,
             disableProductLinks: 'default',
+            successContent: false,
             successUrl: false,
             successRedirectDelay: false
         },
@@ -889,6 +890,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $getRequestedSuccessSettings: function () {
             return {
+                successContent: this.getAttribute('successContent'),
                 successUrl: this.getAttribute('successUrl'),
                 successRedirectDelay: this.getAttribute('successRedirectDelay')
             };
@@ -926,8 +928,27 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             if (typeof settings.successContent === 'string' && settings.successContent !== '') {
                 const Content = document.createElement('div');
                 Content.dataset.name = 'success-content';
-                // HTML comes exclusively from trusted PHP configuration stored with the order.
-                Content.innerHTML = settings.successContent;
+                if (settings.successContentSource === 'php') {
+                    // Only trusted PHP configuration may bypass sanitization.
+                    Content.innerHTML = settings.successContent;
+                } else if (typeof Content.setHTML === 'function') {
+                    const options = {};
+
+                    if (typeof window.Sanitizer === 'function') {
+                        const sanitizer = new window.Sanitizer();
+
+                        for (const name of ['class', 'aria-label', 'aria-hidden']) {
+                            sanitizer.allowAttribute(name);
+                        }
+
+                        options.sanitizer = sanitizer;
+                    }
+
+                    Content.setHTML(settings.successContent, options);
+                } else {
+                    Content.textContent = settings.successContent;
+                }
+
                 const Container = Elm.querySelector('[data-name="checkout-container"]') || Elm;
                 Container.appendChild(Content);
             }

@@ -26,6 +26,8 @@ use function in_array;
  * Class Checkout
  *
  * Represents the simple checkout control
+ *
+ * @phpstan-import-type CompletionSettings from SuccessSettings
  */
 class Checkout extends QUI\Control
 {
@@ -296,7 +298,7 @@ class Checkout extends QUI\Control
      *     hash: string,
      *     orderHash: string,
      *     productCount: int,
-     *     successSettings: array{successContent: string|false, successUrl: string|false, successRedirectDelay: int|false}
+     *     successSettings: CompletionSettings
      * }
      *
      * @throws QUI\ERP\Order\Exception
@@ -371,7 +373,7 @@ class Checkout extends QUI\Control
      *     hash: string,
      *     orderHash: string,
      *     productCount: int,
-     *     successSettings: array{successContent: string|false, successUrl: string|false, successRedirectDelay: int|false}
+     *     successSettings: CompletionSettings
      * }
      * @throws QUI\ERP\Order\Basket\Exception
      * @throws \Exception
