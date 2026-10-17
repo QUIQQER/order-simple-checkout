@@ -22,6 +22,9 @@ final class CheckoutTest extends TestCase
 
         self::assertSame(true, $Checkout->getAttribute('showBasketLink'));
         self::assertSame(false, $Checkout->getAttribute('showEmail'));
+        self::assertSame(false, $Checkout->getAttribute('successContent'));
+        self::assertSame(false, $Checkout->getAttribute('successUrl'));
+        self::assertSame(false, $Checkout->getAttribute('successRedirectDelay'));
         self::assertSame(
             'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             $Checkout->getAttribute('data-qui')

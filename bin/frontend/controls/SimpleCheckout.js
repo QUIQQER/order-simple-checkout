@@ -34,7 +34,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             '$onProcessPaymentChange',
             '$initEmbeddedOrderProcess',
             '$maybeFireShowOrderSuccessInfo',
-            '$removeProcessPaymentChange'
+            '$removeProcessPaymentChange',
+            '$clearSuccessRedirect'
         ],
 
         options: {
@@ -45,7 +46,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             showOrderSuccessInfo: true,
             showBasketLink: true,
             disableAddress: false,
-            disableProductLinks: 'default'
+            disableProductLinks: 'default',
+            successUrl: false,
+            successRedirectDelay: false
         },
 
         initialize: function (options) {
@@ -66,6 +69,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$processPaymentChangeTimers = [];
             this.$showOrderSuccessInfoPending = false;
             this.$EmbeddedOrderProcess = null;
+            this.$successSettings = null;
+            this.$successRedirectTimer = null;
+            this.$successActionsShown = false;
+            this.$successViewReady = false;
 
             this.$PayToOrderBtn = null;
             this.ScrollToPaymentBtn = null;
@@ -73,7 +80,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.addEvents({
                 onImport: this.$onImport,
-                onInject: this.$onInject
+                onInject: this.$onInject,
+                onDestroy: this.$clearSuccessRedirect
             });
 
             // this.addEvent('showOrderSuccessInfo', () => {
@@ -99,6 +107,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $onImport: function () {
             const Elm = this.getElm();
+            this.$applySuccessSettings(Elm.getAttribute('data-qui-options-successsettings'));
 
             this.Loader = new QUILoader().inject(Elm);
             this.$setAnchor();
@@ -259,9 +268,13 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         $loadOrder: function () {
             if (this.getAttribute('orderHash')) {
                 return new Promise((resolve, reject) => {
-                    QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_getOrder', resolve, {
+                    QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_getOrder', (result) => {
+                        this.$applySuccessSettings(result.successSettings);
+                        resolve(result);
+                    }, {
                         'package': 'quiqqer/order-simple-checkout',
                         orderHash: this.getAttribute('orderHash'),
+                        successSettings: JSON.stringify(this.$getRequestedSuccessSettings()),
                         onError: reject
                     });
                 });
@@ -449,8 +462,12 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$setAnchor();
 
             return new Promise((resolve) => {
-                const settings = this.getAttributes();
-                settings.showEmail = this.getAttribute('showEmail');
+                const settings = {
+                    disableAddress: this.getAttribute('disableAddress'),
+                    disableProductLinks: this.getAttribute('disableProductLinks'),
+                    showEmail: this.getAttribute('showEmail'),
+                    ...this.$getRequestedSuccessSettings()
+                };
 
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl', (html) => {
                     const Ghost = new Element('div', {
@@ -458,6 +475,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
 
                     const Checkout = Ghost.getElement('[data-name="quiqqer-simple-checkout"]');
+                    const successSettings = Checkout.getAttribute('data-qui-options-successsettings');
+                    this.$applySuccessSettings(successSettings);
+                    this.getElm().setAttribute('data-qui-options-successsettings', successSettings);
 
                     this.getElm().addClass(Checkout.className);
                     this.getElm().set('data-qui', Checkout.get('data-qui'));
@@ -635,6 +655,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         }
 
                         this.setAttribute('orderHash', result.orderHash);
+                        this.$applySuccessSettings(result.successSettings);
+                        this.$successViewReady = false;
                         this.$setAnchor();
 
                         // for the OrderProcess.js
@@ -694,11 +716,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                                 });
                                             }
 
-                                            if (result.step !== 'Processing' && this.$showOrderSuccessInfoPending) {
-                                                this.$removeProcessPaymentChange();
-                                                this.$showOrderSuccessInfoPending = false;
-                                                this.fireEvent('showOrderSuccessInfo', [this]);
-                                            }
+                                            this.$successViewReady = true;
+                                            this.$finishSuccessInfo(result.step);
+                                            this.$maybeFireShowOrderSuccessInfo();
                                             resolve();
                                         }
                                     });
@@ -755,6 +775,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         $renderOrderProcessStep: function (result) {
             const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
             const scripts = this.$extractScripts(result.html);
+            this.$applySuccessSettings(result.successSettings);
+            this.$successViewReady = false;
+            this.$showOrderSuccessInfoPending = !!this.getAttribute('showOrderSuccessInfo');
 
             this.getElm().addClass('quiqqer-simple-checkout--processing');
             this.setAttribute('orderHash', result.orderHash);
@@ -793,6 +816,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                 opacity: 1
                             }, {
                                 callback: () => {
+                                    this.$successViewReady = true;
+                                    this.$finishSuccessInfo(result.step);
+                                    this.$maybeFireShowOrderSuccessInfo();
                                     if (typeof Container.scrollIntoView === 'function') {
                                         Container.scrollIntoView({
                                             behavior: 'smooth',
@@ -843,15 +869,104 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return;
             }
 
-            const current = Process.getAttribute('current');
+            this.$finishSuccessInfo(Process.getAttribute('current'));
+        },
 
-            if (!current || String(current).toLowerCase() === 'processing') {
+        $finishSuccessInfo: function (step) {
+            if (
+                !this.$showOrderSuccessInfoPending ||
+                !this.$successViewReady ||
+                String(step).toLowerCase() !== 'finish'
+            ) {
                 return;
             }
 
             this.$removeProcessPaymentChange();
             this.$showOrderSuccessInfoPending = false;
+            this.$showSuccessActions();
             this.fireEvent('showOrderSuccessInfo', [this]);
+        },
+
+        $getRequestedSuccessSettings: function () {
+            return {
+                successUrl: this.getAttribute('successUrl'),
+                successRedirectDelay: this.getAttribute('successRedirectDelay')
+            };
+        },
+
+        $applySuccessSettings: function (settings) {
+            if (typeof settings === 'string') {
+                try {
+                    settings = JSON.parse(settings);
+                } catch (error) {
+                    return;
+                }
+            }
+
+            if (!settings || typeof settings !== 'object') {
+                return;
+            }
+
+            this.$successSettings = settings;
+
+            for (const name of ['successUrl', 'successRedirectDelay']) {
+                this.setAttribute(name, settings[name] ?? false);
+            }
+        },
+
+        $showSuccessActions: function () {
+            if (this.$successActionsShown || !this.$successSettings) {
+                return;
+            }
+
+            this.$successActionsShown = true;
+            const settings = this.$successSettings;
+            const Elm = this.getElm();
+
+            if (typeof settings.successContent === 'string' && settings.successContent !== '') {
+                const Content = document.createElement('div');
+                Content.dataset.name = 'success-content';
+                // HTML comes exclusively from trusted PHP configuration stored with the order.
+                Content.innerHTML = settings.successContent;
+                const Container = Elm.querySelector('[data-name="checkout-container"]') || Elm;
+                Container.appendChild(Content);
+            }
+
+            if (
+                typeof settings.successUrl !== 'string' ||
+                !Number.isInteger(settings.successRedirectDelay) ||
+                settings.successRedirectDelay < 0 ||
+                settings.successRedirectDelay > 86400
+            ) {
+                return;
+            }
+
+            let target;
+
+            try {
+                target = new URL(settings.successUrl, window.location.href);
+            } catch (error) {
+                return;
+            }
+
+            if (target.protocol !== 'https:' && target.protocol !== 'http:') {
+                return;
+            }
+
+            this.$successRedirectTimer = window.setTimeout(() => {
+                this.$successRedirectTimer = null;
+
+                if (Elm.isConnected) {
+                    window.location.assign(target.href);
+                }
+            }, settings.successRedirectDelay * 1000);
+        },
+
+        $clearSuccessRedirect: function () {
+            if (this.$successRedirectTimer !== null) {
+                window.clearTimeout(this.$successRedirectTimer);
+                this.$successRedirectTimer = null;
+            }
         },
 
         $removeProcessPaymentChange: function () {

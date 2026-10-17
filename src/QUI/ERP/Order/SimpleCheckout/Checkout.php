@@ -41,6 +41,9 @@ class Checkout extends QUI\Control
             'disableProductLinks' => 'default',
             'showBasketLink' => true,
             'showEmail' => false,
+            'successContent' => false,
+            'successUrl' => false,
+            'successRedirectDelay' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
@@ -90,6 +93,13 @@ class Checkout extends QUI\Control
             if ($this->getOrder()) {
                 $Basket->toOrder($this->getOrder());
             }
+        }
+
+        $Order = $this->getOrder();
+
+        if ($Order !== null) {
+            $successSettings = SuccessSettings::configure($Order, $this->getAttributes());
+            $this->setJavaScriptControlOption('successsettings', json_encode($successSettings, JSON_THROW_ON_ERROR));
         }
 
         $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
@@ -285,7 +295,8 @@ class Checkout extends QUI\Control
      *     url: string,
      *     hash: string,
      *     orderHash: string,
-     *     productCount: int
+     *     productCount: int,
+     *     successSettings: array{successContent: string|false, successUrl: string|false, successRedirectDelay: int|false}
      * }
      *
      * @throws QUI\ERP\Order\Exception
@@ -302,6 +313,8 @@ class Checkout extends QUI\Control
                 QUI\ERP\Order\Handler::ERROR_ORDER_NOT_FOUND
             );
         }
+
+        SuccessSettings::configure($OrderInProcess, $this->getAttributes());
 
         $failedPaymentProcedure = OrderSettings::getInstance()->get('order', 'failedPaymentProcedure');
         $Payment = $OrderInProcess->getPayment();
@@ -357,7 +370,8 @@ class Checkout extends QUI\Control
      *     url: string,
      *     hash: string,
      *     orderHash: string,
-     *     productCount: int
+     *     productCount: int,
+     *     successSettings: array{successContent: string|false, successUrl: string|false, successRedirectDelay: int|false}
      * }
      * @throws QUI\ERP\Order\Basket\Exception
      * @throws \Exception
@@ -430,6 +444,7 @@ class Checkout extends QUI\Control
             'hash' => $OrderProcess->getStepHash(),
             'orderHash' => $Order->getUUID(),
             'productCount' => $Order->getArticles()->count(),
+            'successSettings' => SuccessSettings::read($Order),
         ];
     }
 

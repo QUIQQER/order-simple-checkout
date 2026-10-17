@@ -7,10 +7,11 @@
 use QUI\ERP\Address;
 use QUI\ERP\Order\OrderInProcess;
 use QUI\ERP\Order\SimpleCheckout\Checkout;
+use QUI\ERP\Order\SimpleCheckout\SuccessSettings;
 
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getOrder',
-    function ($orderHash) {
+    function ($orderHash, $successSettings = null) {
         $User = QUI::getUserBySession();
         $Address = $User->getStandardAddress();
         $Checkout = new Checkout([
@@ -38,6 +39,10 @@ QUI::getAjax()->registerFunction(
         if ($Order->getCustomer()->getUUID() !== $User->getUUID()) {
             throw new QUI\Exception(['quiqqer/order', 'exception.no.permission.for.this.order']);
         }
+
+        $settings = is_string($successSettings) ? json_decode($successSettings, true) : [];
+        $settings = SuccessSettings::frontendSettings(is_array($settings) ? $settings : []);
+        $result['successSettings'] = SuccessSettings::configure($Order, $settings);
 
         if ($Order instanceof OrderInProcess) {
             $Payment = $Order->getPayment();
@@ -70,5 +75,5 @@ QUI::getAjax()->registerFunction(
 
         return $result;
     },
-    ['orderHash']
+    ['orderHash', 'successSettings']
 );
