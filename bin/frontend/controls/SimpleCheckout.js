@@ -11,9 +11,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     'qui/controls/loader/Loader',
     'qui/utils/Form',
     'Locale',
-    'Ajax'
+    'Ajax',
+    'package/quiqqer/order-simple-checkout/bin/frontend/utils/ProductUrl'
 
-], function (QUI, QUIControl, QUILoader, QUIFormUtils, QUILocale, QUIAjax) {
+], function (QUI, QUIControl, QUILoader, QUIFormUtils, QUILocale, QUIAjax, ProductUrl) {
     'use strict';
 
     const lg = 'quiqqer/order-simple-checkout';
@@ -34,7 +35,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             '$onProcessPaymentChange',
             '$initEmbeddedOrderProcess',
             '$maybeFireShowOrderSuccessInfo',
-            '$removeProcessPaymentChange'
+            '$removeProcessPaymentChange',
+            '$clearSuccessRedirect'
         ],
 
         options: {
@@ -45,7 +47,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             showOrderSuccessInfo: true,
             showBasketLink: true,
             disableAddress: false,
-            disableProductLinks: 'default'
+            disableProductLinks: 'default',
+            addToBasket: false,
+            successContent: false,
+            successUrl: false,
+            successRedirectDelay: false
         },
 
         initialize: function (options) {
@@ -63,9 +69,14 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$initialized = false;
             this.$isOrdering = false;
             this.$orderPromise = null;
+            this.$productsPromise = null;
             this.$processPaymentChangeTimers = [];
             this.$showOrderSuccessInfoPending = false;
             this.$EmbeddedOrderProcess = null;
+            this.$successSettings = null;
+            this.$successRedirectTimer = null;
+            this.$successActionsShown = false;
+            this.$successViewReady = false;
 
             this.$PayToOrderBtn = null;
             this.ScrollToPaymentBtn = null;
@@ -73,7 +84,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             this.addEvents({
                 onImport: this.$onImport,
-                onInject: this.$onInject
+                onInject: this.$onInject,
+                onDestroy: this.$clearSuccessRedirect
             });
 
             // this.addEvent('showOrderSuccessInfo', () => {
@@ -99,6 +111,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $onImport: function () {
             const Elm = this.getElm();
+            if (!this.$successSettings) {
+                this.$applySuccessSettings(Elm.getAttribute('data-qui-options-successsettings'));
+            }
 
             this.Loader = new QUILoader().inject(Elm);
             this.$setAnchor();
@@ -165,11 +180,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $startInitialLoad: function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const product = urlParams.get('product');
             let loaded;
 
-            if (product) {
+            if (ProductUrl.hasProducts(window.location.search)) {
                 loaded = this.$loadProducts().then(() => {
                     return this.$loadOrder();
                 });
@@ -411,46 +424,105 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $loadProducts: function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const product = urlParams.get('product');
+            if (this.$productsPromise) {
+                return this.$productsPromise;
+            }
 
-            // @todo url params - product
-            if (product) {
-                this.setAttribute('products', [
-                    {
-                        id: product,
-                        quantity: 1
+            // An existing hash resumes its checkout, including returns from payment providers.
+            if (this.getAttribute('orderHash')) {
+                return Promise.resolve();
+            }
+
+            this.$productsPromise = Promise.resolve().then(() => {
+                const selection = ProductUrl.parse(window.location.search);
+                const products = selection.products ?? this.getAttribute('products');
+
+                if (!products) {
+                    return;
+                }
+
+                if (selection.products !== null) {
+                    this.setAttribute('products', products);
+                }
+
+                const addToBasket = selection.addToBasket || this.getAttribute('addToBasket') === true;
+                const created = addToBasket ? this.$addProductsToBasket(products) : this.$createProductOrder(products);
+
+                return created.then((orderHash) => {
+                    if (typeof orderHash !== 'string' || orderHash === '') {
+                        throw new Error('Could not create checkout');
                     }
-                ]);
-            }
 
-            if (this.getAttribute('products') && !this.getAttribute('orderHash')) {
-                return new Promise((resolve, reject) => {
-                    QUIAjax.post(
-                        'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
-                        (orderHash) => {
-                            this.setAttribute('orderHash', orderHash);
-                            this.$setAnchor();
-                            resolve();
-                        },
-                        {
-                            'package': 'quiqqer/order-simple-checkout',
-                            products: JSON.encode(this.getAttribute('products')),
-                            onError: reject
-                        }
-                    );
+                    this.setAttribute('orderHash', orderHash);
+                    this.$setAnchor();
+
+                    if (selection.products !== null) {
+                        window.history.replaceState(window.history.state, '', ProductUrl.consume(window.location.href));
+                    }
                 });
-            }
+            }).catch((error) => {
+                this.$productsPromise = null;
+                throw error;
+            });
 
-            return Promise.resolve();
+            return this.$productsPromise;
+        },
+
+        $createProductOrder: function (products) {
+            return new Promise((resolve, reject) => {
+                QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess', resolve, {
+                    'package': 'quiqqer/order-simple-checkout',
+                    products: JSON.stringify(products),
+                    onError: reject
+                });
+            });
+        },
+
+        $addProductsToBasket: function (products) {
+            return new Promise((resolve, reject) => {
+                require(['package/quiqqer/order/bin/frontend/Basket'], resolve, reject);
+            }).then(async (Basket) => {
+                if (typeof Basket.ready === 'function') {
+                    await Basket.ready();
+                } else if (!Basket.isLoaded()) {
+                    await Basket.load();
+                }
+
+                // Use the same availability checks, field handling and basket rules as normal additions.
+                const available = await Promise.all(products.map(product => {
+                    return Basket.existsProduct(product.id ?? product.productId);
+                }));
+
+                if (available.some(value => !value)) {
+                    throw new Error('Product unavailable');
+                }
+
+                for (const product of products) {
+                    await Basket.addProduct(product.id ?? product.productId, product.quantity ?? 1, product.fields ?? {});
+                }
+
+                await Basket.save(true);
+                const orderHash = await Basket.toOrder();
+
+                if (orderHash) {
+                    return orderHash;
+                }
+
+                // Guest baskets live in the browser; use their complete selection for guest checkout.
+                const basketProducts = Basket.getProducts().map(product => product.getAttributes());
+                return this.$createProductOrder(basketProducts);
+            });
         },
 
         $loadCheckout: function () {
             this.$setAnchor();
 
             return new Promise((resolve) => {
-                const settings = this.getAttributes();
-                settings.showEmail = this.getAttribute('showEmail');
+                const settings = {
+                    disableAddress: this.getAttribute('disableAddress'),
+                    disableProductLinks: this.getAttribute('disableProductLinks'),
+                    showEmail: this.getAttribute('showEmail')
+                };
 
                 QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl', (html) => {
                     const Ghost = new Element('div', {
@@ -474,7 +546,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('orderHash'),
-                    settings: JSON.encode(settings)
+                    settings: JSON.stringify(settings)
                 });
             });
         },
@@ -635,6 +707,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         }
 
                         this.setAttribute('orderHash', result.orderHash);
+                        this.$successViewReady = false;
                         this.$setAnchor();
 
                         // for the OrderProcess.js
@@ -694,11 +767,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                                 });
                                             }
 
-                                            if (result.step !== 'Processing' && this.$showOrderSuccessInfoPending) {
-                                                this.$removeProcessPaymentChange();
-                                                this.$showOrderSuccessInfoPending = false;
-                                                this.fireEvent('showOrderSuccessInfo', [this]);
-                                            }
+                                            this.$successViewReady = true;
+                                            this.$finishSuccessInfo(result.step);
+                                            this.$maybeFireShowOrderSuccessInfo();
                                             resolve();
                                         }
                                     });
@@ -755,6 +826,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         $renderOrderProcessStep: function (result) {
             const Container = this.getElm().getElement('.quiqqer-simple-checkout-container');
             const scripts = this.$extractScripts(result.html);
+            this.$successViewReady = false;
+            this.$showOrderSuccessInfoPending = !!this.getAttribute('showOrderSuccessInfo');
 
             this.getElm().addClass('quiqqer-simple-checkout--processing');
             this.setAttribute('orderHash', result.orderHash);
@@ -793,6 +866,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                                 opacity: 1
                             }, {
                                 callback: () => {
+                                    this.$successViewReady = true;
+                                    this.$finishSuccessInfo(result.step);
+                                    this.$maybeFireShowOrderSuccessInfo();
                                     if (typeof Container.scrollIntoView === 'function') {
                                         Container.scrollIntoView({
                                             behavior: 'smooth',
@@ -843,15 +919,132 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 return;
             }
 
-            const current = Process.getAttribute('current');
+            this.$finishSuccessInfo(Process.getAttribute('current'));
+        },
 
-            if (!current || String(current).toLowerCase() === 'processing') {
+        $finishSuccessInfo: function (step) {
+            if (
+                !this.$showOrderSuccessInfoPending ||
+                !this.$successViewReady ||
+                String(step).toLowerCase() !== 'finish'
+            ) {
                 return;
             }
 
             this.$removeProcessPaymentChange();
             this.$showOrderSuccessInfoPending = false;
+            this.$showSuccessActions();
             this.fireEvent('showOrderSuccessInfo', [this]);
+        },
+
+        $getSuccessSettings: function () {
+            const content = this.getAttribute('successContent');
+
+            return {
+                successContent: typeof content === 'string' ? content : this.$successSettings?.successContent ?? false,
+                successContentSource: typeof content === 'string' ? 'frontend' : 'php',
+                successUrl: this.getAttribute('successUrl'),
+                successRedirectDelay: this.getAttribute('successRedirectDelay')
+            };
+        },
+
+        $applySuccessSettings: function (settings) {
+            if (typeof settings === 'string') {
+                try {
+                    settings = JSON.parse(settings);
+                } catch (error) {
+                    return;
+                }
+            }
+
+            if (!settings || typeof settings !== 'object') {
+                return;
+            }
+
+            this.$successSettings = settings;
+
+            for (const name of ['successUrl', 'successRedirectDelay']) {
+                if (this.getAttribute(name) === false) {
+                    this.setAttribute(name, settings[name] ?? false);
+                }
+            }
+        },
+
+        $showSuccessActions: function () {
+            if (this.$successActionsShown) {
+                return;
+            }
+
+            this.$successActionsShown = true;
+            const settings = this.$getSuccessSettings();
+            const Elm = this.getElm();
+
+            if (typeof settings.successContent === 'string' && settings.successContent !== '') {
+                const Content = document.createElement('div');
+                Content.dataset.name = 'success-content';
+                if (settings.successContentSource === 'php') {
+                    // Only trusted PHP configuration may bypass sanitization.
+                    Content.innerHTML = settings.successContent;
+                } else if (typeof Content.setHTML === 'function') {
+                    const options = {};
+
+                    if (typeof window.Sanitizer === 'function') {
+                        const sanitizer = new window.Sanitizer();
+
+                        for (const name of ['class', 'aria-label', 'aria-hidden']) {
+                            sanitizer.allowAttribute(name);
+                        }
+
+                        options.sanitizer = sanitizer;
+                    }
+
+                    Content.setHTML(settings.successContent, options);
+                } else {
+                    Content.textContent = settings.successContent;
+                }
+
+                const Container = Elm.querySelector('[data-name="checkout-container"]') || Elm;
+                Container.appendChild(Content);
+            }
+
+            if (
+                typeof settings.successUrl !== 'string' ||
+                /[\x00-\x20\x7f\\]/.test(settings.successUrl) ||
+                settings.successUrl.startsWith('//') ||
+                !/^(?:\/(?!\/)|https?:\/\/)/i.test(settings.successUrl) ||
+                !Number.isInteger(settings.successRedirectDelay) ||
+                settings.successRedirectDelay < 0 ||
+                settings.successRedirectDelay > 86400
+            ) {
+                return;
+            }
+
+            let target;
+
+            try {
+                target = new URL(settings.successUrl, window.location.href);
+            } catch (error) {
+                return;
+            }
+
+            if (target.protocol !== 'https:' && target.protocol !== 'http:') {
+                return;
+            }
+
+            this.$successRedirectTimer = window.setTimeout(() => {
+                this.$successRedirectTimer = null;
+
+                if (Elm.isConnected) {
+                    window.location.assign(target.href);
+                }
+            }, settings.successRedirectDelay * 1000);
+        },
+
+        $clearSuccessRedirect: function () {
+            if (this.$successRedirectTimer !== null) {
+                window.clearTimeout(this.$successRedirectTimer);
+                this.$successRedirectTimer = null;
+            }
         },
 
         $removeProcessPaymentChange: function () {
@@ -1118,7 +1311,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
                     orderHash: this.getAttribute('orderHash'),
-                    settings: JSON.encode(this.getAttributes())
+                    settings: JSON.stringify({
+                        disableAddress: this.getAttribute('disableAddress'),
+                        disableProductLinks: this.getAttribute('disableProductLinks')
+                    })
                 });
             });
         },

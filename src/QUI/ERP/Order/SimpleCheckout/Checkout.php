@@ -41,6 +41,9 @@ class Checkout extends QUI\Control
             'disableProductLinks' => 'default',
             'showBasketLink' => true,
             'showEmail' => false,
+            'successContent' => false,
+            'successUrl' => false,
+            'successRedirectDelay' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
             'data-qui-load-hash-from-url' => 0
@@ -91,6 +94,9 @@ class Checkout extends QUI\Control
                 $Basket->toOrder($this->getOrder());
             }
         }
+
+        $successSettings = SuccessSettings::normalize($this->getAttributes());
+        $this->setJavaScriptControlOption('successsettings', json_encode($successSettings, JSON_THROW_ON_ERROR));
 
         $Checkout = new QUI\ERP\Order\Controls\OrderProcess\Checkout();
         $Checkout->generateCheckboxLinks($Engine);
