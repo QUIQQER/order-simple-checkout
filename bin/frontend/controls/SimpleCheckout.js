@@ -11,9 +11,10 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
     'qui/controls/loader/Loader',
     'qui/utils/Form',
     'Locale',
-    'Ajax'
+    'Ajax',
+    'package/quiqqer/order-simple-checkout/bin/frontend/utils/ProductUrl'
 
-], function (QUI, QUIControl, QUILoader, QUIFormUtils, QUILocale, QUIAjax) {
+], function (QUI, QUIControl, QUILoader, QUIFormUtils, QUILocale, QUIAjax, ProductUrl) {
     'use strict';
 
     const lg = 'quiqqer/order-simple-checkout';
@@ -47,6 +48,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             showBasketLink: true,
             disableAddress: false,
             disableProductLinks: 'default',
+            addToBasket: false,
             successContent: false,
             successUrl: false,
             successRedirectDelay: false
@@ -67,6 +69,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$initialized = false;
             this.$isOrdering = false;
             this.$orderPromise = null;
+            this.$productsPromise = null;
             this.$processPaymentChangeTimers = [];
             this.$showOrderSuccessInfoPending = false;
             this.$EmbeddedOrderProcess = null;
@@ -177,11 +180,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $startInitialLoad: function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const product = urlParams.get('product');
             let loaded;
 
-            if (product) {
+            if (ProductUrl.hasProducts(window.location.search)) {
                 loaded = this.$loadProducts().then(() => {
                     return this.$loadOrder();
                 });
@@ -423,38 +424,94 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $loadProducts: function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const product = urlParams.get('product');
+            if (this.$productsPromise) {
+                return this.$productsPromise;
+            }
 
-            // @todo url params - product
-            if (product) {
-                this.setAttribute('products', [
-                    {
-                        id: product,
-                        quantity: 1
+            // An existing hash resumes its checkout, including returns from payment providers.
+            if (this.getAttribute('orderHash')) {
+                return Promise.resolve();
+            }
+
+            this.$productsPromise = Promise.resolve().then(() => {
+                const selection = ProductUrl.parse(window.location.search);
+                const products = selection.products ?? this.getAttribute('products');
+
+                if (!products) {
+                    return;
+                }
+
+                if (selection.products !== null) {
+                    this.setAttribute('products', products);
+                }
+
+                const addToBasket = selection.addToBasket || this.getAttribute('addToBasket') === true;
+                const created = addToBasket ? this.$addProductsToBasket(products) : this.$createProductOrder(products);
+
+                return created.then((orderHash) => {
+                    if (typeof orderHash !== 'string' || orderHash === '') {
+                        throw new Error('Could not create checkout');
                     }
-                ]);
-            }
 
-            if (this.getAttribute('products') && !this.getAttribute('orderHash')) {
-                return new Promise((resolve, reject) => {
-                    QUIAjax.post(
-                        'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
-                        (orderHash) => {
-                            this.setAttribute('orderHash', orderHash);
-                            this.$setAnchor();
-                            resolve();
-                        },
-                        {
-                            'package': 'quiqqer/order-simple-checkout',
-                            products: JSON.encode(this.getAttribute('products')),
-                            onError: reject
-                        }
-                    );
+                    this.setAttribute('orderHash', orderHash);
+                    this.$setAnchor();
+
+                    if (selection.products !== null) {
+                        window.history.replaceState(window.history.state, '', ProductUrl.consume(window.location.href));
+                    }
                 });
-            }
+            }).catch((error) => {
+                this.$productsPromise = null;
+                throw error;
+            });
 
-            return Promise.resolve();
+            return this.$productsPromise;
+        },
+
+        $createProductOrder: function (products) {
+            return new Promise((resolve, reject) => {
+                QUIAjax.post('package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess', resolve, {
+                    'package': 'quiqqer/order-simple-checkout',
+                    products: JSON.stringify(products),
+                    onError: reject
+                });
+            });
+        },
+
+        $addProductsToBasket: function (products) {
+            return new Promise((resolve, reject) => {
+                require(['package/quiqqer/order/bin/frontend/Basket'], resolve, reject);
+            }).then(async (Basket) => {
+                if (typeof Basket.ready === 'function') {
+                    await Basket.ready();
+                } else if (!Basket.isLoaded()) {
+                    await Basket.load();
+                }
+
+                // Use the same availability checks, field handling and basket rules as normal additions.
+                const available = await Promise.all(products.map(product => {
+                    return Basket.existsProduct(product.id ?? product.productId);
+                }));
+
+                if (available.some(value => !value)) {
+                    throw new Error('Product unavailable');
+                }
+
+                for (const product of products) {
+                    await Basket.addProduct(product.id ?? product.productId, product.quantity ?? 1, product.fields ?? {});
+                }
+
+                await Basket.save(true);
+                const orderHash = await Basket.toOrder();
+
+                if (orderHash) {
+                    return orderHash;
+                }
+
+                // Guest baskets live in the browser; use their complete selection for guest checkout.
+                const basketProducts = Basket.getProducts().map(product => product.getAttributes());
+                return this.$createProductOrder(basketProducts);
+            });
         },
 
         $loadCheckout: function () {
