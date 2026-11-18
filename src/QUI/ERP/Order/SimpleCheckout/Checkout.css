@@ -29,6 +29,10 @@
     border: 1px solid red;
 }
 
+.quiqqer-simple-checkout[aria-busy="true"] {
+    min-height: 24rem;
+}
+
 .quiqqer-simple-checkout-empty {
     align-items: center;
     display: flex;

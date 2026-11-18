@@ -43,6 +43,7 @@ function checkout(basket, options = {}) {
     const instance = {
         ...definition,
         $isOrdering: false,
+        $initialLoadComplete: true,
         getAttribute: name => attributes[name],
         setAttribute: (name, value) => { attributes[name] = value; },
         getElm: () => element
@@ -118,4 +119,37 @@ test('custom templates can omit the order button without a null access', () => {
         state.instance.$syncBasketState();
     });
     assert.equal(state.instance.$PayToOrderBtn, null);
+});
+
+test('the empty view and checkout stay hidden while URL products are loading', () => {
+    const state = checkout();
+    state.instance.$initialLoadComplete = false;
+    state.instance.$bindPayButton();
+    state.instance.$syncBasketState();
+
+    assert.equal(state.sections.get('empty-checkout').hidden, true);
+    assert.equal(state.sections.get('checkout-form').hidden, true);
+    assert.equal(state.button.disabled, true);
+
+    state.setEmpty(false);
+    state.instance.$syncBasketState();
+    assert.equal(state.sections.get('empty-checkout').hidden, true);
+    assert.equal(state.sections.get('checkout-form').hidden, true);
+
+    state.instance.$initialLoadComplete = true;
+    state.instance.$syncBasketState();
+    assert.equal(state.sections.get('empty-checkout').hidden, true);
+    assert.equal(state.sections.get('checkout-form').hidden, false);
+    assert.equal(state.button.disabled, false);
+});
+
+test('the empty message is shown only after an empty basket has finished loading', () => {
+    const state = checkout();
+    state.instance.$initialLoadComplete = false;
+    state.instance.$syncBasketState();
+    assert.equal(state.sections.get('empty-checkout').hidden, true);
+
+    state.instance.$initialLoadComplete = true;
+    state.instance.$syncBasketState();
+    assert.equal(state.sections.get('empty-checkout').hidden, false);
 });

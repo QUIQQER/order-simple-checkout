@@ -192,11 +192,13 @@ test('the rendered checkout loads programmatic products before its order data', 
     // Keep the test focused on selecting the products before the checkout GUI is loaded.
     state.instance.getElm = () => ({
         getElement: () => false,
-        getElements: () => []
+        getElements: () => [],
+        querySelector: () => null,
+        setAttribute() {}
     });
     state.instance.$parseTermsAndConditions = () => {};
     state.instance.Loader = {hide() {}};
-    state.instance.$startInitialLoad();
+    await state.instance.$startInitialLoad();
     await finished;
 
     assert.equal(productsLoadedBeforeOrder, true);

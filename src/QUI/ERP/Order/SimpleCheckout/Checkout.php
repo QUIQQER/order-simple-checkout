@@ -45,6 +45,7 @@ class Checkout extends QUI\Control
             'successRedirectDelay' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
+            'aria-busy' => 'true',
             'data-qui-load-hash-from-url' => 0
         ]);
 
