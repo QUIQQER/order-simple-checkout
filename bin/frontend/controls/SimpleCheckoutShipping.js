@@ -28,12 +28,21 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
         $onImport: function() {
             this.$registerEvents();
+            this.$syncVisibility();
 
             this.$Loader = new Element('span', {
                 'class': 'fa fa-spin fa-circle-notch simpleCheckout-details-section-loader'
             }).inject(this.getElm().getParent('.simpleCheckout-details-section'));
 
             this.$Loader.style.display = 'none';
+        },
+
+        $syncVisibility: function() {
+            const Section = this.getElm().closest('[data-name="shipping-section"]');
+
+            if (Section) {
+                Section.hidden = Boolean(this.getElm().querySelector('[data-name="shipping-not-required"]'));
+            }
         },
 
         $registerEvents: function() {
@@ -83,6 +92,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                     QUI.parse(this.getElm()).then(() => {
                         this.$registerEvents();
+                        this.$syncVisibility();
                         this.fireEvent('refreshEnd', [this]);
                         this.$Loader.style.display = 'none';
                         resolve();

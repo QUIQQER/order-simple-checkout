@@ -24,9 +24,18 @@ QUI::getAjax()->registerFunction(
         }
 
         $Checkout = new Checkout(['orderHash' => $orderHash]);
+        $Checkout->setGuestEmail((string)($orderData['email'] ?? ''));
         $Order = $Checkout->getOrder();
         $orderDirty = false;
         $userDirty = false;
+
+        if (
+            $User instanceof QUI\ERP\Order\Guest\GuestOrderUser
+            && $Order
+        ) {
+            $Order->setCustomer($User);
+            $orderDirty = true;
+        }
 
         $erpAddressData = [
             'salutation' => $orderData['salutation'] ?? '',
@@ -70,6 +79,14 @@ QUI::getAjax()->registerFunction(
         $erpAddressData['uuid'] = $Address->getUUID();
         $erpAddressData['id'] = $Address->getId();
         $ErpAddress = new Address($erpAddressData);
+
+        if (
+            $User instanceof QUI\ERP\Order\Guest\GuestOrderUser
+            && $User->getAttribute('email')
+        ) {
+            $ErpAddress->addMail($User->getAttribute('email'));
+        }
+
         $address = $ErpAddress->getAttributes();
 
         $addressDirty = false;
@@ -194,6 +211,7 @@ QUI::getAjax()->registerFunction(
         if (
             !empty($orderData['shipping'])
             && QUI::getPackageManager()->isInstalled('quiqqer/shipping')
+            && !$Checkout->hasOnlyDigitalProducts()
         ) {
             if ($Order) {
                 $currentShippingId = $Order->getShipping()?->getId();

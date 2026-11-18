@@ -123,6 +123,10 @@ class CheckoutDelivery extends QUI\Control implements CheckoutStepInterface
         $showEmail = $this->Checkout->getAttribute('showEmail');
         $UserSession = QUI::getUserBySession();
 
+        if ($UserSession instanceof QUI\ERP\Order\Guest\GuestOrderUser) {
+            $showEmail = false;
+        }
+
         if (
             $UserSession->getUUID()
             && !($UserSession instanceof QUI\Users\Nobody)

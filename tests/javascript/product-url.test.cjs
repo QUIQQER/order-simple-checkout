@@ -115,6 +115,7 @@ function checkout(search = '', options = {}, basket = null, post = null) {
     const context = {
         URL,
         URLSearchParams,
+        moofx: () => ({animate() {}}),
         window: {
             location,
             history: {
@@ -163,6 +164,45 @@ test('existing JavaScript product configurations are forwarded unchanged', async
     await state.instance.$loadProducts();
     assert.deepEqual(JSON.parse(state.requests[0].products), products);
     assert.equal(state.history.length, 0);
+});
+
+test('injected checkout waits for the entry form before creating the product order', async () => {
+    const products = [{productId: 123}];
+    const state = checkout('', {products});
+    let loaded = 0;
+    state.instance.$loadCheckout = async () => { loaded++; };
+
+    await state.instance.$onInject();
+    assert.equal(loaded, 1);
+    assert.equal(state.requests.length, 0);
+    assert.deepEqual(state.attributes.products, products);
+});
+
+test('the rendered checkout loads programmatic products before its order data', async () => {
+    const products = [{productId: 123, quantity: 2}];
+    const state = checkout('', {products});
+    let productsLoadedBeforeOrder = false;
+    const finished = new Promise(resolve => {
+        state.instance.$loadOrder = async () => {
+            productsLoadedBeforeOrder = state.requests.length === 1;
+            return {order: false};
+        };
+        state.instance.$loadGUI = async () => { resolve(); };
+    });
+    // Keep the test focused on selecting the products before the checkout GUI is loaded.
+    state.instance.getElm = () => ({
+        getElement: () => false,
+        getElements: () => [],
+        querySelector: () => null,
+        setAttribute() {}
+    });
+    state.instance.$parseTermsAndConditions = () => {};
+    state.instance.Loader = {hide() {}};
+    await state.instance.$startInitialLoad();
+    await finished;
+
+    assert.equal(productsLoadedBeforeOrder, true);
+    assert.deepEqual(JSON.parse(state.requests[0].products), products);
 });
 
 test('repeated initialization shares one request and adds the URL selection once', async () => {

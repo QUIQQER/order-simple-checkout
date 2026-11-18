@@ -1,14 +1,26 @@
-<div class="quiqqer-simple-checkout-orderDetails" style="opacity: 0">
+<section class="quiqqer-simple-checkout-empty simpleCheckout-details-section"
+         data-name="empty-checkout" role="status" hidden>
+    <span class="fa-regular fa-face-frown quiqqer-simple-checkout-empty-icon" aria-hidden="true"></span>
+    <h2>{locale group="quiqqer/order-simple-checkout" var="checkout.empty.title"}</h2>
+    <p>{locale group="quiqqer/order-simple-checkout" var="checkout.empty.description"}</p>
+    <a href="{$backToShopUrl|escape:'html'}" class="btn btn-primary">
+        {locale group="quiqqer/order-simple-checkout" var="checkout.empty.link"}
+    </a>
+</section>
+
+<div class="quiqqer-simple-checkout-orderDetails" style="opacity: 0"
+     data-name="order-summary" {if $isBasketEmpty}hidden{/if}>
     {$BasketForHeader->create()}
 </div>
 
-<div class="hide-on-desktop quiqqer-simple-checkout__scrollToPaymentContainer" style="opacity: 0;">
+<div class="hide-on-desktop quiqqer-simple-checkout__scrollToPaymentContainer" style="opacity: 0;"
+     data-name="scroll-to-payment" {if $isBasketEmpty}hidden{/if}>
     <button class="quiqqer-simple-checkout__scrollToPaymentBtn btn btn-primary" type="button">
         {locale group="quiqqer/order-simple-checkout" var="ordering.btn.continueWithPurchase"}
     </button>
 </div>
 
-<form method="post" action="" style="opacity: 0">
+<form method="post" action="" style="opacity: 0" data-name="checkout-form" {if $isBasketEmpty}hidden{/if}>
 
     <div class="quiqqer-simple-checkout-container" data-name="checkout-container">
         <section class="quiqqer-simple-checkout-details">
@@ -32,18 +44,39 @@
                 </div>
                 {/if}
 
-                <div class="quiqqer-simple-checkout-data-contact simpleCheckout-details-section">
-                    <h2 class="simpleCheckoutCard-subheader">
-                        {locale group="quiqqer/order-simple-checkout" var="title.contact"}
-                    </h2>
+                <div class="quiqqer-simple-checkout-data-contact simpleCheckout-details-section" data-name="contact">
+                    <div class="quiqqer-simple-checkout-contact-header">
+                        <h2 class="simpleCheckoutCard-subheader">
+                            {locale group="quiqqer/order-simple-checkout" var="title.contact"}
+                        </h2>
 
-                    {if $User && $User->getId() === 6}
+                        {if $isGuestCheckout}
+                        <button type="button" class="btn btn-secondary log-in" data-name="login" aria-haspopup="dialog">
+                            <span class="fa fa-right-to-bracket" aria-hidden="true"></span>
+                            {locale group="quiqqer/order-simple-checkout" var="log.in.link"}
+                        </button>
+                        {/if}
+                    </div>
+
+                    {if $isGuestCheckout}
+                    <label class="quiqqer-simple-checkout-contact-email">
+                        <span>{locale group="quiqqer/order-simple-checkout" var="component.email"} *</span>
+                        <input type="email"
+                               name="email"
+                               data-name="contact-email"
+                               autocomplete="email"
+                               value="{$User->getAttribute('email')|escape:'html'}"
+                               required
+                        />
+                    </label>
+                    <p data-name="contact-email-error" role="status" hidden></p>
+                    {elseif $User && $User->getId() === 6}
                     <div class="text-muted">
                         <span>{locale group="quiqqer/order-simple-checkout" var="logged.in.guest"}</span>
                         <br/>
                         <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
                         <a href=""
-                           class="log-in">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
+                           class="log-in" data-name="login">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
                     </div>
                     {elseif $User}
                     <div>
@@ -56,7 +89,7 @@
                     {else}
                     <div>
                         <span>{locale group="quiqqer/order-simple-checkout" var="log.in"}</span>
-                        <a href="">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
+                        <a href="" data-name="login">{locale group="quiqqer/order-simple-checkout" var="log.in.link"}</a>
                     </div>
                     {/if}
                 </div>
@@ -71,7 +104,10 @@
                 {/if}
 
                 {if $Shipping}
-                <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-details-section">
+                <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-details-section"
+                     data-name="shipping-section"
+                     {if $isDigitalOrder}hidden{/if}
+                >
                     <h2 class="simpleCheckoutCard-subheader">
                         {locale group="quiqqer/shipping" var="ordering.step.title.Shipping"}
                     </h2>
@@ -129,7 +165,8 @@
                 {/if}
                 {/if}
 
-                <button name="pay" class="btn btn-primary btn-lg btn-large">
+                <button name="pay" type="button" data-name="pay" class="btn btn-primary btn-lg btn-large"
+                        {if !$Order || !$Order->getArticles()->count()}disabled{/if}>
                     {locale group="quiqqer/order" var="ordering.btn.pay.to.order"}
                 </button>
 

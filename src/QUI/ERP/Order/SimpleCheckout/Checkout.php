@@ -7,20 +7,19 @@ use QUI\ERP\Order\AbstractOrder;
 use QUI\ERP\Order\Basket\ExceptionBasketNotFound;
 use QUI\ERP\Order\Controls\OrderProcess\Finish;
 use QUI\ERP\Order\OrderInProcess;
-use QUI\ERP\Order\OrderInterface;
 use QUI\ERP\Order\Settings as OrderSettings;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutBillingAddress;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
 use QUI\ERP\Order\Utils\OrderProcessSteps;
+use QUI\ERP\Products\Handler\Products;
+use QUI\ERP\Products\Product\Types\DigitalProduct;
 use QUI\Exception;
 
 use function class_exists;
-use function class_implements;
 use function dirname;
 use function file_exists;
-use function in_array;
 
 /**
  * Class Checkout
@@ -46,6 +45,7 @@ class Checkout extends QUI\Control
             'successRedirectDelay' => false,
             'data-qui' => 'package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleCheckout',
             'data-name' => 'quiqqer-simple-checkout',
+            'aria-busy' => 'true',
             'data-qui-load-hash-from-url' => 0
         ]);
 
@@ -73,6 +73,10 @@ class Checkout extends QUI\Control
 
         if ($this->getAttribute('template') && file_exists($this->getAttribute('template'))) {
             $template = $this->getAttribute('template');
+        }
+
+        if ($this->requiresLogin()) {
+            return '<div class="quiqqer-order-simple-login" data-name="login-required"></div>';
         }
 
         // guest order
@@ -128,13 +132,18 @@ class Checkout extends QUI\Control
         }
 
         [$showDelivery, $showShipping, $showBillingAddress] = $this->getStepVisibility($isShippingAvailable);
+        $Order = $this->getOrder();
 
         $Engine->assign([
             'this' => $this,
-            'Order' => $this->getOrder(),
+            'Order' => $Order,
+            'isBasketEmpty' => !$Order || !$Order->getArticles()->count(),
+            'backToShopUrl' => $this->getBackToShopUrl(),
             'Basket' => new Basket($this),
             'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
+            'isGuestCheckout' => $this->getUser() instanceof QUI\ERP\Order\Guest\GuestOrderUser,
+            'isDigitalOrder' => $this->hasOnlyDigitalProducts($Order),
             'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null,
             'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
             'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
@@ -174,10 +183,20 @@ class Checkout extends QUI\Control
      */
     public function isValid(): bool
     {
+        if (
+            $this->getUser() instanceof QUI\ERP\Order\Guest\GuestOrderUser
+            && !$this->hasGuestEmail()
+        ) {
+            return false;
+        }
+
         $validateAddress = true;
         $validateShipping = true;
 
-        if (!$this->isShippingAvailable()) {
+        if (
+            !$this->isShippingAvailable()
+            || $this->hasOnlyDigitalProducts()
+        ) {
             $validateShipping = false;
         }
 
@@ -229,8 +248,17 @@ class Checkout extends QUI\Control
     public function gatherMissingOrderDetails(): array
     {
         $missing = [];
+
+        if (
+            $this->getUser() instanceof QUI\ERP\Order\Guest\GuestOrderUser
+            && !$this->hasGuestEmail()
+        ) {
+            $missing[] = 'email';
+        }
+
         $Order = null;
-        $isShippingAvailable = $this->isShippingAvailable();
+        $isShippingAvailable = $this->isShippingAvailable()
+            && !$this->hasOnlyDigitalProducts();
 
         // check address
         $addressRequired = true;
@@ -278,6 +306,35 @@ class Checkout extends QUI\Control
         return $missing;
     }
 
+    public function hasOnlyDigitalProducts(?AbstractOrder $Order = null): bool
+    {
+        $Order ??= $this->getOrder();
+        $articles = $Order?->getArticles()->getArticles() ?? [];
+
+        if ($articles === []) {
+            return false;
+        }
+
+        foreach ($articles as $Article) {
+            if ($Article->getId() <= 0) {
+                return false;
+            }
+
+            try {
+                $Product = Products::getProduct($Article->getId());
+            } catch (QUI\Exception) {
+                // Unknown articles must not bypass shipping requirements.
+                return false;
+            }
+
+            if (!($Product instanceof DigitalProduct)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function isShippingAvailable(): bool
     {
         return QUI::getPackageManager()->isInstalled('quiqqer/shipping')
@@ -300,6 +357,7 @@ class Checkout extends QUI\Control
      */
     public function orderWithCosts(): array
     {
+        $this->checkGuestEmail();
         $OrderInProcess = $this->getOrder();
 
         if (!$OrderInProcess) {
@@ -356,6 +414,29 @@ class Checkout extends QUI\Control
         return $this->getOrderProcessStep();
     }
 
+    public function completePaidOrder(OrderInProcess $Order): AbstractOrder
+    {
+        if (
+            !$Order->getDataEntry('orderedWithCosts')
+            || $Order->getOrderId()
+        ) {
+            return $Order;
+        }
+
+        $Payment = $Order->getPayment();
+
+        if (
+            !$Payment
+            || !$Payment->isSuccessful($Order->getUUID())
+        ) {
+            return $Order;
+        }
+
+        $this->checkGuestEmail();
+
+        return $Order->createOrder(QUI::getUsers()->getSystemUser());
+    }
+
     /**
      * @return array{
      *     html: string,
@@ -371,6 +452,15 @@ class Checkout extends QUI\Control
     public function getOrderProcessStep(): array
     {
         $Order = $this->getProcessOrder();
+
+        if (
+            $Order instanceof OrderInProcess
+            && $Order->getDataEntry('orderedWithCosts')
+        ) {
+            $this->checkGuestEmail();
+        }
+
+        $isDigitalOrder = $this->hasOnlyDigitalProducts($Order);
 
         $processingStep = new QUI\ERP\Order\Controls\OrderProcess\Processing([
             'Order' => $Order,
@@ -389,7 +479,18 @@ class Checkout extends QUI\Control
                     QUI\ERP\Order\OrderProcess $instance,
                     AbstractOrder $Order,
                     OrderProcessSteps $Steps
-                ) use ($processingStep) {
+                ) use (
+                    $processingStep,
+                    $isDigitalOrder
+                ) {
+                    if ($isDigitalOrder) {
+                        foreach ($Steps as $index => $Step) {
+                            if ($Step instanceof QUI\ERP\Shipping\Order\Shipping) {
+                                unset($Steps[$index]);
+                            }
+                        }
+                    }
+
                     if ($Order->getPayment() && !$Order->getPayment()->isSuccessful($Order->getUUID())) {
                         $Finish = null;
 
@@ -448,6 +549,8 @@ class Checkout extends QUI\Control
      */
     public function getProcessOrder(): AbstractOrder
     {
+        $this->checkLoginRequirement();
+
         $OrderHandler = QUI\ERP\Order\Handler::getInstance();
         $orderHash = $this->getAttribute('orderHash');
 
@@ -467,13 +570,29 @@ class Checkout extends QUI\Control
 
     // region getter
 
+    public function getBackToShopUrl(): string
+    {
+        $siteLink = OrderSettings::getInstance()->get('orderProcess', 'backToShopUrl');
+
+        if (is_string($siteLink) && QUI\Projects\Site\Utils::isSiteLink($siteLink)) {
+            try {
+                return QUI\Projects\Site\Utils::getSiteByLink($siteLink)->getUrlRewritten();
+            } catch (QUI\Exception $Exception) {
+                QUI\System\Log::writeDebugException($Exception);
+            }
+        }
+
+        return QUI::getRewrite()->getProject()?->firstChild()->getUrlRewritten() ?? URL_DIR;
+    }
+
     /**
      * @throws Exception
      * @throws QUI\ERP\Order\Exception
      */
     public function getOrder(): ?OrderInProcess
     {
-        $Order = null;
+        $this->checkLoginRequirement();
+
         $Orders = QUI\ERP\Order\Handler::getInstance();
 
         if ($this->getAttribute('orderHash')) {
@@ -483,44 +602,12 @@ class Checkout extends QUI\Control
             }
         }
 
-        try {
-            $result = QUI::getEvents()->fireEvent('orderProcessGetOrder', [$this]);
+        $OrderProcess = new QUI\ERP\Order\OrderProcess([
+            'basket' => false
+        ]);
+        $Order = $OrderProcess->getOrder();
 
-            if (!empty($result)) {
-                $OrderInstance = null;
-
-                foreach ($result as $entry) {
-                    if ($entry && in_array(OrderInterface::class, class_implements($entry) ?: [], true)) {
-                        $OrderInstance = $entry;
-                    }
-                }
-
-                if (
-                    $OrderInstance
-                    && in_array(OrderInterface::class, class_implements($OrderInstance) ?: [], true)
-                ) {
-                    return $OrderInstance;
-                }
-            }
-        } catch (\Exception) {
-        }
-
-        try {
-            // select the last order in processing
-            $OrderInProcess = $Orders->getLastOrderInProcessFromUser($this->getUser());
-
-            if (!$OrderInProcess->getOrderId()) {
-                $Order = $OrderInProcess;
-            }
-        } catch (QUI\Exception) {
-        }
-
-        if ($Order === null) {
-            // if no order exists, we create one
-            $Order = QUI\ERP\Order\Factory::getInstance()->createOrderInProcess();
-        }
-
-        return $Order;
+        return $Order instanceof OrderInProcess ? $Order : null;
     }
 
     /**
@@ -531,6 +618,93 @@ class Checkout extends QUI\Control
     public function getUser(): QUI\Interfaces\Users\User
     {
         return QUI::getUserBySession();
+    }
+
+    public function requiresLogin(): bool
+    {
+        if (!Settings::isLoginRequired()) {
+            return false;
+        }
+
+        $User = $this->getUser();
+
+        return QUI::getUsers()->isNobodyUser($User)
+            || $User instanceof QUI\ERP\Order\Guest\GuestOrderUser;
+    }
+
+    public function checkLoginRequirement(): void
+    {
+        if ($this->requiresLogin()) {
+            throw new QUI\Exception([
+                'quiqqer/order-simple-checkout',
+                'exception.login.required'
+            ]);
+        }
+    }
+
+    private function hasGuestEmail(): bool
+    {
+        return filter_var($this->getUser()->getAttribute('email'), FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    public function setGuestEmail(string $email): void
+    {
+        $User = $this->getUser();
+
+        if (!($User instanceof QUI\ERP\Order\Guest\GuestOrderUser)) {
+            return;
+        }
+
+        $email = trim($email);
+        QUI::getSession()->remove(QUI\ERP\Order\Guest\GuestOrder::EMAIL);
+        $User->setAttribute('email', '');
+
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            return;
+        }
+
+        QUI::getSession()->set(QUI\ERP\Order\Guest\GuestOrder::EMAIL, $email);
+        $User->setAttribute('email', $email);
+        $this->checkGuestEmail();
+    }
+
+    public function checkGuestEmail(): void
+    {
+        $User = $this->getUser();
+
+        if (!($User instanceof QUI\ERP\Order\Guest\GuestOrderUser)) {
+            return;
+        }
+
+        $email = trim((string)$User->getAttribute('email'));
+
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            throw new QUI\Exception(['quiqqer/core', 'controls.email.select.email_invalid']);
+        }
+
+        foreach (['getUserByMail', 'getUserByName'] as $method) {
+            try {
+                $ExistingUser = QUI::getUsers()->$method($email);
+            } catch (QUI\Users\Exception $Exception) {
+                if ($Exception->getCode() === 404) {
+                    continue;
+                }
+
+                throw $Exception;
+            }
+
+            if (!$ExistingUser->isActive()) {
+                throw new QUI\Exception(['quiqqer/core', 'exception.user.save.mail.exists'], 409);
+            }
+
+            $Exception = new QUI\Exception(
+                ['quiqqer/order-guestorder', 'mail.is.already.registered'],
+                401
+            );
+            $Exception->setAttribute('authenticationRequired', true);
+
+            throw $Exception;
+        }
     }
 
     /**

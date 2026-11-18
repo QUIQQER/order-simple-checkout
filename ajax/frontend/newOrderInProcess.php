@@ -10,6 +10,9 @@ use QUI\Users\User;
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_newOrderInProcess',
     function ($products) {
+        $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout();
+        $Checkout->checkLoginRequirement();
+
         $products = json_decode($products, true);
         $Orders = QUI\ERP\Order\Handler::getInstance();
         $UserSession = QUI::getUserBySession();
@@ -36,7 +39,6 @@ QUI::getAjax()->registerFunction(
             if (QUI::getUserBySession() instanceof User) {
                 $OrderInProcess = QUI\ERP\Order\Factory::getInstance()->createOrderInProcess();
             } else {
-                $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout();
                 $OrderInProcess = $Checkout->getOrder();
 
                 if ($OrderInProcess) {

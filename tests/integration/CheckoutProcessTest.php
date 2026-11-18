@@ -63,6 +63,15 @@ final class CheckoutProcessTest extends TestCase
         self::assertArrayNotHasKey('successSettings', $step);
     }
 
+    public function testAuthenticatedCheckoutWithoutHashUsesOrderProcessEventContract(): void
+    {
+        $Order = Factory::getInstance()->createOrderInProcess(\QUI::getUsers()->getSystemUser());
+        $this->orderHash = $Order->getUUID();
+        $Checkout = new Checkout();
+
+        self::assertSame($this->orderHash, $Checkout->getOrder()?->getUUID());
+    }
+
     private function getConnection(): Connection
     {
         return \QUI::getDataBaseConnection();
