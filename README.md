@@ -19,6 +19,17 @@ Features
 * New site type
     * Fast and simple checkout
 
+Guest orders and login
+----------------------
+
+When `quiqqer/order-guestorder` is installed and **Allow guest orders without registration** is selected,
+the checkout site starts a guest session and displays Simple Checkout immediately. Customers enter their email address
+alongside their order details, without a separate login or guest entry step. Other guest order modes keep their existing
+entry behavior. Creating the checkout control in a PHP script does not start a guest session.
+
+Under **ERP → Order → Simple Checkout**, enable **Require login at checkout** to disable guest checkout in Simple Checkout,
+including existing guest sessions. This setting is disabled by default and takes precedence over the Guest Order settings.
+
 Installation
 ------------
 The Package Name is: quiqqer/order-simple-checkout

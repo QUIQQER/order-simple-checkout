@@ -122,27 +122,11 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 this.setAttribute('loadHashFromUrl', true);
             }
 
-            this.$Form = Elm.getElement('form');
+            this.$Form = Elm.querySelector('[data-name="checkout-form"]');
+            this.$syncBasketState();
+            this.$bindContactEvents();
 
-            this.getElm().getElements('a.log-in').addEvent('click', (e) => {
-                e.stop();
-
-                require([
-                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
-                ], (LoginWindow) => {
-                    new LoginWindow({
-                        redirect: false,
-                        reload: false,
-                        events: {
-                            onSuccess: () => {
-                                window.location.reload();
-                            }
-                        }
-                    }).open();
-                });
-            });
-
-            const LoginNode = this.getElm().getElement('.quiqqer-order-simple-login');
+            const LoginNode = Elm.querySelector('[data-name="login-required"]');
 
             if (LoginNode) {
                 require(['package/quiqqer/frontend-users/bin/frontend/controls/login/Login'], (Login) => {
@@ -150,9 +134,9 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         redirect: false,
                         reload: false,
                         onSuccess: () => {
-                            this.getElm().setStyle('minHeight', this.getElm().getSize().y);
+                            Elm.style.minHeight = `${Elm.getBoundingClientRect().height}px`;
                             this.Loader.show();
-                            LoginNode.destroy();
+                            LoginNode.remove();
                             this.$onInject();
                         }
                     }).inject(LoginNode);
@@ -179,10 +163,66 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             });
         },
 
+        $bindContactEvents: function () {
+            const Elm = this.getElm();
+            const Email = Elm.querySelector('[data-name="contact-email"]');
+            const EmailError = Elm.querySelector('[data-name="contact-email-error"]');
+
+            if (Email) {
+                if (EmailError) {
+                    EmailError.id = `checkout-email-error-${this.getId()}`;
+                    Email.setAttribute('aria-describedby', EmailError.id);
+                }
+
+                Email.addEventListener('change', () => {
+                    this.update();
+                });
+            }
+
+            Elm.querySelectorAll('[data-name="login"]').forEach((LoginButton) => {
+                LoginButton.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    require([
+                        'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                    ], (LoginWindow) => {
+                        new LoginWindow({
+                            redirect: false,
+                            reload: false,
+                            events: {
+                                onSuccess: () => {
+                                    window.location.reload();
+                                },
+                                onClose: () => {
+                                    LoginButton.focus();
+                                }
+                            }
+                        }).open();
+                    });
+                });
+            });
+        },
+
+        $setContactEmailValidity: function (invalid) {
+            const Elm = this.getElm();
+            const Contact = Elm.querySelector('[data-name="contact"]');
+            const Email = Elm.querySelector('[data-name="contact-email"]');
+            const EmailError = Elm.querySelector('[data-name="contact-email-error"]');
+
+            Contact?.classList.toggle('quiqqer-simple-checkout-require', invalid);
+            Email?.setAttribute('aria-invalid', String(invalid));
+
+            if (EmailError) {
+                EmailError.textContent = invalid ? Email?.validationMessage ?? '' : '';
+                EmailError.hidden = !invalid;
+            }
+        },
+
         $startInitialLoad: function () {
             let loaded;
 
-            if (ProductUrl.hasProducts(window.location.search)) {
+            if (ProductUrl.hasProducts(window.location.search) || this.getAttribute('products')) {
                 loaded = this.$loadProducts().then(() => {
                     return this.$loadOrder();
                 });
@@ -244,9 +284,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
         },
 
         $onInject: function () {
-            this.$loadProducts().then(() => {
-                return this.$loadCheckout();
-            }).catch((err) => {
+            return this.$loadCheckout().catch((err) => {
                 console.error(err);
                 this.getElm().set('html', '');
 
@@ -293,8 +331,16 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         }
                     });
                 }).then((Basket) => {
+                    if (Basket.count() === 0) {
+                        return false;
+                    }
+
                     return Basket.toOrder();
                 }).then((orderHash) => {
+                    if (!orderHash) {
+                        return {order: false};
+                    }
+
                     this.setAttribute('orderHash', orderHash);
 
                     return this.$loadOrder();
@@ -376,19 +422,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     });
                 }
 
-                this.$PayToOrderBtn = this.getElm().getElement('[name="pay"]');
-
-                if (this.getAttribute('showPayToOrderBtn')) {
-                    this.$PayToOrderBtn.addEvent('click', (e) => {
-                        e.stop();
-                        this.orderWithCosts().catch(() => {
-                            // Error handling is performed by orderWithCosts().
-                        });
-                    });
-                } else {
-                    this.$PayToOrderBtn.destroy();
-                    this.$PayToOrderBtn = null;
-                }
+                this.$bindPayButton();
 
                 this.ScrollToPaymentBtn = this.getElm().querySelector('.quiqqer-simple-checkout__scrollToPaymentBtn');
 
@@ -1307,6 +1341,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                         this.Loader.hide();
                     }
                     this.$BasketLoader.style.display = 'none';
+                    this.$syncBasketState();
                     resolve();
                 }, {
                     'package': 'quiqqer/order-simple-checkout',
@@ -1328,19 +1363,56 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             console.error(message);
         },
 
+        $bindPayButton: function () {
+            this.$PayToOrderBtn = this.getElm().querySelector('[data-name="pay"]');
+
+            if (!this.$PayToOrderBtn) {
+                return;
+            }
+
+            if (!this.getAttribute('showPayToOrderBtn')) {
+                this.$PayToOrderBtn.remove();
+                this.$PayToOrderBtn = null;
+                return;
+            }
+
+            this.$PayToOrderBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                this.orderWithCosts().catch(() => {
+                    // Error handling is performed by orderWithCosts().
+                });
+            });
+
+            this.$setPayButtonDisabled(this.$isOrdering);
+        },
+
+        $syncBasketState: function () {
+            const Elm = this.getElm();
+            const empty = Boolean(Elm.querySelector('[data-name="basket-empty"]'));
+            const EmptyState = Elm.querySelector('[data-name="empty-checkout"]');
+
+            if (EmptyState) {
+                EmptyState.hidden = !empty;
+            }
+
+            for (const name of ['checkout-form', 'order-summary', 'scroll-to-payment']) {
+                const Section = Elm.querySelector(`[data-name="${name}"]`);
+
+                if (Section) {
+                    Section.hidden = empty;
+                }
+            }
+
+            this.$setPayButtonDisabled(this.$isOrdering);
+        },
+
         $setPayButtonDisabled: function (disabled) {
             if (!this.$PayToOrderBtn) {
                 return;
             }
 
-            this.$PayToOrderBtn.disabled = disabled;
-
-            if (disabled) {
-                this.$PayToOrderBtn.setAttribute('disabled', 'disabled');
-                return;
-            }
-
-            this.$PayToOrderBtn.removeAttribute('disabled');
+            const emptyBasket = this.getElm().querySelector('[data-name="basket-empty"]');
+            this.$PayToOrderBtn.disabled = disabled || Boolean(emptyBasket);
         },
 
         update: function () {
@@ -1373,6 +1445,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
                     if (!isValid) {
                         QUIAjax.get('package_quiqqer_order-simple-checkout_ajax_frontend_validate', (missing) => {
+                            this.$setContactEmailValidity(missing.includes('email'));
+
                             if (Delivery) {
                                 if (missing.indexOf('address') !== -1) {
                                     Delivery.addClass('quiqqer-simple-checkout-require');
@@ -1402,6 +1476,8 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                             orderHash: this.getAttribute('orderHash')
                         });
                     } else {
+                        this.$setContactEmailValidity(false);
+
                         if (Delivery) {
                             Delivery.removeClass('quiqqer-simple-checkout-require');
                         }

@@ -9,6 +9,8 @@ use QUI\ERP\Order\SimpleCheckout\Checkout;
 QUI::getAjax()->registerFunction(
     'package_quiqqer_order-simple-checkout_ajax_frontend_getSimpleCheckoutControl',
     function ($orderHash, $settings) {
+        QUI\ERP\Order\SimpleCheckout\Settings::startGuestCheckout();
+
         if (!empty($settings)) {
             $settings = json_decode($settings, true);
         }
