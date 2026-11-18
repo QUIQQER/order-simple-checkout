@@ -13,6 +13,8 @@ use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutDelivery;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutPayment;
 use QUI\ERP\Order\SimpleCheckout\Steps\CheckoutShipping;
 use QUI\ERP\Order\Utils\OrderProcessSteps;
+use QUI\ERP\Products\Handler\Products;
+use QUI\ERP\Products\Product\Types\DigitalProduct;
 use QUI\Exception;
 
 use function class_exists;
@@ -140,6 +142,7 @@ class Checkout extends QUI\Control
             'BasketForHeader' => $BasketForHeader,
             'User' => $this->getUser(),
             'isGuestCheckout' => $this->getUser() instanceof QUI\ERP\Order\Guest\GuestOrderUser,
+            'isDigitalOrder' => $this->hasOnlyDigitalProducts($Order),
             'Delivery' => $showDelivery ? new CheckoutDelivery($this) : null,
             'BillingAddress' => $showBillingAddress ? new CheckoutBillingAddress($this) : null,
             'Shipping' => $showShipping ? new CheckoutShipping($this) : null,
@@ -189,7 +192,10 @@ class Checkout extends QUI\Control
         $validateAddress = true;
         $validateShipping = true;
 
-        if (!$this->isShippingAvailable()) {
+        if (
+            !$this->isShippingAvailable()
+            || $this->hasOnlyDigitalProducts()
+        ) {
             $validateShipping = false;
         }
 
@@ -250,7 +256,8 @@ class Checkout extends QUI\Control
         }
 
         $Order = null;
-        $isShippingAvailable = $this->isShippingAvailable();
+        $isShippingAvailable = $this->isShippingAvailable()
+            && !$this->hasOnlyDigitalProducts();
 
         // check address
         $addressRequired = true;
@@ -296,6 +303,35 @@ class Checkout extends QUI\Control
         }
 
         return $missing;
+    }
+
+    public function hasOnlyDigitalProducts(?AbstractOrder $Order = null): bool
+    {
+        $Order ??= $this->getOrder();
+        $articles = $Order?->getArticles()->getArticles() ?? [];
+
+        if ($articles === []) {
+            return false;
+        }
+
+        foreach ($articles as $Article) {
+            if ($Article->getId() <= 0) {
+                return false;
+            }
+
+            try {
+                $Product = Products::getProduct($Article->getId());
+            } catch (QUI\Exception) {
+                // Unknown articles must not bypass shipping requirements.
+                return false;
+            }
+
+            if (!($Product instanceof DigitalProduct)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function isShippingAvailable(): bool
@@ -391,6 +427,7 @@ class Checkout extends QUI\Control
     public function getOrderProcessStep(): array
     {
         $Order = $this->getProcessOrder();
+        $isDigitalOrder = $this->hasOnlyDigitalProducts($Order);
 
         $processingStep = new QUI\ERP\Order\Controls\OrderProcess\Processing([
             'Order' => $Order,
@@ -409,7 +446,18 @@ class Checkout extends QUI\Control
                     QUI\ERP\Order\OrderProcess $instance,
                     AbstractOrder $Order,
                     OrderProcessSteps $Steps
-                ) use ($processingStep) {
+                ) use (
+                    $processingStep,
+                    $isDigitalOrder
+                ) {
+                    if ($isDigitalOrder) {
+                        foreach ($Steps as $index => $Step) {
+                            if ($Step instanceof QUI\ERP\Shipping\Order\Shipping) {
+                                unset($Steps[$index]);
+                            }
+                        }
+                    }
+
                     if ($Order->getPayment() && !$Order->getPayment()->isSuccessful($Order->getUUID())) {
                         $Finish = null;
 

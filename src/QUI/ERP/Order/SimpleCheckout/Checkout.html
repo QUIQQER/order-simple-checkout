@@ -104,7 +104,10 @@
                 {/if}
 
                 {if $Shipping}
-                <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-details-section">
+                <div class="quiqqer-simple-checkout-data-shipping simpleCheckout-details-section"
+                     data-name="shipping-section"
+                     {if $isDigitalOrder}hidden{/if}
+                >
                     <h2 class="simpleCheckoutCard-subheader">
                         {locale group="quiqqer/shipping" var="ordering.step.title.Shipping"}
                     </h2>

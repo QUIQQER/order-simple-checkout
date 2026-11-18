@@ -30,6 +30,13 @@ entry behavior. Creating the checkout control in a PHP script does not start a g
 Under **ERP → Order → Simple Checkout**, enable **Require login at checkout** to disable guest checkout in Simple Checkout,
 including existing guest sessions. This setting is disabled by default and takes precedence over the Guest Order settings.
 
+Digital products
+----------------
+
+Orders containing only digital products (including subscriptions) skip shipping selection and do not require a
+shipping method. Mixed orders and orders containing physical or unknown products retain the normal shipping flow.
+Invoice and contact details are still collected as configured.
+
 Installation
 ------------
 The Package Name is: quiqqer/order-simple-checkout

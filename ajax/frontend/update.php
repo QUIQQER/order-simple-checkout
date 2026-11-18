@@ -211,6 +211,7 @@ QUI::getAjax()->registerFunction(
         if (
             !empty($orderData['shipping'])
             && QUI::getPackageManager()->isInstalled('quiqqer/shipping')
+            && !$Checkout->hasOnlyDigitalProducts()
         ) {
             if ($Order) {
                 $currentShippingId = $Order->getShipping()?->getId();
