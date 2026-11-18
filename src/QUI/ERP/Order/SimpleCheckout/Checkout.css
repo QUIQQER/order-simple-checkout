@@ -29,6 +29,36 @@
     border: 1px solid red;
 }
 
+.quiqqer-simple-checkout[aria-busy="true"] {
+    min-height: 24rem;
+}
+
+.quiqqer-simple-checkout-empty {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    justify-content: center;
+    min-height: 24rem;
+    text-align: center;
+}
+
+.quiqqer-simple-checkout-empty > h2,
+.quiqqer-simple-checkout-empty > p {
+    margin: 0;
+}
+
+.quiqqer-simple-checkout-empty-icon {
+    font-size: 6rem;
+}
+
+.quiqqer-simple-checkout-empty[hidden],
+.quiqqer-simple-checkout > form[hidden],
+.quiqqer-simple-checkout-orderDetails[hidden],
+.quiqqer-simple-checkout__scrollToPaymentContainer[hidden] {
+    display: none;
+}
+
 /*******************************/
 /* order details (only mobile) */
 /*******************************/
@@ -113,6 +143,41 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+.quiqqer-simple-checkout-contact-header {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.quiqqer-simple-checkout-contact-header > h2 {
+    margin-bottom: 0;
+}
+
+.quiqqer-simple-checkout-contact-header > .log-in {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.quiqqer-simple-checkout-contact-header > .log-in:focus-visible,
+.quiqqer-simple-checkout-contact-email > input:focus-visible {
+    outline: auto;
+    outline-offset: 2px;
+}
+
+.quiqqer-simple-checkout-contact-email,
+.quiqqer-simple-checkout-contact-email > span {
+    display: block;
+}
+
+.quiqqer-simple-checkout-contact-email > input {
+    width: 100%;
 }
 
 .quiqqer-simple-checkout-data-or:before,

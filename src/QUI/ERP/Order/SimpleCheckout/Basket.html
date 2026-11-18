@@ -1,10 +1,10 @@
 {template_event name="quiqqer::order::simple::basket::begin"}
 {if $basketEmpty}
-    <div class="quiqqer-simple-checkout-basket__empty">
+    <div class="quiqqer-simple-checkout-basket__empty" data-name="basket-empty">
         <h2 class="simpleCheckoutCard-subheader simpleCheckoutCard-subheader--orderCard">
             {locale group="quiqqer/order-simple-checkout" var="simpleCheckout.subheader.basket"}
         </h2>
-        <div class="text-muted quiqqer-simple-checkout-basket__emptyMessage">
+        <div class="text-muted quiqqer-simple-checkout-basket__emptyMessage" role="status">
             {locale group="quiqqer/order-simple-checkout" var="basket.empty"}
         </div>
     </div>

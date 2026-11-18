@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<quiqqer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://www.quiqqer.com/docs/schemas/2.x/locale.xsd">
 <locales>
 
     <groups name="quiqqer/order-simple-checkout" datatype="php,js">
@@ -317,6 +319,33 @@
     </groups>
 
     <groups name="quiqqer/order-simple-checkout" datatype="php">
+        <locale name="checkout.empty.title">
+            <de><![CDATA[Oh nein! Dein Warenkorb ist noch leer.]]></de>
+            <en><![CDATA[Oh no! Your cart is still empty.]]></en>
+            <es><![CDATA[¡Oh, no! Tu carrito sigue vacío.]]></es>
+            <pt><![CDATA[Oh não! O teu carrinho ainda está vazio.]]></pt>
+            <fr><![CDATA[Oh non ! Votre panier est encore vide.]]></fr>
+            <it><![CDATA[Oh no! Il tuo carrello è ancora vuoto.]]></it>
+            <pl><![CDATA[O nie! Twój koszyk jest jeszcze pusty.]]></pl>
+        </locale>
+        <locale name="checkout.empty.description">
+            <de><![CDATA[Zeit, das zu ändern!]]></de>
+            <en><![CDATA[Let's change that!]]></en>
+            <es><![CDATA[¡Vamos a cambiar eso!]]></es>
+            <pt><![CDATA[Vamos mudar isso!]]></pt>
+            <fr><![CDATA[Il est temps d'y remédier !]]></fr>
+            <it><![CDATA[È il momento di rimediare!]]></it>
+            <pl><![CDATA[Czas to zmienić!]]></pl>
+        </locale>
+        <locale name="checkout.empty.link">
+            <de><![CDATA[Hier findest du tolle Produkte]]></de>
+            <en><![CDATA[Find great products here]]></en>
+            <es><![CDATA[Encuentra productos geniales aquí]]></es>
+            <pt><![CDATA[Encontra ótimos produtos aqui]]></pt>
+            <fr><![CDATA[Découvrez de super produits ici]]></fr>
+            <it><![CDATA[Scopri fantastici prodotti qui]]></it>
+            <pl><![CDATA[Tutaj znajdziesz świetne produkty]]></pl>
+        </locale>
         <locale name="admin.types.simpleCheckout">
             <de><![CDATA[Einfacher Bestellprozess]]></de>
             <en><![CDATA[Simple ordering process]]></en>
@@ -472,4 +501,35 @@ Taka strona idealnie nadaje się do promowania nowości, bestsellerów lub ofert
         </locale>
     </groups>
 
+    <groups name="quiqqer/order-simple-checkout" datatype="php">
+        <locale name="orderSimpleCheckout.settings.requireLogin">
+            <de><![CDATA[Anmeldung im Checkout erforderlich]]></de>
+            <en><![CDATA[Require login at checkout]]></en>
+            <es><![CDATA[Exigir inicio de sesión al finalizar la compra]]></es>
+            <pt><![CDATA[Exigir início de sessão na finalização da compra]]></pt>
+            <fr><![CDATA[Exiger une connexion pour commander]]></fr>
+            <it><![CDATA[Richiedi l'accesso per completare l'acquisto]]></it>
+            <pl><![CDATA[Wymagaj logowania przy finalizacji zamówienia]]></pl>
+        </locale>
+        <locale name="orderSimpleCheckout.settings.requireLogin.description">
+            <de><![CDATA[Wenn aktiviert, ist eine Anmeldung für den Simple Checkout erforderlich. Gastbestellungen sind hier dann auch bei installiertem und aktiviertem Gastbestellungsmodul nicht möglich. Standardmäßig ist diese Option deaktiviert.]]></de>
+            <en><![CDATA[When enabled, customers must log in to use Simple Checkout. Guest orders are then unavailable here even if the Guest Order module is installed and enabled. This option is disabled by default.]]></en>
+            <es><![CDATA[Si se activa, los clientes deben iniciar sesión para utilizar Simple Checkout. Los pedidos como invitado no estarán disponibles aquí, aunque el módulo de pedidos como invitado esté instalado y activado. Esta opción está desactivada por defecto.]]></es>
+            <pt><![CDATA[Quando ativada, os clientes têm de iniciar sessão para utilizar o Simple Checkout. As encomendas como convidado ficam indisponíveis aqui, mesmo que o módulo de encomendas como convidado esteja instalado e ativado. Esta opção está desativada por predefinição.]]></pt>
+            <fr><![CDATA[Si cette option est activée, les clients doivent se connecter pour utiliser Simple Checkout. Les commandes en tant qu'invité sont alors indisponibles ici, même si le module de commande invité est installé et activé. Cette option est désactivée par défaut.]]></fr>
+            <it><![CDATA[Se attivata, i clienti devono accedere per utilizzare Simple Checkout. Gli ordini come ospite non sono quindi disponibili qui, anche se il modulo per gli ordini degli ospiti è installato e attivato. Questa opzione è disattivata per impostazione predefinita.]]></it>
+            <pl><![CDATA[Po włączeniu tej opcji klienci muszą się zalogować, aby korzystać z Simple Checkout. Zamówienia jako gość są wtedy niedostępne, nawet jeśli moduł zamówień gości jest zainstalowany i włączony. Ta opcja jest domyślnie wyłączona.]]></pl>
+        </locale>
+        <locale name="exception.login.required">
+            <de><![CDATA[Bitte melde dich an, um die Bestellung fortzusetzen.]]></de>
+            <en><![CDATA[Please log in to continue your order.]]></en>
+            <es><![CDATA[Inicia sesión para continuar con tu pedido.]]></es>
+            <pt><![CDATA[Inicia sessão para continuar a tua encomenda.]]></pt>
+            <fr><![CDATA[Veuillez vous connecter pour poursuivre votre commande.]]></fr>
+            <it><![CDATA[Accedi per proseguire con il tuo ordine.]]></it>
+            <pl><![CDATA[Zaloguj się, aby kontynuować zamówienie.]]></pl>
+        </locale>
+    </groups>
+
 </locales>
+</quiqqer>

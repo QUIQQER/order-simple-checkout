@@ -12,6 +12,8 @@
 $Site->setAttribute('nocache', true);
 
 try {
+    QUI\ERP\Order\SimpleCheckout\Settings::startGuestCheckout();
+
     $Checkout = new QUI\ERP\Order\SimpleCheckout\Checkout([
         'data-qui-load-hash-from-url' => 1
     ]);

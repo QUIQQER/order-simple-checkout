@@ -12,6 +12,7 @@ QUI::getAjax()->registerFunction(
         $Checkout = new Checkout([
             'orderHash' => $orderHash
         ]);
+        $Checkout->checkGuestEmail();
 
         $Order = $Checkout->getOrder();
 

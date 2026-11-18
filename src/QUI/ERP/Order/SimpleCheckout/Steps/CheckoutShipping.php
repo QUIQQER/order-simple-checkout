@@ -32,6 +32,10 @@ class CheckoutShipping extends QUI\Control implements CheckoutStepInterface
 
     public function getBody(): string
     {
+        if ($this->Checkout->hasOnlyDigitalProducts()) {
+            return '<span data-name="shipping-not-required" hidden></span>';
+        }
+
         if (
             !QUI::getPackageManager()->isInstalled('quiqqer/shipping')
             || !class_exists('QUI\ERP\Shipping\Order\Shipping')

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<quiqqer>
+<quiqqer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://www.quiqqer.com/docs/schemas/2.x/settings.xsd">
     <settings name="ERP">
         <config>
             <section name="orderSimpleCheckout">
+                <conf name="requireLogin">
+                    <type><![CDATA[bool]]></type>
+                    <defaultvalue>0</defaultvalue>
+                </conf>
                 <conf name="disableProductLinks">
                     <type><![CDATA[bool]]></type>
                     <defaultvalue>0</defaultvalue>
@@ -29,6 +34,17 @@
                         <title>
                             <locale group="quiqqer/order-simple-checkout" var="orderSimpleCheckout.settings.title"/>
                         </title>
+
+                        <input type="checkbox" conf="orderSimpleCheckout.requireLogin">
+                            <text>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="orderSimpleCheckout.settings.requireLogin"/>
+                            </text>
+                            <description>
+                                <locale group="quiqqer/order-simple-checkout"
+                                        var="orderSimpleCheckout.settings.requireLogin.description"/>
+                            </description>
+                        </input>
 
                         <input type="checkbox" conf="orderSimpleCheckout.disableProductLinks">
                             <text>
