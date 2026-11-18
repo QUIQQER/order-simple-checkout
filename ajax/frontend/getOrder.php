@@ -40,15 +40,7 @@ QUI::getAjax()->registerFunction(
         }
 
         if ($Order instanceof OrderInProcess) {
-            $Payment = $Order->getPayment();
-
-            if (
-                $Payment
-                && $Payment->isSuccessful($Order->getUUID())
-                && !$Order->getOrderId()
-            ) {
-                $Order = $Order->createOrder(QUI::getUsers()->getSystemUser());
-            }
+            $Order = $Checkout->completePaidOrder($Order);
         }
 
         $Customer = $Order->getCustomer();

@@ -47,10 +47,13 @@ function contact() {
         {
             Class: function (value) { return value; },
             define: (name, dependencies, factory) => { definition = factory({}, {}, {}, {}, {}, {}, {}); },
-            require: (dependencies, resolve) => resolve(class {
-                constructor(options) { loginOptions = options; }
-                open() { opened = true; }
-            })
+            require: (dependencies, resolve) => {
+                assert.equal(dependencies[0], 'controls/users/LoginWindow');
+                resolve(class {
+                    constructor(options) { loginOptions = options; }
+                    open() { opened = true; }
+                });
+            }
         }
     );
     const instance = {

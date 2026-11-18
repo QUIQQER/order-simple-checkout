@@ -357,6 +357,7 @@ class Checkout extends QUI\Control
      */
     public function orderWithCosts(): array
     {
+        $this->checkGuestEmail();
         $OrderInProcess = $this->getOrder();
 
         if (!$OrderInProcess) {
@@ -413,6 +414,29 @@ class Checkout extends QUI\Control
         return $this->getOrderProcessStep();
     }
 
+    public function completePaidOrder(OrderInProcess $Order): AbstractOrder
+    {
+        if (
+            !$Order->getDataEntry('orderedWithCosts')
+            || $Order->getOrderId()
+        ) {
+            return $Order;
+        }
+
+        $Payment = $Order->getPayment();
+
+        if (
+            !$Payment
+            || !$Payment->isSuccessful($Order->getUUID())
+        ) {
+            return $Order;
+        }
+
+        $this->checkGuestEmail();
+
+        return $Order->createOrder(QUI::getUsers()->getSystemUser());
+    }
+
     /**
      * @return array{
      *     html: string,
@@ -428,6 +452,14 @@ class Checkout extends QUI\Control
     public function getOrderProcessStep(): array
     {
         $Order = $this->getProcessOrder();
+
+        if (
+            $Order instanceof OrderInProcess
+            && $Order->getDataEntry('orderedWithCosts')
+        ) {
+            $this->checkGuestEmail();
+        }
+
         $isDigitalOrder = $this->hasOnlyDigitalProducts($Order);
 
         $processingStep = new QUI\ERP\Order\Controls\OrderProcess\Processing([
@@ -631,33 +663,48 @@ class Checkout extends QUI\Control
             return;
         }
 
-        $GuestConfig = QUI::getPackage('quiqqer/order-guestorder')->getConfig();
+        QUI::getSession()->set(QUI\ERP\Order\Guest\GuestOrder::EMAIL, $email);
+        $User->setAttribute('email', $email);
+        $this->checkGuestEmail();
+    }
 
-        if (!$GuestConfig?->getValue('guestorder', 'prevent_duplicate_guest_order_registration')) {
-            foreach (['getUserByName', 'getUserByMail'] as $method) {
-                try {
-                    $ExistingUser = QUI::getUsers()->$method($email);
-                } catch (QUI\Exception) {
+    public function checkGuestEmail(): void
+    {
+        $User = $this->getUser();
+
+        if (!($User instanceof QUI\ERP\Order\Guest\GuestOrderUser)) {
+            return;
+        }
+
+        $email = trim((string)$User->getAttribute('email'));
+
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            throw new QUI\Exception(['quiqqer/core', 'controls.email.select.email_invalid']);
+        }
+
+        foreach (['getUserByMail', 'getUserByName'] as $method) {
+            try {
+                $ExistingUser = QUI::getUsers()->$method($email);
+            } catch (QUI\Users\Exception $Exception) {
+                if ($Exception->getCode() === 404) {
                     continue;
                 }
 
-                if ($ExistingUser->isActive()) {
-                    $Exception = new QUI\Exception(
-                        [
-                            'quiqqer/order-guestorder',
-                            'mail.is.already.registered'
-                        ],
-                        401
-                    );
-                    $Exception->setAttribute('authenticationRequired', true);
-
-                    throw $Exception;
-                }
+                throw $Exception;
             }
-        }
 
-        QUI::getSession()->set(QUI\ERP\Order\Guest\GuestOrder::EMAIL, $email);
-        $User->setAttribute('email', $email);
+            if (!$ExistingUser->isActive()) {
+                throw new QUI\Exception(['quiqqer/core', 'exception.user.save.mail.exists'], 409);
+            }
+
+            $Exception = new QUI\Exception(
+                ['quiqqer/order-guestorder', 'mail.is.already.registered'],
+                401
+            );
+            $Exception->setAttribute('authenticationRequired', true);
+
+            throw $Exception;
+        }
     }
 
     /**

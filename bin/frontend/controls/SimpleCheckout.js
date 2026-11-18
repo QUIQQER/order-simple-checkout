@@ -133,7 +133,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
 
             if (LoginNode) {
                 Elm.setAttribute('aria-busy', 'false');
-                require(['package/quiqqer/frontend-users/bin/frontend/controls/login/Login'], (Login) => {
+                require(['controls/users/Login'], (Login) => {
                     new Login({
                         redirect: false,
                         reload: false,
@@ -190,7 +190,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     event.stopPropagation();
 
                     require([
-                        'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                        'controls/users/LoginWindow'
                     ], (LoginWindow) => {
                         new LoginWindow({
                             redirect: false,
@@ -303,7 +303,7 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                 }
 
                 require([
-                    'package/quiqqer/frontend-users/bin/frontend/controls/login/Window'
+                    'controls/users/LoginWindow'
                 ], (Login) => {
                     new Login({
                         events: {
@@ -736,7 +736,15 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
             this.$setPayButtonDisabled(true);
             this.Loader.show();
 
-            this.$orderPromise = this.update().then(() => {
+            this.$orderPromise = this.update().then((updated) => {
+                if (updated === false) {
+                    this.$isOrdering = false;
+                    this.$orderPromise = null;
+                    this.$setPayButtonDisabled(false);
+                    this.Loader.hide();
+                    return false;
+                }
+
                 this.fireEvent('orderStart', [this]);
 
                 return new Promise((resolve, reject) => {
@@ -823,24 +831,74 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     }, {
                         'package': 'quiqqer/order-simple-checkout',
                         orderHash: this.getAttribute('orderHash'),
+                        showLogin: false,
+                        showError: false,
                         onError: reject
                     });
                 });
             });
 
             return this.$orderPromise.catch((err) => {
+                this.$isOrdering = false;
+                this.$orderPromise = null;
+                this.$setPayButtonDisabled(false);
+                this.Loader.hide();
+
+                if (
+                    err.getCode?.() === 401 &&
+                    err.getAttribute?.('authenticationRequired') === true
+                ) {
+                    this.$openGuestAccountLogin(err.getMessage());
+                    return false;
+                }
+
                 if (typeof err.getMessage === 'function') {
                     this.$showError(err.getMessage());
                 } else {
                     console.error(err);
                 }
 
-                this.$isOrdering = false;
-                this.$orderPromise = null;
-                this.$setPayButtonDisabled(false);
-                this.Loader.hide();
-
                 throw err;
+            });
+        },
+
+        $openGuestAccountLogin: function (message) {
+            if (this.$guestLoginOpen) {
+                return;
+            }
+
+            this.$guestLoginOpen = true;
+            require([
+                'controls/users/LoginWindow'
+            ], (LoginWindow) => {
+                let authenticated = false;
+
+                new LoginWindow({
+                    reload: false,
+                    redirect: false,
+                    message: message,
+                    events: {
+                        onSuccess: () => {
+                            authenticated = true;
+                            window.location.reload();
+                        },
+                        onClose: () => {
+                            this.$guestLoginOpen = false;
+                            if (authenticated) {
+                                return;
+                            }
+
+                            const Email = this.getElm().querySelector('[data-name="contact-email"]');
+
+                            if (Email) {
+                                Email.value = '';
+                                this.$setContactEmailValidity(false);
+                                Email.focus();
+                                this.update();
+                            }
+                        }
+                    }
+                }).open();
             });
         },
 
@@ -1507,7 +1565,20 @@ define('package/quiqqer/order-simple-checkout/bin/frontend/controls/SimpleChecko
                     'package': 'quiqqer/order-simple-checkout',
                     orderData: JSON.encode(orderData),
                     orderHash: this.getAttribute('orderHash'),
+                    showLogin: false,
+                    showError: false,
                     onError: (err) => {
+                        this.$BasketLoader.style.display = 'none';
+
+                        if (
+                            err.getCode?.() === 401 &&
+                            err.getAttribute?.('authenticationRequired') === true
+                        ) {
+                            this.$openGuestAccountLogin(err.getMessage());
+                            resolve(false);
+                            return;
+                        }
+
                         if (typeof err.getMessage === 'function') {
                             this.$showError(err.getMessage());
                             if (!this.$isOrdering) {
